@@ -1,0 +1,205 @@
+.contact-container {
+  max-width: 560px;
+  padding: 28px 32px;
+}
+
+.contact-title {
+  margin: 0 0 6px;
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--contact-color, #8a9bb0);
+}
+
+.contact-title-prefix {
+  color: #8a9bb0;
+  font-weight: 400;
+}
+
+.contact-subtitle {
+  margin: 0 0 24px;
+  color: #8a9bb0;
+  font-size: 0.92rem;
+  line-height: 1.6;
+}
+
+/* Card wraps the entire form — matches puppy-details card style */
+.contact-card {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.07);
+  overflow: hidden;
+  position: relative;
+}
+
+.contact-card-watermark {
+  position: absolute;
+  bottom: 12px;
+  right: -10px;
+  width: 140px;
+  height: 140px;
+  color: var(--contact-color, #8a9bb0);
+  opacity: 0.07;
+  pointer-events: none;
+  z-index: 0;
+  transform: rotate(12deg);
+}
+
+.contact-card-top-bar {
+  height: 4px;
+  background: var(--contact-color, #8a9bb0);
+}
+
+.contact-form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding: 24px 24px 54px;
+  position: relative;
+  z-index: 1;
+}
+
+/* Honeypot — visually hidden, not just display:none so screen readers skip it too */
+.contact-honeypot {
+  position: absolute;
+  left: -9999px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  opacity: 0;
+}
+
+.contact-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* Matches .details-stat-label */
+.contact-field label {
+  font-size: 0.68rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: #9bafc4;
+}
+
+.contact-field input,
+.contact-field textarea {
+  padding: 10px 14px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  color: #2c3e50;
+  background: #f4f8fd;
+  font-family: inherit;
+  resize: vertical;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.contact-field input:focus,
+.contact-field textarea:focus {
+  outline: none;
+  border-color: var(--contact-color, #8a9bb0);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--contact-color, #8a9bb0) 18%, transparent);
+}
+
+/* Matches .cta-button */
+.contact-submit {
+  align-self: flex-start;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--contact-color, #8a9bb0);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  padding: 12px 16px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+  transition: transform 0.18s ease, box-shadow 0.18s ease, filter 0.18s ease;
+}
+
+.contact-submit:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+  filter: brightness(1.08);
+}
+
+.contact-submit-icon {
+  width: 16px;
+  height: 16px;
+  opacity: 0.85;
+  flex-shrink: 0;
+}
+
+.contact-submit-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+  margin-top: 36px;
+}
+
+.contact-response-note {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.78rem;
+  color: #9bafc4;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+}
+
+.contact-clock-icon {
+  width: 13px;
+  height: 13px;
+  flex-shrink: 0;
+  opacity: 0.8;
+}
+
+.contact-submit:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.contact-error {
+  color: #c0392b;
+  font-size: 0.88rem;
+  margin: 0;
+}
+
+/* Matches .status-available badge colours */
+.contact-success {
+  background: #e8f8f0;
+  border: 1.5px solid #a9dfbf;
+  border-radius: 10px;
+  padding: 22px 24px;
+  color: #1e8449;
+  margin: 24px 0 0;
+}
+
+.contact-success p {
+  margin: 0 0 14px;
+  font-weight: 500;
+  font-size: 0.95rem;
+}
+
+.contact-reset {
+  background: none;
+  border: 1.5px solid #a9dfbf;
+  color: #1e8449;
+  border-radius: 8px;
+  padding: 7px 18px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.contact-reset:hover {
+  background: rgba(30, 132, 73, 0.08);
+}
+
