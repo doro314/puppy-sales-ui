@@ -22,16 +22,16 @@ const categories = [
     icon: null,
     folder: null,
     details: {
-      breed: "Mixed Breed",
-      mom: "Bella",
-      dad: "Max",
+      breed: "Havapoo",
+      mom: "Coco",
+      dad: "Leo",
       birthDate: "2026-01-15",
       litterSize: 3,
       readyToAdoptDate: "2026-03-12", // ← controls "Available Soon" for all puppies
       vaccinations: "DHPP (8 wk), DHPP (12 wk)",
       dewormingDate: "2026-02-12",
       vetChecked: true,
-      litterDescription: "A beautiful litter of mixed-breed puppies, known for their playful personalities and gentle temperaments. They were raised in a loving home environment with children and other pets, making them well-socialized from birth. Each puppy has been handled daily to ensure they are comfortable with human interaction. They are curious, energetic, and full of character — each one unique in their own wonderful way. We are incredibly proud of this litter and are committed to finding them the most caring and loving forever homes possible.",
+      litterDescription: "A beautiful litter of Havapoo puppies, known for their playful personalities and gentle temperaments. They were raised in a loving home environment with children and other pets, making them well-socialized from birth.",
     },
   },
   {

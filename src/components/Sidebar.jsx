@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import './Sidebar.css';
 
 // Paw icon SVG components
@@ -18,17 +19,51 @@ const PawIcon = ({ color = "#4a90d9" }) => (
 );
 
 function Sidebar({ categories, activeCategory, onCategoryChange, showContact = false }) {
+  const [mobileOpen, setMobileOpen] = useState(false);
+
+  const allTabs = [
+    ...categories,
+    ...(showContact ? [{ id: 'contact', name: 'Contact Us', folder: null }] : []),
+  ];
+  const activeLabel = allTabs.find((t) => t.id === activeCategory)?.name ?? 'Menu';
+
+  const handleSelect = (id) => {
+    onCategoryChange(id);
+    setMobileOpen(false);
+  };
+
   return (
-    <div className="sidebar">
+    <div className={`sidebar${mobileOpen ? ' sidebar--open' : ''}`}>
       <div className="sidebar-header">
         <h2>Puppy Gallery</h2>
       </div>
+
+      {/* Mobile-only accordion trigger */}
+      <button
+        className="mobile-nav-trigger"
+        onClick={() => setMobileOpen((o) => !o)}
+        aria-expanded={mobileOpen}
+      >
+        <span className="mobile-nav-label">{activeLabel}</span>
+        <svg
+          className="mobile-nav-chevron"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2.5"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
+          <polyline points="6 9 12 15 18 9" />
+        </svg>
+      </button>
+
       <nav className="sidebar-nav">
         {categories.map((category) => (
           <button
             key={category.id}
             className={`sidebar-tab ${activeCategory === category.id ? 'active' : ''} ${!category.folder ? 'bold-tab' : ''}`}
-            onClick={() => onCategoryChange(category.id)}
+            onClick={() => handleSelect(category.id)}
             title={category.icon === 'paw-blue' ? 'Boy' : category.icon === 'paw-pink' ? 'Girl' : undefined}
           >
             {category.folder && (
@@ -41,7 +76,7 @@ function Sidebar({ categories, activeCategory, onCategoryChange, showContact = f
         {showContact && (
           <button
             className={`sidebar-tab contact-tab ${activeCategory === 'contact' ? 'active' : ''}`}
-            onClick={() => onCategoryChange('contact')}
+            onClick={() => handleSelect('contact')}
           >
             <span className="sidebar-label">Contact Us</span>
           </button>

@@ -125,6 +125,38 @@ function PuppyDetails({ details, genderColor, isAvailableSoon = false }) {
   );
 }
 
+function ParentsSection({ dadName, momName }) {
+  return (
+    <div className="parents-section">
+      <div className="parents-top-bar" />
+      <div className="parents-inner">
+        <h3 className="parents-heading">Meet the Parents</h3>
+        <p className="parents-sub">The proud mom &amp; dad behind this litter</p>
+        <div className="parents-grid">
+          <div className="parent-card">
+            <div className="parent-img-wrap">
+              <img src="/Leo.jpg" alt={`${dadName} — Dad`} className="parent-img" />
+              <div className="parent-overlay">
+                <span className="parent-role parent-role--dad">Dad</span>
+                <span className="parent-name">{dadName}</span>
+              </div>
+            </div>
+          </div>
+          <div className="parent-card">
+            <div className="parent-img-wrap">
+              <img src="/Coco.jpg" alt={`${momName} — Mom`} className="parent-img" />
+              <div className="parent-overlay">
+                <span className="parent-role parent-role--mom">Mom</span>
+                <span className="parent-name">{momName}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function CtaSection({ categoryFolder, categoryName, isAvailableSoon, available, accentColor, availablePuppies, onInquire, onNavigate }) {
   if (!categoryFolder) return null;
 
@@ -295,14 +327,12 @@ function ImageGallery({ activeCategory, onInquire, onNavigate, categories = [] }
     return (
       <div className="gallery-container">
         <header className="gallery-header">
-          <h2
-            className="gallery-title"
-            style={{ color: accentColor }}
-          >
+          <h2 className="gallery-title" style={{ color: accentColor }}>
             {categoryFolder && <span className="gallery-title-prefix">Name | </span>}
             {categoryName}
           </h2>
         </header>
+        {activeCategory === 'all' && <ParentsSection dadName={litterInfo?.details?.dad} momName={litterInfo?.details?.mom} />}
         <PuppyDetails details={categoryInfo?.details} genderColor={accentColor} isAvailableSoon={isAvailableSoon} />
         <div className="paw-placeholder-container">
           <PawPlaceholder color={accentColor} />
@@ -317,6 +347,7 @@ function ImageGallery({ activeCategory, onInquire, onNavigate, categories = [] }
           onInquire={onInquire}
           onNavigate={onNavigate}
         />
+        <p className="gallery-copyright">&copy; {new Date().getFullYear()} All rights reserved.</p>
       </div>
     );
   }
@@ -324,15 +355,13 @@ function ImageGallery({ activeCategory, onInquire, onNavigate, categories = [] }
   return (
     <div className="gallery-container">
       <header className="gallery-header">
-        <h2
-          className="gallery-title"
-          style={{ color: accentColor }}
-        >
+        <h2 className="gallery-title" style={{ color: accentColor }}>
           {categoryFolder && <span className="gallery-title-prefix">Name | </span>}
           {categoryName}
         </h2>
       </header>
 
+      {activeCategory === 'all' && <ParentsSection dadName={litterInfo?.details?.dad} momName={litterInfo?.details?.mom} />}
       <PuppyDetails details={categoryInfo?.details} genderColor={accentColor} isAvailableSoon={isAvailableSoon} />
 
       <div className="main-image-container" ref={containerRef}>
@@ -348,6 +377,10 @@ function ImageGallery({ activeCategory, onInquire, onNavigate, categories = [] }
         <button className="arrow-button arrow-right" onClick={nextFunc} style={{ width: stripWidth }}>&#8250;</button>
       </div>
       <div className="image-card-footer">
+        <div className="footer-nav-buttons">
+          <button className="footer-nav-button" onClick={backFunc} aria-label="Previous image">&#8249;</button>
+          <button className="footer-nav-button" onClick={nextFunc} aria-label="Next image">&#8250;</button>
+        </div>
         <span className="image-counter">{currentIndex + 1} / {imageList.length}</span>
       </div>
 
@@ -356,7 +389,7 @@ function ImageGallery({ activeCategory, onInquire, onNavigate, categories = [] }
           <img
             className={`thumbnail ${index === currentIndex ? "active" : ""}`}
             onClick={() => handleClick(image, index)}
-            key={index}
+            key={image}
             src={image}
             alt={`puppy-${index}`}
           />
@@ -373,6 +406,7 @@ function ImageGallery({ activeCategory, onInquire, onNavigate, categories = [] }
         onInquire={onInquire}
         onNavigate={onNavigate}
       />
+      <p className="gallery-copyright">&copy; {new Date().getFullYear()} All rights reserved.</p>
     </div>
   );
 }

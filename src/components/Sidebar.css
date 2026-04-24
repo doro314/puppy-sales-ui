@@ -47,7 +47,7 @@
 }
 
 .sidebar-tab.active {
-  background-color: #4a90d9;
+  background-color: #8a9bb0;
   color: white;
 }
 
@@ -68,4 +68,83 @@
   border-top: 1px solid rgba(255, 255, 255, 0.1);
   padding-top: 18px;
   margin-top: 12px;
+}
+
+/* Mobile-only trigger — hidden on desktop */
+.mobile-nav-trigger {
+  display: none;
+}
+
+/* ── Mobile: sidebar becomes a collapsible accordion ── */
+@media (max-width: 768px) {
+  .sidebar {
+    width: 100%;
+    min-height: auto;
+    position: relative;
+  }
+
+  .sidebar-header {
+    display: none;
+  }
+
+  /* Accordion trigger bar */
+  .mobile-nav-trigger {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    padding: 18px 18px;
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+    color: white;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    text-align: left;
+  }
+
+  .mobile-nav-label {
+    font-weight: 600;
+  }
+
+  .mobile-nav-chevron {
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+    transition: transform 0.25s ease;
+  }
+
+  /* Rotate chevron when open */
+  .sidebar--open .mobile-nav-chevron {
+    transform: rotate(180deg);
+  }
+
+  /* Nav panel — collapsed by default */
+  .sidebar-nav {
+    flex-direction: column;
+    gap: 2px;
+    padding: 0;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease, padding 0.3s ease;
+  }
+
+  /* Nav panel — expanded */
+  .sidebar--open .sidebar-nav {
+    max-height: 600px;
+    padding: 8px 10px;
+  }
+
+  .sidebar-tab {
+    padding: 12px 14px;
+    font-size: 14px;
+    border-radius: 8px;
+  }
+
+  .contact-tab {
+    margin-top: 4px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    padding-top: 12px;
+  }
 }
