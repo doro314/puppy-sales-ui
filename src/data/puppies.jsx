@@ -90,6 +90,20 @@ const categories = [
       available: true,
     },
   },
+  {
+    id: "Barkly",
+    name: "Barkly",
+    icon: "paw-pink",
+    folder: "barkly",
+    details: {
+      sex: "Female",
+      color: "Black and white",
+      pattern: "Tuxedo",
+      weightAsOf: { value: "4.2 lbs", asOf: "2026-04-20" },
+      personality: "Adventurous and bold",
+      available: true,
+    },
+  },
 ];
 
 export function getCategories() {
