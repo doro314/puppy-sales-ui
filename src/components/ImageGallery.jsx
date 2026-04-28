@@ -232,7 +232,7 @@ function CtaSection({ categoryFolder, categoryName, isAvailableSoon, available, 
   return null;
 }
 
-function ImageGallery({ activeCategory, onInquire, onNavigate, categories = [] }) {
+function ImageGallery({ activeCategory, onInquire, onNavigate, categories = [], showParents = false }) {
   const availablePuppies = categories.filter(
     (c) => c.folder && c.details?.available && c.id !== activeCategory
   );
@@ -332,7 +332,7 @@ function ImageGallery({ activeCategory, onInquire, onNavigate, categories = [] }
             {categoryName}
           </h2>
         </header>
-        {activeCategory === 'all' && <ParentsSection dadName={litterInfo?.details?.dad} momName={litterInfo?.details?.mom} />}
+        {activeCategory === 'all' && showParents && <ParentsSection dadName={litterInfo?.details?.dad} momName={litterInfo?.details?.mom} />}
         <PuppyDetails details={categoryInfo?.details} genderColor={accentColor} isAvailableSoon={isAvailableSoon} />
         <div className="paw-placeholder-container">
           <PawPlaceholder color={accentColor} />
@@ -361,7 +361,7 @@ function ImageGallery({ activeCategory, onInquire, onNavigate, categories = [] }
         </h2>
       </header>
 
-      {activeCategory === 'all' && <ParentsSection dadName={litterInfo?.details?.dad} momName={litterInfo?.details?.mom} />}
+      {activeCategory === 'all' && showParents && <ParentsSection dadName={litterInfo?.details?.dad} momName={litterInfo?.details?.mom} />}
       <PuppyDetails details={categoryInfo?.details} genderColor={accentColor} isAvailableSoon={isAvailableSoon} />
 
       <div className="main-image-container" ref={containerRef}>

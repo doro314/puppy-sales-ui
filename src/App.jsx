@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import './App.css';
 import Sidebar from './components/Sidebar';
 import ImageGallery from './components/ImageGallery';
@@ -10,6 +11,9 @@ const SHOW_CONTACT = true;
 // ──────────────────────────────────────────────────────────────────────────
 
 function App() {
+  const [searchParams] = useSearchParams();
+  const showParents = searchParams.get('parents') === 'true';
+  
   const categories = getCategories();
   const [activeCategory, setActiveCategory] = useState('all');
   const [contactPrefill, setContactPrefill] = useState('');
@@ -52,7 +56,7 @@ function App() {
         <main className="main-content">
           {activeCategory === 'contact' && SHOW_CONTACT
             ? <ContactForm initialMessage={contactPrefill} accentColor={contactAccentColor} />
-            : <ImageGallery activeCategory={activeCategory} onInquire={handleInquire} onNavigate={handleNavigate} categories={categories} />
+            : <ImageGallery activeCategory={activeCategory} onInquire={handleInquire} onNavigate={handleNavigate} categories={categories} showParents={showParents} />
           }
         </main>
       </div>
