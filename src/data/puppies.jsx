@@ -18,7 +18,7 @@
 const categories = [
   {
     id: "all",
-    name: "Our Litter",
+    name: "Litter Info",
     icon: null,
     folder: null,
     details: {

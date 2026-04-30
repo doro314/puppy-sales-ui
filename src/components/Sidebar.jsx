@@ -59,16 +59,26 @@ function Sidebar({ categories, activeCategory, onCategoryChange, showContact = f
       </button>
 
       <nav className="sidebar-nav">
-        {categories.map((category) => (
+        {categories.filter((c) => !c.folder).map((category) => (
           <button
             key={category.id}
-            className={`sidebar-tab ${activeCategory === category.id ? 'active' : ''} ${!category.folder ? 'bold-tab' : ''}`}
+            className={`sidebar-tab ${activeCategory === category.id ? 'active' : ''} bold-tab`}
+            onClick={() => handleSelect(category.id)}
+          >
+            <span className="sidebar-label">{category.name}</span>
+          </button>
+        ))}
+
+        <div className="sidebar-section-label">Puppies</div>
+
+        {categories.filter((c) => c.folder).map((category) => (
+          <button
+            key={category.id}
+            className={`sidebar-tab sidebar-tab--puppy ${activeCategory === category.id ? 'active' : ''}`}
             onClick={() => handleSelect(category.id)}
             title={category.icon === 'paw-blue' ? 'Boy' : category.icon === 'paw-pink' ? 'Girl' : undefined}
           >
-            {category.folder && (
-              <PawIcon color={activeCategory === category.id ? 'white' : category.icon === 'paw-blue' ? '#4a90d9' : '#e91e8c'} />
-            )}
+            <PawIcon color={activeCategory === category.id ? 'white' : category.icon === 'paw-blue' ? '#4a90d9' : '#e91e8c'} />
             <span className="sidebar-label">{category.name}</span>
           </button>
         ))}
