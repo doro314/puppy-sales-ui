@@ -101,7 +101,7 @@ function PuppyDetails({ details, genderColor, isAvailableSoon = false }) {
                   {key === "sex" && genderColor && value ? (
                     <span className="sex-pill">{String(value)}</span>
                   ) : (
-                    <span className="details-stat-value">{formatValue(key, value)}</span>
+                    <span className="details-stat-value" title={formatValue(key, value)}>{formatValue(key, value)}</span>
                   )}
                 </div>
               )}
@@ -386,13 +386,19 @@ function ImageGallery({ activeCategory, onInquire, onNavigate, categories = [], 
 
       <div className="thumbnail-strip">
         {imageList.map((image, index) => (
-          <img
-            className={`thumbnail ${index === currentIndex ? "active" : ""}`}
-            onClick={() => handleClick(image, index)}
+          <button
             key={image}
-            src={image}
-            alt={`puppy-${index}`}
-          />
+            className={`thumbnail-btn ${index === currentIndex ? "active" : ""}`}
+            onClick={() => handleClick(image, index)}
+            aria-label={`View photo ${index + 1} of ${imageList.length}`}
+            aria-pressed={index === currentIndex}
+          >
+            <img
+              className="thumbnail"
+              src={image}
+              alt=""
+            />
+          </button>
         ))}
       </div>
 

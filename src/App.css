@@ -346,25 +346,33 @@
   filter: brightness(1.08);
 }
 
-.thumbnail {
-  width: 100%;
-  aspect-ratio: 1 / 1;
-  object-fit: cover;
+.thumbnail-btn {
+  display: block;
+  padding: 0;
+  border: 3px solid transparent;
   border-radius: 8px;
   cursor: pointer;
-  border: 3px solid transparent;
+  background: none;
   transition: all 0.2s ease;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
 }
 
-.thumbnail:hover {
+.thumbnail-btn:hover {
   transform: scale(1.05);
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
 }
 
-.thumbnail.active {
+.thumbnail-btn.active {
   border-color: #8a9bb0;
   box-shadow: 0 4px 12px rgba(74, 144, 217, 0.3);
+}
+
+.thumbnail {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  display: block;
 }
 
 /* Puppy Details */
@@ -465,6 +473,15 @@
   font-size: 0.92rem;
   font-weight: 600;
   color: #2c3e50;
+  overflow-wrap: break-word;
+}
+
+/* Desktop strip only — clamp long values to 2 lines; full text visible on hover via title */
+.details-stats .details-stat-value {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 .status-badge {
