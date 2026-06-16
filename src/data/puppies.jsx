@@ -48,62 +48,6 @@ const categories = [
       available: true,
     },
   },
-  {
-    id: "Rosa",
-    name: "Rosa",
-    icon: "paw-pink",
-    folder: "rosa",
-    details: {
-      sex: "Female",
-      color: "Golden cream",
-      pattern: "Solid",
-      weightAsOf: { value: "3.8 lbs", asOf: "2026-04-20" },
-      personality: "Sweet and cuddly",
-      available: true,
-    },
-  },
-  {
-    id: "Cece",
-    name: "Cece",
-    icon: "paw-pink",
-    folder: "cece",
-    details: {
-      sex: "Female",
-      color: "Brown and tan",
-      pattern: "Merle",
-      weightAsOf: { value: "3.5 lbs", asOf: "2026-04-20" },
-      personality: "Playful and energetic",
-      available: false,
-    },
-  },
-  {
-    id: "Sparky",
-    name: "Sparky",
-    icon: "paw-blue",
-    folder: "sparky",
-    details: {
-      sex: "Male",
-      color: "Black and white",
-      pattern: "Tuxedo",
-      weightAsOf: { value: "4.2 lbs", asOf: "2026-04-20" },
-      personality: "Adventurous and bold",
-      available: true,
-    },
-  },
-  {
-    id: "Barkly",
-    name: "Barkly",
-    icon: "paw-pink",
-    folder: "barkly",
-    details: {
-      sex: "Female",
-      color: "Black and white",
-      pattern: "Tuxedo",
-      weightAsOf: { value: "4.2 lbs", asOf: "2026-04-20" },
-      personality: "Adventurous and bold",
-      available: true,
-    },
-  },
 ];
 
 export function getCategories() {

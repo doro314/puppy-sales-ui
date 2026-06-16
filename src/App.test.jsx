@@ -1,6 +1,10 @@
 import { render, screen, fireEvent } from '@testing-library/react';
+import { MemoryRouter } from 'react-router-dom';
 import { vi } from 'vitest';
 import App from './App';
+
+// App uses useSearchParams(), which requires a Router context
+const renderApp = () => render(<App />, { wrapper: MemoryRouter });
 
 // ── Mock data modules — tests never touch real puppies.jsx or images ───────
 
@@ -76,13 +80,13 @@ vi.mock('./data/imageLoader', () => ({
 
 describe('App layout', () => {
   test('renders site header', () => {
-    render(<App />);
+    renderApp();
     expect(screen.getByText('Doro Family Puppies')).toBeInTheDocument();
     expect(screen.getByText(/Lovingly raised/i)).toBeInTheDocument();
   });
 
   test('renders sidebar tabs for all categories', () => {
-    render(<App />);
+    renderApp();
     const nav = screen.getByRole('navigation');
     expect(nav).toHaveTextContent('Our Litter');
     expect(nav).toHaveTextContent('PupAvailable');
@@ -90,26 +94,26 @@ describe('App layout', () => {
   });
 
   test('renders contact tab', () => {
-    render(<App />);
+    renderApp();
     expect(screen.getByText('Contact Us')).toBeInTheDocument();
   });
 });
 
 describe('Navigation', () => {
   test('clicking a puppy tab updates the gallery heading', () => {
-    render(<App />);
+    renderApp();
     fireEvent.click(screen.getByText('PupAvailable'));
     expect(screen.getByRole('heading', { level: 2, name: /PupAvailable/i })).toBeInTheDocument();
   });
 
   test('clicking Contact Us shows the contact form', () => {
-    render(<App />);
+    renderApp();
     fireEvent.click(screen.getByText('Contact Us'));
     expect(screen.getByText(/Interested in one of our puppies/i)).toBeInTheDocument();
   });
 
   test('contact form is prefilled after clicking Inquire', () => {
-    render(<App />);
+    renderApp();
     fireEvent.click(screen.getByText('PupAvailable'));
     const inquireBtn = screen.queryByRole('button', { name: /Inquire About PupAvailable/i });
     if (inquireBtn) {
@@ -121,18 +125,18 @@ describe('Navigation', () => {
 
 describe('Puppy details', () => {
   test('Our Litter shows mocked breed data', () => {
-    render(<App />);
+    renderApp();
     expect(screen.getByText('Test Breed')).toBeInTheDocument();
   });
 
   test('available puppy shows Available badge', () => {
-    render(<App />);
+    renderApp();
     fireEvent.click(screen.getByText('PupAvailable'));
     expect(screen.getByText('Available')).toBeInTheDocument();
   });
 
   test('adopted puppy shows Adopted badge', () => {
-    render(<App />);
+    renderApp();
     fireEvent.click(screen.getByText('PupAdopted'));
     expect(screen.getByText('Adopted')).toBeInTheDocument();
   });
@@ -140,7 +144,7 @@ describe('Puppy details', () => {
 
 describe('Missing data handling', () => {
   test('null/undefined/empty fields render as -- not raw undefined or N/A', () => {
-    render(<App />);
+    renderApp();
     fireEvent.click(screen.getByText('PupPartial'));
     const dashes = screen.getAllByText('\u2014\u2014');  // em-dash placeholder
     expect(dashes.length).toBeGreaterThanOrEqual(3);
@@ -151,7 +155,7 @@ describe('Missing data handling', () => {
   });
 
   test('null available hides the status badge entirely', () => {
-    render(<App />);
+    renderApp();
     fireEvent.click(screen.getByText('PupPartial'));
     expect(screen.queryByText('Available')).not.toBeInTheDocument();
     expect(screen.queryByText('Adopted')).not.toBeInTheDocument();
@@ -159,7 +163,7 @@ describe('Missing data handling', () => {
   });
 
   test('null sex falls back to -- instead of rendering a pill', () => {
-    render(<App />);
+    renderApp();
     fireEvent.click(screen.getByText('PupPartial'));
     // The sex-pill should not exist — value falls through to formatValue → "--"
     expect(document.querySelector('.sex-pill')).not.toBeInTheDocument();
@@ -168,20 +172,20 @@ describe('Missing data handling', () => {
 
 describe('Edge case data formatting', () => {
   test('boolean true renders as Yes, false as No', () => {
-    render(<App />);
+    renderApp();
     fireEvent.click(screen.getByText('PupEdge'));
     expect(screen.getByText('Yes')).toBeInTheDocument();
     expect(screen.getByText('No')).toBeInTheDocument();
   });
 
   test('malformed date string renders as —— not "Invalid Date"', () => {
-    render(<App />);
+    renderApp();
     fireEvent.click(screen.getByText('PupEdge'));
     expect(screen.queryByText('Invalid Date')).not.toBeInTheDocument();
   });
 
   test('unknown icon value falls back to neutral grey accent without crash', () => {
-    render(<App />);
+    renderApp();
     fireEvent.click(screen.getByText('PupEdge'));
     const heading = screen.getByRole('heading', { level: 2, name: /PupEdge/i });
     expect(heading.style.color).toBeTruthy();
