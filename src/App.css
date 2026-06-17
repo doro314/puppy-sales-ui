@@ -562,6 +562,7 @@
 
 .sex-pill {
   display: inline-block;
+  align-self: flex-start;
   padding: 6px 12px;
   border-radius: 999px;
   font-size: 0.82rem;
