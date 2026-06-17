@@ -41,7 +41,7 @@ const categories = [
     folder: "bella",
     details: {
       sex: "Female",
-      color: "White with black spots",
+      color: "White/Black",
       weightAsOf: { value: "19.8 oz", asOf: "2026-06-16" },
       markings: null,
       personality: "Sleepy Baby",
@@ -83,7 +83,7 @@ const categories = [
     folder: "olive",
     details: {
       sex: "Female",
-      color: "White with a black Eye",
+      color: "White/Black",
       weightAsOf: { value: "19.6 oz", asOf: "2026-06-16" },
       markings: null,
       personality: "Sleepy Baby",
@@ -97,7 +97,7 @@ const categories = [
     folder: "pepper",
     details: {
       sex: "Male",
-      color: "White with brown spots",
+      color: "White/Brown",
       weightAsOf: { value: "20.9 oz", asOf: "2026-06-16" },
       markings: null,
       personality: "Sleepy Baby",
