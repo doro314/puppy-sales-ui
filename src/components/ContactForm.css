@@ -103,6 +103,33 @@
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--contact-color, #8a9bb0) 18%, transparent);
 }
 
+.contact-field input.invalid,
+.contact-field textarea.invalid {
+  border-color: #e74c3c;
+  background: #fdf5f5;
+  box-shadow: 0 0 0 3px rgba(231, 76, 60, 0.08);
+}
+
+.contact-field input.invalid:focus,
+.contact-field textarea.invalid:focus {
+  border-color: #e74c3c;
+  box-shadow: 0 0 0 3px rgba(231, 76, 60, 0.18);
+}
+
+.contact-required {
+  color: #e74c3c;
+  margin-left: 1px;
+}
+
+.contact-field-error {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.78rem;
+  color: #c0392b;
+  font-weight: 500;
+}
+
 /* Matches .cta-button */
 .contact-submit {
   align-self: flex-start;

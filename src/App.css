@@ -224,27 +224,6 @@
   pointer-events: none;
 }
 
-.dot-progress {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 7px;
-  margin-bottom: 16px;
-}
-
-.dot {
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: #d0dae6;
-  transition: all 0.2s ease;
-  cursor: pointer;
-}
-
-.dot.active {
-  background: var(--accent-color, #4a90d9);
-  transform: scale(1.35);
-}
 
 .thumbnail-strip {
   display: grid;
@@ -706,9 +685,22 @@
 
 /* ── Mobile layout (≤768px) — desktop styles unchanged ── */
 @media (max-width: 768px) {
+  /* Lock the viewport so header+accordion stay fixed and only main-content scrolls */
+  .app-wrapper {
+    height: 100dvh;
+    min-height: unset;
+    overflow: hidden;
+  }
+
   /* Stack sidebar above content */
   .app-layout {
     flex-direction: column;
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  .main-content {
+    min-height: 0;
   }
 
   /* Header */

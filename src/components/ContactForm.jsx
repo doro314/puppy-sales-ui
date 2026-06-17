@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import "./ContactForm.css";
+import { PawSvg, IconClock } from "./Icons";
 
 // TODO: Formspree setup checklist
 // 1. Sign up at https://formspree.io
@@ -10,28 +11,58 @@ import "./ContactForm.css";
 // 6. (Optional) Enable Formspree's spam filter / reCAPTCHA in the form settings dashboard
 
 // Replace with your Formspree form ID after signing up at https://formspree.io
-const FORMSPREE_ID = "YOUR_FORM_ID";
+const FORMSPREE_ID = "xdavvdak";
+
+function validate(fields) {
+  const errors = {};
+  if (!fields.name.trim()) errors.name = "Name is required.";
+  if (!fields.email.trim()) {
+    errors.email = "Email is required.";
+  } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(fields.email)) {
+    errors.email = "Please enter a valid email address.";
+  }
+  if (!fields.message.trim()) errors.message = "Message is required.";
+  return errors;
+}
 
 function ContactForm({ initialMessage = "", accentColor = "#8a9bb0" }) {
   const [fields, setFields] = useState({ name: "", email: "", message: initialMessage });
+  const [touched, setTouched] = useState({ name: false, email: false, message: false });
+  const [submitAttempted, setSubmitAttempted] = useState(false);
   const [honeypot, setHoneypot] = useState("");
   const [status, setStatus] = useState("idle"); // idle | sending | success | error
+
+  const errors = validate(fields);
+  const hasErrors = Object.keys(errors).length > 0;
 
   // Sync if parent changes prefill (e.g. navigating from different puppy)
   useEffect(() => {
     setFields((prev) => ({ ...prev, message: initialMessage }));
     setStatus("idle");
+    setSubmitAttempted(false);
+    setTouched({ name: false, email: false, message: false });
   }, [initialMessage]);
 
   const handleChange = (e) => {
     setFields((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
+  const handleBlur = (e) => {
+    setTouched((prev) => ({ ...prev, [e.target.name]: true }));
+  };
+
+  const showError = (field) => (touched[field] || submitAttempted) && errors[field];
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     // Honeypot check — bots fill this hidden field, humans don't
     if (honeypot) return;
+
+    if (hasErrors) {
+      setSubmitAttempted(true);
+      return;
+    }
 
     setStatus("sending");
 
@@ -45,6 +76,8 @@ function ContactForm({ initialMessage = "", accentColor = "#8a9bb0" }) {
       if (res.ok) {
         setStatus("success");
         setFields({ name: "", email: "", message: "" });
+        setTouched({ name: false, email: false, message: false });
+        setSubmitAttempted(false);
       } else {
         setStatus("error");
       }
@@ -64,13 +97,7 @@ function ContactForm({ initialMessage = "", accentColor = "#8a9bb0" }) {
 
       <div className="contact-card">
         <div className="contact-card-top-bar" />
-        <svg viewBox="0 0 24 24" fill="currentColor" className="contact-card-watermark" aria-hidden="true">
-          <ellipse cx="12" cy="19" rx="5" ry="4" />
-          <ellipse cx="6" cy="11" rx="2.5" ry="3" />
-          <ellipse cx="18" cy="11" rx="2.5" ry="3" />
-          <ellipse cx="9" cy="6" rx="2" ry="2.5" />
-          <ellipse cx="15" cy="6" rx="2" ry="2.5" />
-        </svg>
+        <PawSvg className="contact-card-watermark" aria-hidden="true" />
         {status === "success" ? (
           <div className="contact-form">
             <div className="contact-success">
@@ -94,43 +121,74 @@ function ContactForm({ initialMessage = "", accentColor = "#8a9bb0" }) {
           />
 
           <div className="contact-field">
-            <label htmlFor="name">Name</label>
+            <label htmlFor="name">Name <span className="contact-required" aria-hidden="true">*</span></label>
             <input
               id="name"
               name="name"
               type="text"
               value={fields.name}
               onChange={handleChange}
+              onBlur={handleBlur}
               required
               placeholder="Your name"
+              aria-invalid={!!showError("name")}
+              aria-describedby={showError("name") ? "name-error" : undefined}
+              className={showError("name") ? "invalid" : ""}
             />
+            {showError("name") && (
+              <span id="name-error" className="contact-field-error" role="alert">
+                <span aria-hidden="true">⚠</span> {errors.name}
+              </span>
+            )}
           </div>
 
           <div className="contact-field">
-            <label htmlFor="email">Email</label>
+            <label htmlFor="email">Email <span className="contact-required" aria-hidden="true">*</span></label>
             <input
               id="email"
               name="email"
               type="email"
               value={fields.email}
               onChange={handleChange}
+              onBlur={handleBlur}
               required
               placeholder="you@example.com"
+              aria-invalid={!!showError("email")}
+              aria-describedby={showError("email") ? "email-error" : undefined}
+              className={showError("email") ? "invalid" : ""}
             />
+            {showError("email") && (
+              <span id="email-error" className="contact-field-error" role="alert">
+                <span aria-hidden="true">⚠</span> {errors.email}
+              </span>
+            )}
           </div>
 
           <div className="contact-field">
-            <label htmlFor="message">Message</label>
+            <label htmlFor="message">Message <span className="contact-required" aria-hidden="true">*</span></label>
             <textarea
               id="message"
               name="message"
               value={fields.message}
               onChange={handleChange}
+              onBlur={handleBlur}
               required
               rows={5}
               placeholder="Tell us which puppy you're interested in..."
+              aria-invalid={!!showError("message")}
+              aria-describedby={showError("message") ? "message-error" : undefined}
+              className={showError("message") ? "invalid" : ""}
             />
+            {showError("message") && (
+              <span id="message-error" className="contact-field-error" role="alert">
+                <span aria-hidden="true">⚠</span> {errors.message}
+              </span>
+            )}
           </div>
+
+          {submitAttempted && hasErrors && (
+            <p className="contact-error">Please complete the highlighted fields before sending.</p>
+          )}
 
           {status === "error" && (
             <p className="contact-error">Something went wrong. Please try again.</p>
@@ -142,20 +200,11 @@ function ContactForm({ initialMessage = "", accentColor = "#8a9bb0" }) {
               className="contact-submit"
               disabled={status === "sending"}
             >
-              <svg viewBox="0 0 24 24" fill="currentColor" className="contact-submit-icon">
-                <ellipse cx="12" cy="19" rx="5" ry="4" />
-                <ellipse cx="6" cy="11" rx="2.5" ry="3" />
-                <ellipse cx="18" cy="11" rx="2.5" ry="3" />
-                <ellipse cx="9" cy="6" rx="2" ry="2.5" />
-                <ellipse cx="15" cy="6" rx="2" ry="2.5" />
-              </svg>
+              <PawSvg className="contact-submit-icon" />
               {status === "sending" ? "Sending…" : "Send Message"}
             </button>
             <span className="contact-response-note">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="contact-clock-icon">
-                <circle cx="12" cy="12" r="10" />
-                <polyline points="12 6 12 12 16 14" />
-              </svg>
+              <IconClock className="contact-clock-icon" />
               We’ll respond within 24 hours
             </span>
           </div>

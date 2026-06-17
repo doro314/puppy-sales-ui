@@ -109,6 +109,7 @@
     width: 100%;
     min-height: auto;
     position: relative;
+    flex-shrink: 0;
   }
 
   .sidebar-header {
@@ -136,16 +137,10 @@
     font-weight: 600;
   }
 
-  .mobile-nav-chevron {
-    width: 18px;
-    height: 18px;
+  .mobile-nav-icon {
+    width: 20px;
+    height: 20px;
     flex-shrink: 0;
-    transition: transform 0.25s ease;
-  }
-
-  /* Rotate chevron when open */
-  .sidebar--open .mobile-nav-chevron {
-    transform: rotate(180deg);
   }
 
   /* Nav panel — collapsed by default */

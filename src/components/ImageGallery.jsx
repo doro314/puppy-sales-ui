@@ -1,129 +1,15 @@
 import { useState, useMemo, useEffect, useRef, useCallback } from "react";
 import { getCategoryById } from "../data/puppies";
 import { getImagesByFolder } from "../data/imageLoader";
+import PuppyDetails from "./PuppyDetails";
+import { IconClock, IconHome, IconPaw, PawPlaceholder, PawSvg } from "./Icons";
 
 const allImagesByFolder = getImagesByFolder();
-
-function formatKey(key) {
-  return key
-    .replace(/([A-Z])/g, " $1")
-    .replace(/^./, (s) => s.toUpperCase());
-}
 
 const GENDER_COLORS = {
   "paw-blue": "#4a90d9",
   "paw-pink": "#e91e8c",
 };
-
-function IconClock() {
-  return (
-    <svg className="cta-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <circle cx="12" cy="12" r="10" />
-      <polyline points="12 6 12 12 16 14" />
-    </svg>
-  );
-}
-
-function IconHome() {
-  return (
-    <svg className="cta-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9.5z" />
-      <polyline points="9 21 9 12 15 12 15 21" />
-    </svg>
-  );
-}
-
-function IconPaw() {
-  return (
-    <svg className="cta-icon" viewBox="0 0 24 24" fill="currentColor">
-      <ellipse cx="12" cy="19" rx="5" ry="4" />
-      <ellipse cx="6" cy="11" rx="2.5" ry="3" />
-      <ellipse cx="18" cy="11" rx="2.5" ry="3" />
-      <ellipse cx="9" cy="6" rx="2" ry="2.5" />
-      <ellipse cx="15" cy="6" rx="2" ry="2.5" />
-    </svg>
-  );
-}
-
-function PawPlaceholder({ color = "#c8d6e5" }) {
-  return (
-    <div className="paw-placeholder">
-      <svg viewBox="0 0 24 24" fill={color} className="paw-placeholder-icon">
-        <ellipse cx="12" cy="19" rx="5" ry="4" />
-        <ellipse cx="6" cy="11" rx="2.5" ry="3" />
-        <ellipse cx="18" cy="11" rx="2.5" ry="3" />
-        <ellipse cx="9" cy="6" rx="2" ry="2.5" />
-        <ellipse cx="15" cy="6" rx="2" ry="2.5" />
-      </svg>
-      <p className="paw-placeholder-text">Photos coming soon</p>
-    </div>
-  );
-}
-
-function formatValue(key, value) {
-  if (value === null || value === undefined || value === "") return "\u2014\u2014";
-  if (typeof value === "boolean") return value ? "Yes" : "No";
-  if (key === "weightAsOf" && typeof value === "object") {
-    if (!value.value && !value.asOf) return "\u2014\u2014";
-    return `${value.value ?? "\u2014\u2014"} · ${value.asOf ? new Date(value.asOf + "T00:00:00").toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }) : "\u2014\u2014"}`;
-  }
-  if ((key.toLowerCase().includes("date") || key === "readyToAdoptDate") && typeof value === "string") {
-    const d = new Date(value + "T00:00:00");
-    return isNaN(d) ? "\u2014\u2014" : d.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
-  }
-  return String(value);
-}
-
-function PuppyDetails({ details, genderColor, isAvailableSoon = false }) {
-  if (!details) return null;
-  const { litterDescription, available, ...fields } = details;
-  const statEntries = Object.entries(fields);
-  const isGrid = statEntries.length > 5;
-
-  return (
-    <div
-      className={`puppy-details${isGrid ? " puppy-details--grid" : ""}`}
-      style={genderColor ? { "--gender-color": genderColor } : undefined}
-    >
-      <div className="details-top-bar" />
-      <div className="details-body">
-        <div className={isGrid ? "details-grid" : "details-stats"}>
-          {statEntries.map(([key, value]) => (
-            <div className={isGrid ? "details-grid-item" : "details-stat"} key={key}>
-              {isGrid ? (
-                <>
-                  <span className="details-stat-label">{formatKey(key)}</span>
-                  <span className="details-stat-value">{formatValue(key, value)}</span>
-                </>
-              ) : (
-                <div className="details-stat-inner">
-                  <span className="details-stat-label">{formatKey(key)}</span>
-                  {key === "sex" && genderColor && value ? (
-                    <span className="sex-pill">{String(value)}</span>
-                  ) : (
-                    <span className="details-stat-value" title={formatValue(key, value)}>{formatValue(key, value)}</span>
-                  )}
-                </div>
-              )}
-            </div>
-          ))}
-        </div>
-        {!isGrid && available != null && (
-          <span className={
-            isAvailableSoon ? "status-badge status-available-soon"
-            : available ? "status-badge status-available"
-            : "status-badge status-adopted"
-          }>
-            {isAvailableSoon ? "Available Soon" : available ? "Available" : "Adopted"}
-          </span>
-        )}
-      </div>
-      {litterDescription && (
-        <p className="litter-description">{litterDescription}</p>
-      )}
-    </div>
-  );
-}
 
 function ParentsSection({ dadName, momName }) {
   return (
@@ -381,13 +267,7 @@ function ImageGallery({ activeCategory, onInquire, onNavigate, categories = [], 
         />
         {activeCategory === "all" && bigImage?.puppyName && (
           <div className="photo-puppy-label">
-            <svg className="photo-paw-icon" viewBox="0 0 24 24" fill={GENDER_COLORS[bigImage.puppyIcon] ?? "#8a9bb0"}>
-              <ellipse cx="12" cy="19" rx="5" ry="4" />
-              <ellipse cx="6" cy="11" rx="2.5" ry="3" />
-              <ellipse cx="18" cy="11" rx="2.5" ry="3" />
-              <ellipse cx="9" cy="6" rx="2" ry="2.5" />
-              <ellipse cx="15" cy="6" rx="2" ry="2.5" />
-            </svg>
+            <PawSvg className="photo-paw-icon" fill={GENDER_COLORS[bigImage.puppyIcon] ?? "#8a9bb0"} />
             {bigImage.puppyId && onNavigate && (
               <span className="photo-puppy-cta" onClick={() => onNavigate(bigImage.puppyId)}>
                 View →
@@ -419,13 +299,7 @@ function ImageGallery({ activeCategory, onInquire, onNavigate, categories = [], 
             <img className="thumbnail" src={image.src} alt="" />
             {activeCategory === "all" && image.puppyName && (
               <span className="thumbnail-puppy-label">
-                <svg className="thumbnail-paw-icon" viewBox="0 0 24 24" fill={GENDER_COLORS[image.puppyIcon] ?? "#8a9bb0"}>
-                  <ellipse cx="12" cy="19" rx="5" ry="4" />
-                  <ellipse cx="6" cy="11" rx="2.5" ry="3" />
-                  <ellipse cx="18" cy="11" rx="2.5" ry="3" />
-                  <ellipse cx="9" cy="6" rx="2" ry="2.5" />
-                  <ellipse cx="15" cy="6" rx="2" ry="2.5" />
-                </svg>
+                <PawSvg className="thumbnail-paw-icon" fill={GENDER_COLORS[image.puppyIcon] ?? "#8a9bb0"} />
                 {image.puppyName}
               </span>
             )}
