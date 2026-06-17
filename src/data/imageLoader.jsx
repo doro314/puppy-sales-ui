@@ -17,7 +17,7 @@ export function getImagesByFolder() {
     const folder = parts[parts.length - 2];
 
     if (!folders[folder]) folders[folder] = [];
-    folders[folder].push(src);
+    if (!folders[folder].includes(src)) folders[folder].push(src);
   }
 
   return folders;

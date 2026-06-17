@@ -46,7 +46,6 @@ vi.mock('./data/puppies', () => {
       details: {
         sex: null,
         color: undefined,
-        pattern: '',
         weightAsOf: { value: null, asOf: null },
         personality: 'Shy',
         available: null,

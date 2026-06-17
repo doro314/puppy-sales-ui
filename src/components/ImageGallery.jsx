@@ -252,15 +252,21 @@ function ImageGallery({ activeCategory, onInquire, onNavigate, categories = [], 
 
   const imageList = useMemo(() => {
     if (activeCategory === "all") {
-      return Object.values(allImagesByFolder).flat();
+      return Object.entries(allImagesByFolder).flatMap(([folder, images]) => {
+        const puppy = categories.find(c => c.folder === folder);
+        return images.map(src => ({
+          src,
+          puppyName: puppy?.name ?? folder,
+          puppyId: puppy?.id ?? null,
+          puppyIcon: puppy?.icon ?? null,
+        }));
+      });
     }
-
     if (categoryFolder && allImagesByFolder[categoryFolder]) {
-      return allImagesByFolder[categoryFolder];
+      return allImagesByFolder[categoryFolder].map(src => ({ src, puppyName: null }));
     }
-
     return [];
-  }, [activeCategory, categoryFolder]);
+  }, [activeCategory, categoryFolder, categories]);
 
   const [bigImage, setBigImage] = useState(null);
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -365,14 +371,31 @@ function ImageGallery({ activeCategory, onInquire, onNavigate, categories = [], 
       <PuppyDetails details={categoryInfo?.details} genderColor={accentColor} isAvailableSoon={isAvailableSoon} />
 
       <div className="main-image-container" ref={containerRef}>
-        <img className="main-image-blur-bg" src={bigImage} alt="" aria-hidden="true" />
+        <img className="main-image-blur-bg" src={bigImage?.src} alt="" aria-hidden="true" />
         <img
           className="main-image"
-          src={bigImage}
+          src={bigImage?.src}
           alt={categoryName}
           ref={imgRef}
           onLoad={calcStripWidth}
         />
+        {activeCategory === "all" && bigImage?.puppyName && (
+          <div className="photo-puppy-label">
+            <svg className="photo-paw-icon" viewBox="0 0 24 24" fill={GENDER_COLORS[bigImage.puppyIcon] ?? "#8a9bb0"}>
+              <ellipse cx="12" cy="19" rx="5" ry="4" />
+              <ellipse cx="6" cy="11" rx="2.5" ry="3" />
+              <ellipse cx="18" cy="11" rx="2.5" ry="3" />
+              <ellipse cx="9" cy="6" rx="2" ry="2.5" />
+              <ellipse cx="15" cy="6" rx="2" ry="2.5" />
+            </svg>
+            {bigImage.puppyId && onNavigate && (
+              <span className="photo-puppy-cta" onClick={() => onNavigate(bigImage.puppyId)}>
+                View →
+              </span>
+            )}
+            <span className="photo-puppy-name">{bigImage.puppyName}</span>
+          </div>
+        )}
         <button className="arrow-button arrow-left" onClick={backFunc} style={{ width: stripWidth }}>&#8249;</button>
         <button className="arrow-button arrow-right" onClick={nextFunc} style={{ width: stripWidth }}>&#8250;</button>
       </div>
@@ -387,17 +410,25 @@ function ImageGallery({ activeCategory, onInquire, onNavigate, categories = [], 
       <div className="thumbnail-strip">
         {imageList.map((image, index) => (
           <button
-            key={image}
+            key={image.src}
             className={`thumbnail-btn ${index === currentIndex ? "active" : ""}`}
             onClick={() => handleClick(image, index)}
             aria-label={`View photo ${index + 1} of ${imageList.length}`}
             aria-pressed={index === currentIndex}
           >
-            <img
-              className="thumbnail"
-              src={image}
-              alt=""
-            />
+            <img className="thumbnail" src={image.src} alt="" />
+            {activeCategory === "all" && image.puppyName && (
+              <span className="thumbnail-puppy-label">
+                <svg className="thumbnail-paw-icon" viewBox="0 0 24 24" fill={GENDER_COLORS[image.puppyIcon] ?? "#8a9bb0"}>
+                  <ellipse cx="12" cy="19" rx="5" ry="4" />
+                  <ellipse cx="6" cy="11" rx="2.5" ry="3" />
+                  <ellipse cx="18" cy="11" rx="2.5" ry="3" />
+                  <ellipse cx="9" cy="6" rx="2" ry="2.5" />
+                  <ellipse cx="15" cy="6" rx="2" ry="2.5" />
+                </svg>
+                {image.puppyName}
+              </span>
+            )}
           </button>
         ))}
       </div>
