@@ -2,7 +2,7 @@ import { useState, useMemo, useEffect, useRef, useCallback } from "react";
 import { getCategoryById } from "../data/puppies";
 import { getImagesByFolder } from "../data/imageLoader";
 import PuppyDetails from "./PuppyDetails";
-import { IconClock, IconHome, IconPaw, PawPlaceholder, PawSvg } from "./Icons";
+import { IconClock, IconClose, IconExpand, IconHome, IconPaw, PawPlaceholder, PawSvg } from "./Icons";
 
 const allImagesByFolder = getImagesByFolder();
 
@@ -157,6 +157,7 @@ function ImageGallery({ activeCategory, onInquire, onNavigate, categories = [], 
   const [bigImage, setBigImage] = useState(null);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [stripWidth, setStripWidth] = useState(48);
+  const [lightboxOpen, setLightboxOpen] = useState(false);
   const containerRef = useRef(null);
   const imgRef = useRef(null);
 
@@ -194,7 +195,20 @@ function ImageGallery({ activeCategory, onInquire, onNavigate, categories = [], 
       setBigImage(null);
       setCurrentIndex(0);
     }
+    setLightboxOpen(false);
   }, [activeCategory, imageList]);
+
+  useEffect(() => {
+    if (!lightboxOpen) return;
+    const handleKey = (e) => { if (e.key === 'Escape') setLightboxOpen(false); };
+    window.addEventListener('keydown', handleKey);
+    return () => window.removeEventListener('keydown', handleKey);
+  }, [lightboxOpen]);
+
+  useEffect(() => {
+    document.body.style.overflow = lightboxOpen ? 'hidden' : '';
+    return () => { document.body.style.overflow = ''; };
+  }, [lightboxOpen]);
 
   const handleClick = (image, index) => {
     setBigImage(image);
@@ -264,7 +278,13 @@ function ImageGallery({ activeCategory, onInquire, onNavigate, categories = [], 
           alt={categoryName}
           ref={imgRef}
           onLoad={calcStripWidth}
+          onClick={() => setLightboxOpen(true)}
+          decoding="async"
+          style={{ cursor: 'zoom-in' }}
         />
+        <button className="expand-btn" onClick={() => setLightboxOpen(true)} aria-label="View fullscreen">
+          <IconExpand className="expand-btn-icon" />
+        </button>
         {activeCategory === "all" && bigImage?.puppyName && (
           <div className="photo-puppy-label">
             <PawSvg className="photo-paw-icon" fill={GENDER_COLORS[bigImage.puppyIcon] ?? "#8a9bb0"} />
@@ -296,7 +316,7 @@ function ImageGallery({ activeCategory, onInquire, onNavigate, categories = [], 
             aria-label={`View photo ${index + 1} of ${imageList.length}`}
             aria-pressed={index === currentIndex}
           >
-            <img className="thumbnail" src={image.src} alt="" />
+            <img className="thumbnail" src={image.src} alt="" loading="lazy" decoding="async" />
             {activeCategory === "all" && image.puppyName && (
               <span className="thumbnail-puppy-label">
                 <PawSvg className="thumbnail-paw-icon" fill={GENDER_COLORS[image.puppyIcon] ?? "#8a9bb0"} />
@@ -318,6 +338,19 @@ function ImageGallery({ activeCategory, onInquire, onNavigate, categories = [], 
         onNavigate={onNavigate}
       />
       <p className="gallery-copyright">&copy; {new Date().getFullYear()} All rights reserved.</p>
+
+      {lightboxOpen && (
+        <div className="lightbox-overlay" onClick={() => setLightboxOpen(false)}>
+          <button
+            className="lightbox-close"
+            onClick={(e) => { e.stopPropagation(); setLightboxOpen(false); }}
+            aria-label="Close fullscreen"
+          >
+            <IconClose className="lightbox-close-icon" />
+          </button>
+          <img className="lightbox-img" src={bigImage?.src} alt={categoryName} />
+        </div>
+      )}
     </div>
   );
 }
