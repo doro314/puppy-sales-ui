@@ -29,7 +29,7 @@ const categories = [
       litterSize: 5,
       readyToAdoptDate: "2026-07-28", // ← controls "Available Soon" for all puppies
       vaccinations: "",
-      dewormingDate: "",
+      dewormingDate: "2026-06-29",
       vetChecked: true,
       litterDescription: "A beautiful litter of Havapoo puppies, known for their playful personalities and gentle temperaments. They were raised in a loving home environment with children and other pets, making them well-socialized from birth.",
     },
