@@ -21,13 +21,31 @@ function App() {
   const [contactPrefill, setContactPrefill] = useState('');
   const [contactAccentColor, setContactAccentColor] = useState('#8a9bb0');
   const [visitorCount, setVisitorCount] = useState(null);
+  const [uniqueCount, setUniqueCount] = useState(null);
 
   useEffect(() => {
     if (isLikelyBot()) { console.log('[counter] bot detected, skipping'); return; }
-    fetch('https://api.counterapi.dev/v1/doro-family-puppies/visits/up')
+    const BASE = 'https://api.counterapi.dev/v1/doro-family-puppies';
+    const parseCount = (d) => d.value ?? d.Count ?? d.count ?? null;
+
+    fetch(`${BASE}/visits/up`)
       .then(r => r.json())
-      .then(d => { console.log('[counter]', d); setVisitorCount(d.value ?? d.Count ?? d.count ?? null); })
-      .catch(err => console.error('[counter] error:', err));
+      .then(d => { console.log('[counter visits]', d); setVisitorCount(parseCount(d)); })
+      .catch(err => console.error('[counter visits] error:', err));
+
+    const isNewVisitor = !localStorage.getItem('dfp-visited');
+    if (isNewVisitor) {
+      localStorage.setItem('dfp-visited', '1');
+      fetch(`${BASE}/uniques/up`)
+        .then(r => r.json())
+        .then(d => { console.log('[counter uniques]', d); setUniqueCount(parseCount(d)); })
+        .catch(err => console.error('[counter uniques] error:', err));
+    } else {
+      fetch(`${BASE}/uniques`)
+        .then(r => r.json())
+        .then(d => setUniqueCount(parseCount(d)))
+        .catch(() => {});
+    }
   }, []);
 
   const handleCategoryChange = (id) => {
@@ -67,7 +85,7 @@ function App() {
         <main className="main-content">
           {activeCategory === 'contact' && SHOW_CONTACT
             ? <ContactForm initialMessage={contactPrefill} accentColor={contactAccentColor} />
-            : <ImageGallery activeCategory={activeCategory} onInquire={handleInquire} onNavigate={handleNavigate} categories={categories} showParents={showParents} showCount={showCount} visitorCount={visitorCount} />
+            : <ImageGallery activeCategory={activeCategory} onInquire={handleInquire} onNavigate={handleNavigate} categories={categories} showParents={showParents} showCount={showCount} visitorCount={visitorCount} uniqueCount={uniqueCount} />
           }
         </main>
       </div>
