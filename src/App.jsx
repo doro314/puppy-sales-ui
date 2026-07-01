@@ -11,6 +11,8 @@ import { isLikelyBot } from './utils';
 const SHOW_CONTACT = true;
 // ──────────────────────────────────────────────────────────────────────────
 
+let counterFired = false;
+
 function App() {
   const [searchParams] = useSearchParams();
   const showParents = searchParams.get('parents') === 'true';
@@ -24,27 +26,30 @@ function App() {
   const [uniqueCount, setUniqueCount] = useState(null);
 
   useEffect(() => {
-    if (isLikelyBot()) { console.log('[counter] bot detected, skipping'); return; }
+    if (counterFired || isLikelyBot()) return;
+    counterFired = true;
+
     const BASE = 'https://api.counterapi.dev/v1/doro-family-puppies';
-    const parseCount = (d) => d.value ?? d.Count ?? d.count ?? null;
 
     fetch(`${BASE}/visits/up`)
       .then(r => r.json())
-      .then(d => { console.log('[counter visits]', d); setVisitorCount(parseCount(d)); })
-      .catch(err => console.error('[counter visits] error:', err));
+      .then(d => setVisitorCount(d.count ?? null))
+      .catch(() => {});
 
     const isNewVisitor = !localStorage.getItem('dfp-visited');
     if (isNewVisitor) {
       localStorage.setItem('dfp-visited', '1');
       fetch(`${BASE}/uniques/up`)
         .then(r => r.json())
-        .then(d => { console.log('[counter uniques]', d); setUniqueCount(parseCount(d)); })
-        .catch(err => console.error('[counter uniques] error:', err));
-    } else {
-      fetch(`${BASE}/uniques`)
-        .then(r => r.json())
-        .then(d => setUniqueCount(parseCount(d)))
+        .then(d => {
+          const count = d.count ?? null;
+          if (count !== null) localStorage.setItem('dfp-unique-count', count);
+          setUniqueCount(count);
+        })
         .catch(() => {});
+    } else {
+      const cached = localStorage.getItem('dfp-unique-count');
+      if (cached) setUniqueCount(Number(cached));
     }
   }, []);
 
