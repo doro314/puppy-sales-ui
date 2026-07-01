@@ -23,11 +23,11 @@ function App() {
   const [visitorCount, setVisitorCount] = useState(null);
 
   useEffect(() => {
-    if (isLikelyBot()) return;
+    if (isLikelyBot()) { console.log('[counter] bot detected, skipping'); return; }
     fetch('https://api.countapi.xyz/hit/doro-family-puppies/visits')
       .then(r => r.json())
-      .then(d => setVisitorCount(d.value))
-      .catch(() => {});
+      .then(d => { console.log('[counter]', d); setVisitorCount(d.value ?? null); })
+      .catch(err => console.error('[counter] error:', err));
   }, []);
 
   const handleCategoryChange = (id) => {
