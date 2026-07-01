@@ -36,20 +36,18 @@ function App() {
       .then(d => setVisitorCount(d.count ?? null))
       .catch(() => {});
 
-    const isNewVisitor = !localStorage.getItem('dfp-visited') || !localStorage.getItem('dfp-unique-count');
+    const isNewVisitor = !localStorage.getItem('dfp-visited');
     if (isNewVisitor) {
       localStorage.setItem('dfp-visited', '1');
       fetch(`${BASE}/uniques/up`)
         .then(r => r.json())
-        .then(d => {
-          const count = d.count ?? null;
-          if (count !== null) localStorage.setItem('dfp-unique-count', count);
-          setUniqueCount(count);
-        })
+        .then(d => setUniqueCount(d.count ?? null))
         .catch(() => {});
     } else {
-      const cached = localStorage.getItem('dfp-unique-count');
-      if (cached) setUniqueCount(Number(cached));
+      fetch(`${BASE}/uniques/`)
+        .then(r => r.json())
+        .then(d => setUniqueCount(d.count ?? null))
+        .catch(() => {});
     }
   }, []);
 
