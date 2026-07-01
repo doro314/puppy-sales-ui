@@ -24,7 +24,7 @@ function App() {
 
   useEffect(() => {
     if (isLikelyBot()) { console.log('[counter] bot detected, skipping'); return; }
-    fetch('https://counterapi.dev/api/doro-family-puppies/visits/up')
+    fetch('https://api.counterapi.dev/v1/doro-family-puppies/visits/up')
       .then(r => r.json())
       .then(d => { console.log('[counter]', d); setVisitorCount(d.value ?? d.Count ?? d.count ?? null); })
       .catch(err => console.error('[counter] error:', err));
