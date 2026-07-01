@@ -1,3 +1,8 @@
+export function isLikelyBot() {
+  if (navigator.webdriver) return true;
+  return /bot|crawl|spider|scrape|headless|phantom|selenium|puppeteer/i.test(navigator.userAgent);
+}
+
 export function formatKey(key) {
   return key
     .replace(/([A-Z])/g, " $1")

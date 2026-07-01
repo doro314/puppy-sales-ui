@@ -118,7 +118,7 @@ function CtaSection({ categoryFolder, categoryName, isAvailableSoon, available, 
   return null;
 }
 
-function ImageGallery({ activeCategory, onInquire, onNavigate, categories = [], showParents = false }) {
+function ImageGallery({ activeCategory, onInquire, onNavigate, categories = [], showParents = false, showCount = false, visitorCount = null }) {
   const availablePuppies = categories.filter(
     (c) => c.folder && c.details?.available && c.id !== activeCategory
   );
@@ -254,6 +254,7 @@ function ImageGallery({ activeCategory, onInquire, onNavigate, categories = [], 
           onNavigate={onNavigate}
         />
         <p className="gallery-copyright">&copy; {new Date().getFullYear()} All rights reserved.</p>
+        {showCount && <p className="gallery-visit-count">{visitorCount === null ? '…' : `${visitorCount.toLocaleString()} visits`}</p>}
       </div>
     );
   }
@@ -338,6 +339,7 @@ function ImageGallery({ activeCategory, onInquire, onNavigate, categories = [], 
         onNavigate={onNavigate}
       />
       <p className="gallery-copyright">&copy; {new Date().getFullYear()} All rights reserved.</p>
+      {showCount && <p className="gallery-visit-count">{visitorCount === null ? '…' : `${visitorCount.toLocaleString()} visits`}</p>}
 
       {lightboxOpen && (
         <div className="lightbox-overlay" onClick={() => setLightboxOpen(false)}>

@@ -1,10 +1,11 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import './App.css';
 import Sidebar from './components/Sidebar';
 import ImageGallery from './components/ImageGallery';
 import ContactForm from './components/ContactForm';
 import { getCategories } from './data/puppies';
+import { isLikelyBot } from './utils';
 
 // ── Toggle contact tab on/off ──────────────────────────────────────────────
 const SHOW_CONTACT = true;
@@ -13,11 +14,21 @@ const SHOW_CONTACT = true;
 function App() {
   const [searchParams] = useSearchParams();
   const showParents = searchParams.get('parents') === 'true';
-  
+  const showCount = searchParams.has('count');
+
   const categories = getCategories();
   const [activeCategory, setActiveCategory] = useState('all');
   const [contactPrefill, setContactPrefill] = useState('');
   const [contactAccentColor, setContactAccentColor] = useState('#8a9bb0');
+  const [visitorCount, setVisitorCount] = useState(null);
+
+  useEffect(() => {
+    if (isLikelyBot()) return;
+    fetch('https://api.countapi.xyz/hit/doro-family-puppies/visits')
+      .then(r => r.json())
+      .then(d => setVisitorCount(d.value))
+      .catch(() => {});
+  }, []);
 
   const handleCategoryChange = (id) => {
     setActiveCategory(id);
@@ -56,7 +67,7 @@ function App() {
         <main className="main-content">
           {activeCategory === 'contact' && SHOW_CONTACT
             ? <ContactForm initialMessage={contactPrefill} accentColor={contactAccentColor} />
-            : <ImageGallery activeCategory={activeCategory} onInquire={handleInquire} onNavigate={handleNavigate} categories={categories} showParents={showParents} />
+            : <ImageGallery activeCategory={activeCategory} onInquire={handleInquire} onNavigate={handleNavigate} categories={categories} showParents={showParents} showCount={showCount} visitorCount={visitorCount} />
           }
         </main>
       </div>
