@@ -344,7 +344,12 @@ function ImageGallery({ activeCategory, onInquire, onNavigate, categories = [], 
         onNavigate={onNavigate}
       />
       <p className="gallery-copyright">&copy; {new Date().getFullYear()} All rights reserved.</p>
-      {showCount && <p className="gallery-visit-count">{visitorCount === null ? '…' : `${visitorCount.toLocaleString()} visits`}</p>}
+      {showCount && (
+        <p className="gallery-visit-count">
+          {visitorCount === null ? '…' : `${visitorCount.toLocaleString()} visits`}
+          {uniqueCount !== null && ` · ${uniqueCount.toLocaleString()} unique`}
+        </p>
+      )}
 
       {lightboxOpen && (
         <div className="lightbox-overlay" onClick={() => setLightboxOpen(false)}>
