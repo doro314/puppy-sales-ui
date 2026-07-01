@@ -36,7 +36,7 @@ function App() {
       .then(d => setVisitorCount(d.count ?? null))
       .catch(() => {});
 
-    const isNewVisitor = !localStorage.getItem('dfp-visited');
+    const isNewVisitor = !localStorage.getItem('dfp-visited') || !localStorage.getItem('dfp-unique-count');
     if (isNewVisitor) {
       localStorage.setItem('dfp-visited', '1');
       fetch(`${BASE}/uniques/up`)
