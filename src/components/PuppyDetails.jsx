@@ -2,7 +2,7 @@ import { formatKey, formatValue } from "../utils";
 
 function PuppyDetails({ details, genderColor, isAvailableSoon = false }) {
   if (!details) return null;
-  const { litterDescription, available, ...fields } = details;
+  const { litterDescription, facts, available, ...fields } = details;
   const statEntries = Object.entries(fields);
   const isGrid = statEntries.length > 5;
 
@@ -43,8 +43,22 @@ function PuppyDetails({ details, genderColor, isAvailableSoon = false }) {
           <span className={statusClass}>{statusLabel}</span>
         )}
       </div>
-      {litterDescription && (
-        <p className="litter-description">{litterDescription}</p>
+      {(facts?.length > 0 || litterDescription) && (
+        <div className="litter-info">
+          {facts?.length > 0 && (
+            <>
+              <h4 className="breed-facts-heading">Key Breed Facts</h4>
+              <ul className="breed-facts-list">
+                {facts.map((fact) => (
+                  <li key={fact} className="breed-facts-item">{fact}</li>
+                ))}
+              </ul>
+            </>
+          )}
+          {litterDescription && (
+            <p className="litter-description">{litterDescription}</p>
+          )}
+        </div>
       )}
     </div>
   );

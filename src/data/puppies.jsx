@@ -31,7 +31,12 @@ const categories = [
       vaccinations: "",
       dewormingDate: "2026-06-29",
       vetChecked: true,
-      litterDescription: "A beautiful litter of Havapoo puppies, known for their playful personalities and gentle temperaments. They were raised in a loving home environment with children and other pets, making them well-socialized from birth.",
+      litterDescription: "Raised in a loving home with children and other pets, making them well-socialized and ready to settle into family life from day one.",
+      facts: [
+        "Typically range from 7 to 20 lbs",
+        "Hypoallergenic, making them a good match for those with mild pet allergies",
+        "Highly trainable and eager to please",
+      ],
     },
   },
   {

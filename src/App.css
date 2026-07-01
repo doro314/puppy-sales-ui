@@ -581,14 +581,41 @@
   letter-spacing: 0.03em;
 }
 
-.litter-description {
-  margin: 0;
+.litter-info {
   padding: 14px 22px 18px;
   border-top: 1px solid #f0f4f8;
+}
+
+.breed-facts-heading {
+  margin: 0 0 8px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: #7a8fa6;
+}
+
+.breed-facts-list {
+  margin: 0;
+  padding: 0 0 0 18px;
+  list-style: disc;
+}
+
+.breed-facts-item {
   color: #8a9bb0;
   font-size: 0.92rem;
   line-height: 1.7;
-  font-style: italic;
+}
+
+.breed-facts-item + .breed-facts-item {
+  margin-top: 2px;
+}
+
+.litter-description {
+  margin: 12px 0 0;
+  color: #8a9bb0;
+  font-size: 0.92rem;
+  line-height: 1.7;
 }
 
 /* ── Parents section ── */
