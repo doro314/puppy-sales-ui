@@ -29,10 +29,13 @@ function Sidebar({ categories, activeCategory, onCategoryChange, showContact = f
         aria-expanded={mobileOpen}
       >
         <span className="mobile-nav-label">{activeLabel}</span>
-        {mobileOpen
-          ? <IconClose className="mobile-nav-icon" />
-          : <IconHamburger className="mobile-nav-icon" />
-        }
+        <span className="mobile-nav-right">
+          <span className="mobile-nav-menu-label">Menu</span>
+          {mobileOpen
+            ? <IconClose className="mobile-nav-icon" />
+            : <IconHamburger className="mobile-nav-icon" />
+          }
+        </span>
       </button>
 
       <nav className="sidebar-nav">

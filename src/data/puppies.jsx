@@ -19,13 +19,13 @@
 
 const categories = [
   {
-    id: "all",
-    name: "Litter Info",
+    id: "home",
+    name: "Home",
     icon: null,
     folder: null,
     details: {
       breed: "Havapoo",
-      mom: "Coco / Hvapoo",
+      mom: "Coco / Havapoo",
       dad: "Leo / Havapoo",
       birthDate: "2026-06-02",
       litterSize: 5,

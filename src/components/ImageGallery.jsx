@@ -11,6 +11,8 @@ const GENDER_COLORS = {
   "paw-pink": "#e91e8c",
 };
 
+const AUTOPLAY_INTERVAL_MS = 8000;
+
 function ParentsSection({ dadName, momName }) {
   return (
     <div className="parents-section">
@@ -158,29 +160,23 @@ function ImageGallery({ activeCategory, onInquire, onNavigate, categories = [], 
     ? (GENDER_COLORS[categoryInfo?.icon] ?? "#8a9bb0")
     : "#8a9bb0";
 
-  const litterInfo = getCategoryById("all");
+  const litterInfo = getCategoryById("home");
   const readyToAdoptDate = litterInfo?.details?.readyToAdoptDate;
   const isAvailableSoon = readyToAdoptDate
     ? new Date() < new Date(readyToAdoptDate + "T00:00:00")
     : false;
 
+  const isHome = activeCategory === "home";
+
   const imageList = useMemo(() => {
-    if (activeCategory === "all") {
-      return Object.entries(allImagesByFolder).flatMap(([folder, images]) => {
-        const puppy = categories.find(c => c.folder === folder);
-        return images.map(src => ({
-          src,
-          puppyName: puppy?.name ?? folder,
-          puppyId: puppy?.id ?? null,
-          puppyIcon: puppy?.icon ?? null,
-        }));
-      });
+    if (activeCategory === "home") {
+      return (allImagesByFolder["home"] ?? []).map(src => ({ src, puppyName: null }));
     }
     if (categoryFolder && allImagesByFolder[categoryFolder]) {
       return allImagesByFolder[categoryFolder].map(src => ({ src, puppyName: null }));
     }
     return [];
-  }, [activeCategory, categoryFolder, categories]);
+  }, [activeCategory, categoryFolder]);
 
   const [bigImage, setBigImage] = useState(null);
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -188,6 +184,24 @@ function ImageGallery({ activeCategory, onInquire, onNavigate, categories = [], 
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const containerRef = useRef(null);
   const imgRef = useRef(null);
+  const intervalRef = useRef(null);
+  const imageListRef = useRef(imageList);
+
+  const clearTimer = useCallback(() => {
+    clearInterval(intervalRef.current);
+  }, []);
+
+  const startTimer = useCallback(() => {
+    clearInterval(intervalRef.current);
+    intervalRef.current = setInterval(() => {
+      setCurrentIndex(prev => {
+        if (!imageListRef.current.length) return prev;
+        const next = (prev + 1) % imageListRef.current.length;
+        setBigImage(imageListRef.current[next]);
+        return next;
+      });
+    }, AUTOPLAY_INTERVAL_MS);
+  }, []);
 
   const calcStripWidth = useCallback(() => {
     const container = containerRef.current;
@@ -214,6 +228,17 @@ function ImageGallery({ activeCategory, onInquire, onNavigate, categories = [], 
     ro.observe(container);
     return () => ro.disconnect();
   }, [calcStripWidth]);
+
+  useEffect(() => { imageListRef.current = imageList; }, [imageList]);
+
+  useEffect(() => {
+    if (!isHome || lightboxOpen || imageList.length === 0) {
+      clearTimer();
+      return;
+    }
+    startTimer();
+    return clearTimer;
+  }, [isHome, lightboxOpen, imageList.length, startTimer, clearTimer]);
 
   useEffect(() => {
     if (imageList.length > 0) {
@@ -248,6 +273,7 @@ function ImageGallery({ activeCategory, onInquire, onNavigate, categories = [], 
     const nextIndex = (currentIndex + 1) % imageList.length;
     setCurrentIndex(nextIndex);
     setBigImage(imageList[nextIndex]);
+    if (isHome) startTimer();
   };
 
   const backFunc = () => {
@@ -255,6 +281,7 @@ function ImageGallery({ activeCategory, onInquire, onNavigate, categories = [], 
     const prevIndex = (currentIndex - 1 + imageList.length) % imageList.length;
     setCurrentIndex(prevIndex);
     setBigImage(imageList[prevIndex]);
+    if (isHome) startTimer();
   };
 
   if (imageList.length === 0) {
@@ -266,7 +293,7 @@ function ImageGallery({ activeCategory, onInquire, onNavigate, categories = [], 
             {categoryName}
           </h2>
         </header>
-        {activeCategory === 'all' && showParents && <ParentsSection dadName={litterInfo?.details?.dad} momName={litterInfo?.details?.mom} />}
+        {activeCategory === 'home' && showParents && <ParentsSection dadName={litterInfo?.details?.dad} momName={litterInfo?.details?.mom} />}
         <PuppyDetails details={categoryInfo?.details} genderColor={accentColor} isAvailableSoon={isAvailableSoon} />
         <div className="paw-placeholder-container">
           <PawPlaceholder color={accentColor} />
@@ -302,7 +329,7 @@ function ImageGallery({ activeCategory, onInquire, onNavigate, categories = [], 
         </h2>
       </header>
 
-      {activeCategory === 'all' && showParents && <ParentsSection dadName={litterInfo?.details?.dad} momName={litterInfo?.details?.mom} />}
+      {activeCategory === 'home' && showParents && <ParentsSection dadName={litterInfo?.details?.dad} momName={litterInfo?.details?.mom} />}
       <PuppyDetails details={categoryInfo?.details} genderColor={accentColor} isAvailableSoon={isAvailableSoon} />
 
       <div className="main-image-container" ref={containerRef}>
@@ -320,7 +347,7 @@ function ImageGallery({ activeCategory, onInquire, onNavigate, categories = [], 
         <button className="expand-btn" onClick={() => setLightboxOpen(true)} aria-label="View fullscreen">
           <IconExpand className="expand-btn-icon" />
         </button>
-        {activeCategory === "all" && bigImage?.puppyName && (
+        {bigImage?.puppyName && (
           <div className="photo-puppy-label">
             <PawSvg className="photo-paw-icon" fill={GENDER_COLORS[bigImage.puppyIcon] ?? "#8a9bb0"} />
             {bigImage.puppyId && onNavigate && (
@@ -333,6 +360,15 @@ function ImageGallery({ activeCategory, onInquire, onNavigate, categories = [], 
         )}
         <button className="arrow-button arrow-left" onClick={backFunc} style={{ width: stripWidth }}>&#8249;</button>
         <button className="arrow-button arrow-right" onClick={nextFunc} style={{ width: stripWidth }}>&#8250;</button>
+        {isHome && imageList.length > 1 && (
+          <div className="slideshow-progress">
+            <div
+              key={currentIndex}
+              className="slideshow-progress-bar"
+              style={{ animationDuration: `${AUTOPLAY_INTERVAL_MS}ms` }}
+            />
+          </div>
+        )}
       </div>
       <div className="image-card-footer">
         <div className="footer-nav-buttons">
@@ -342,25 +378,27 @@ function ImageGallery({ activeCategory, onInquire, onNavigate, categories = [], 
         <span className="image-counter">{currentIndex + 1} / {imageList.length}</span>
       </div>
 
-      <div className="thumbnail-strip">
-        {imageList.map((image, index) => (
-          <button
-            key={image.src}
-            className={`thumbnail-btn ${index === currentIndex ? "active" : ""}`}
-            onClick={() => handleClick(image, index)}
-            aria-label={`View photo ${index + 1} of ${imageList.length}`}
-            aria-pressed={index === currentIndex}
-          >
-            <img className="thumbnail" src={image.src} alt="" loading="lazy" decoding="async" />
-            {activeCategory === "all" && image.puppyName && (
-              <span className="thumbnail-puppy-label">
-                <PawSvg className="thumbnail-paw-icon" fill={GENDER_COLORS[image.puppyIcon] ?? "#8a9bb0"} />
-                {image.puppyName}
-              </span>
-            )}
-          </button>
-        ))}
-      </div>
+      {!isHome && (
+        <div className="thumbnail-strip">
+          {imageList.map((image, index) => (
+            <button
+              key={image.src}
+              className={`thumbnail-btn ${index === currentIndex ? "active" : ""}`}
+              onClick={() => handleClick(image, index)}
+              aria-label={`View photo ${index + 1} of ${imageList.length}`}
+              aria-pressed={index === currentIndex}
+            >
+              <img className="thumbnail" src={image.src} alt="" loading="lazy" decoding="async" />
+              {image.puppyName && (
+                <span className="thumbnail-puppy-label">
+                  <PawSvg className="thumbnail-paw-icon" fill={GENDER_COLORS[image.puppyIcon] ?? "#8a9bb0"} />
+                  {image.puppyName}
+                </span>
+              )}
+            </button>
+          ))}
+        </div>
+      )}
 
       <CtaSection
         categoryFolder={categoryFolder}

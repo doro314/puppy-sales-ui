@@ -19,8 +19,8 @@ function App() {
   const showCount = searchParams.has('count');
 
   const categories = getCategories();
-  const [activeCategory, setActiveCategory] = useState('all');
-  const [previousCategory, setPreviousCategory] = useState('all');
+  const [activeCategory, setActiveCategory] = useState('home');
+  const [previousCategory, setPreviousCategory] = useState('home');
   const [contactPrefill, setContactPrefill] = useState('');
   const [contactAccentColor, setContactAccentColor] = useState('#8a9bb0');
   const [visitorCount, setVisitorCount] = useState(null);

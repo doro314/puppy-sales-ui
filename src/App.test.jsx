@@ -11,7 +11,7 @@ const renderApp = () => render(<App />, { wrapper: MemoryRouter });
 vi.mock('./data/puppies', () => {
   const categories = [
     {
-      id: 'all',
+      id: 'home',
       name: 'Our Litter',
       icon: null,
       folder: null,

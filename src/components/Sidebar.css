@@ -137,6 +137,20 @@
     font-weight: 600;
   }
 
+  .mobile-nav-right {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .mobile-nav-menu-label {
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.45);
+  }
+
   .mobile-nav-icon {
     width: 20px;
     height: 20px;

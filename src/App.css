@@ -726,6 +726,28 @@
   text-shadow: 0 1px 4px rgba(0,0,0,0.5);
 }
 
+/* ── Home slideshow progress bar ── */
+.slideshow-progress {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: rgba(255, 255, 255, 0.15);
+  z-index: 5;
+}
+
+.slideshow-progress-bar {
+  height: 100%;
+  background: rgba(255, 255, 255, 0.75);
+  animation: slideshow-fill linear forwards;
+}
+
+@keyframes slideshow-fill {
+  from { width: 0%; }
+  to   { width: 100%; }
+}
+
 /* ── Expand button (top-right of main image) ── */
 .expand-btn {
   position: absolute;
