@@ -8,8 +8,9 @@ function PuppyDetails({ details, genderColor, isAvailableSoon = false }) {
 
   let statusClass = "status-badge status-adopted";
   let statusLabel = "Adopted";
-  if (isAvailableSoon) { statusClass = "status-badge status-available-soon"; statusLabel = "Available Soon"; }
-  else if (available) { statusClass = "status-badge status-available"; statusLabel = "Available"; }
+  if (available === "reserved") { statusClass = "status-badge status-reserved"; statusLabel = "Reserved"; }
+  else if (isAvailableSoon) { statusClass = "status-badge status-available-soon"; statusLabel = "Available Soon"; }
+  else if (available === "available") { statusClass = "status-badge status-available"; statusLabel = "Available"; }
 
   return (
     <div

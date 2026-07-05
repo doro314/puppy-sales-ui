@@ -8,12 +8,14 @@
 // Special fields:
 //   icon            — "paw-blue" (male) | "paw-pink" (female) | null (litter)
 //   folder          — image subfolder name; null for the litter overview
-//   available       — true | false | null (null hides the status badge)
+//   available       — "available" | "reserved" | "adopted" | null (null hides the status badge)
+//                     "reserved" overrides the global Available Soon state and shows its own badge/CTA
 //   litterDescription — shown as a paragraph below the stat grid, not as a stat row
 //
 // "Available Soon" state:
 //   Driven by readyToAdoptDate on the "all" entry — if today is before that date,
 //   all individual puppy CTAs show "Available Soon" regardless of their available flag.
+//   Exception: "reserved" always shows its own badge and CTA regardless of the date.
 
 const categories = [
   {
@@ -23,8 +25,8 @@ const categories = [
     folder: null,
     details: {
       breed: "Havapoo",
-      mom: "Coco",
-      dad: "Leo",
+      mom: "Coco / Hvapoo",
+      dad: "Leo / Havapoo",
       birthDate: "2026-06-02",
       litterSize: 5,
       readyToAdoptDate: "2026-07-28", // ← controls "Available Soon" for all puppies
@@ -50,7 +52,7 @@ const categories = [
       weightAsOf: { value: "27.8 oz", asOf: "2026-06-28" },
       markings: "Black face mask and side spot",
       personality: "Energetic",
-      available: true,
+      available: "available",
     },
   },
   {
@@ -64,7 +66,7 @@ const categories = [
       weightAsOf: { value: "29.6 oz", asOf: "2026-06-28" },
       markings: "White toes",
       personality: "Cautious Explorer",
-      available: true,
+      available: "reserved",
     },
   },
   {
@@ -78,7 +80,7 @@ const categories = [
       weightAsOf: { value: "26.5 oz", asOf: "2026-06-28" },
       markings: "White Back paws and tip of tail",
       personality: "Chill",
-      available: true,
+      available: "reserved",
     },
   },
   {
@@ -92,7 +94,7 @@ const categories = [
       weightAsOf: { value: "28.5 oz", asOf: "2026-06-28" },
       markings: "Black spot on left eye",
       personality: "Curious",
-      available: true,
+      available: "available",
     },
   },
   {
@@ -106,7 +108,7 @@ const categories = [
       weightAsOf: { value: "29.7 oz", asOf: "2026-06-28" },
       markings: "brown face mask and rear spot",
       personality: "Playful",
-      available: true,
+      available: "available",
     },
   },
 ];

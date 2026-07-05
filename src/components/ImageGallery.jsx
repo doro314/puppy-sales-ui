@@ -43,14 +43,37 @@ function ParentsSection({ dadName, momName }) {
   );
 }
 
-function CtaSection({ categoryFolder, categoryName, isAvailableSoon, available, accentColor, availablePuppies, onInquire, onNavigate }) {
+function CtaSection({ categoryFolder, categoryName, isAvailableSoon, available, accentColor, availablePuppies, browsablePuppies, onInquire, onNavigate }) {
   if (!categoryFolder) return null;
 
-  const goToRandomAvailable = () => {
-    if (!availablePuppies.length || !onNavigate) return;
-    const pick = availablePuppies[Math.floor(Math.random() * availablePuppies.length)];
+  const goToRandom = (pool) => {
+    if (!pool.length || !onNavigate) return;
+    const pick = pool[Math.floor(Math.random() * pool.length)];
     onNavigate(pick.id);
   };
+
+  if (available === "reserved") {
+    const pool = browsablePuppies.length > 0 ? browsablePuppies : availablePuppies;
+    if (!pool.length) return null;
+    return (
+      <>
+        <div className="section-divider" />
+        <div className="cta-card" style={{ "--cta-color": "#8a9bb0" }}>
+          <div className="cta-card-top-bar" />
+          <div className="cta-card-body">
+            <div className="cta-card-text">
+              <IconHome />
+              <div>
+                <p className="cta-card-heading">{categoryName} has been reserved!</p>
+                <p className="cta-card-sub">But we still have puppies looking for theirs.</p>
+              </div>
+            </div>
+            <button className="cta-button" onClick={() => goToRandom(pool)}>Meet Another Pup</button>
+          </div>
+        </div>
+      </>
+    );
+  }
 
   if (isAvailableSoon && onInquire) {
     return (
@@ -73,7 +96,7 @@ function CtaSection({ categoryFolder, categoryName, isAvailableSoon, available, 
     );
   }
 
-  if (!isAvailableSoon && available === false && availablePuppies.length > 0) {
+  if (available === "adopted" && availablePuppies.length > 0) {
     return (
       <>
         <div className="section-divider" />
@@ -87,14 +110,14 @@ function CtaSection({ categoryFolder, categoryName, isAvailableSoon, available, 
                 <p className="cta-card-sub">But we still have puppies looking for theirs.</p>
               </div>
             </div>
-            <button className="cta-button" onClick={goToRandomAvailable}>Meet Another Pup</button>
+            <button className="cta-button" onClick={() => goToRandom(availablePuppies)}>Meet Another Pup</button>
           </div>
         </div>
       </>
     );
   }
 
-  if (!isAvailableSoon && available && onInquire) {
+  if (available === "available" && onInquire) {
     return (
       <>
         <div className="section-divider" />
@@ -120,7 +143,12 @@ function CtaSection({ categoryFolder, categoryName, isAvailableSoon, available, 
 
 function ImageGallery({ activeCategory, onInquire, onNavigate, categories = [], showParents = false, showCount = false, visitorCount = null, uniqueCount = null }) {
   const availablePuppies = categories.filter(
-    (c) => c.folder && c.details?.available && c.id !== activeCategory
+    (c) => c.folder && c.details?.available === "available" && c.id !== activeCategory
+  );
+
+  // Non-reserved, non-adopted pups — used as "Meet Another Pup" targets from a reserved page
+  const browsablePuppies = categories.filter(
+    (c) => c.folder && c.details?.available !== "reserved" && c.details?.available !== "adopted" && c.id !== activeCategory
   );
 
   const categoryInfo = getCategoryById(activeCategory);
@@ -250,6 +278,7 @@ function ImageGallery({ activeCategory, onInquire, onNavigate, categories = [], 
           available={categoryInfo?.details?.available}
           accentColor={accentColor}
           availablePuppies={availablePuppies}
+          browsablePuppies={browsablePuppies}
           onInquire={onInquire}
           onNavigate={onNavigate}
         />
@@ -340,6 +369,7 @@ function ImageGallery({ activeCategory, onInquire, onNavigate, categories = [], 
         available={categoryInfo?.details?.available}
         accentColor={accentColor}
         availablePuppies={availablePuppies}
+        browsablePuppies={browsablePuppies}
         onInquire={onInquire}
         onNavigate={onNavigate}
       />

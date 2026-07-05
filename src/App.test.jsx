@@ -29,14 +29,21 @@ vi.mock('./data/puppies', () => {
       name: 'PupAvailable',
       icon: 'paw-blue',
       folder: 'pupavailable',
-      details: { sex: 'Male', color: 'Black', personality: 'Playful', available: true },
+      details: { sex: 'Male', color: 'Black', personality: 'Playful', available: 'available' },
     },
     {
       id: 'PupAdopted',
       name: 'PupAdopted',
       icon: 'paw-pink',
       folder: 'pupadopted',
-      details: { sex: 'Female', color: 'White', personality: 'Calm', available: false },
+      details: { sex: 'Female', color: 'White', personality: 'Calm', available: 'adopted' },
+    },
+    {
+      id: 'PupReserved',
+      name: 'PupReserved',
+      icon: 'paw-blue',
+      folder: 'pupreserved',
+      details: { sex: 'Male', color: 'Brown', personality: 'Bold', available: 'reserved' },
     },
     {
       id: 'PupPartial',
@@ -60,7 +67,7 @@ vi.mock('./data/puppies', () => {
         vetChecked: true,             // boolean → should show "Yes"
         microchipped: false,          // boolean → should show "No"
         birthDate: 'not-a-date',      // malformed date → should show ——
-        available: true,
+        available: 'available',
       },
     },
   ];
@@ -90,6 +97,7 @@ describe('App layout', () => {
     expect(nav).toHaveTextContent('Our Litter');
     expect(nav).toHaveTextContent('PupAvailable');
     expect(nav).toHaveTextContent('PupAdopted');
+    expect(nav).toHaveTextContent('PupReserved');
   });
 
   test('renders contact tab', () => {
@@ -138,6 +146,13 @@ describe('Puppy details', () => {
     renderApp();
     fireEvent.click(screen.getByText('PupAdopted'));
     expect(screen.getByText('Adopted')).toBeInTheDocument();
+  });
+
+  test('reserved puppy shows Reserved badge and not Available Soon', () => {
+    renderApp();
+    fireEvent.click(screen.getByText('PupReserved'));
+    expect(screen.getByText('Reserved')).toBeInTheDocument();
+    expect(screen.queryByText('Available Soon')).not.toBeInTheDocument();
   });
 });
 

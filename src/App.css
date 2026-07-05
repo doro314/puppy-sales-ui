@@ -563,6 +563,12 @@
   border: 1.5px solid #f5b7b1;
 }
 
+.status-reserved {
+  background: #fff8e1;
+  color: #7a4f00;
+  border: 1.5px solid #ffd666;
+}
+
 .status-available-soon {
   background: #f0f2f5;
   color: #5a6a7a;
