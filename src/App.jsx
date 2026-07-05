@@ -20,6 +20,7 @@ function App() {
 
   const categories = getCategories();
   const [activeCategory, setActiveCategory] = useState('all');
+  const [previousCategory, setPreviousCategory] = useState('all');
   const [contactPrefill, setContactPrefill] = useState('');
   const [contactAccentColor, setContactAccentColor] = useState('#8a9bb0');
   const [visitorCount, setVisitorCount] = useState(null);
@@ -60,6 +61,7 @@ function App() {
   };
 
   const handleInquire = (puppyName, accentColor = '#8a9bb0') => {
+    setPreviousCategory(activeCategory);
     setContactPrefill(`Hi! I'm interested in ${puppyName} and would love to learn more. Please let me know about availability and next steps.`);
     setContactAccentColor(accentColor);
     setActiveCategory('contact');
@@ -87,7 +89,7 @@ function App() {
         />
         <main className="main-content">
           {activeCategory === 'contact' && SHOW_CONTACT
-            ? <ContactForm initialMessage={contactPrefill} accentColor={contactAccentColor} />
+            ? <ContactForm initialMessage={contactPrefill} accentColor={contactAccentColor} onBack={() => handleCategoryChange(previousCategory)} />
             : <ImageGallery activeCategory={activeCategory} onInquire={handleInquire} onNavigate={handleNavigate} categories={categories} showParents={showParents} showCount={showCount} visitorCount={visitorCount} uniqueCount={uniqueCount} />
           }
         </main>

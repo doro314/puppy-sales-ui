@@ -25,7 +25,7 @@ function validate(fields) {
   return errors;
 }
 
-function ContactForm({ initialMessage = "", accentColor = "#8a9bb0" }) {
+function ContactForm({ initialMessage = "", accentColor = "#8a9bb0", onBack }) {
   const [fields, setFields] = useState({ name: "", email: "", message: initialMessage });
   const [touched, setTouched] = useState({ name: false, email: false, message: false });
   const [submitAttempted, setSubmitAttempted] = useState(false);
@@ -88,6 +88,11 @@ function ContactForm({ initialMessage = "", accentColor = "#8a9bb0" }) {
 
   return (
     <div className="contact-container" style={{ "--contact-color": accentColor }}>
+      {onBack && (
+        <button className="contact-back-btn" onClick={onBack} aria-label="Go back">
+          &#8592; Back
+        </button>
+      )}
       <h2 className="contact-title">
         <span className="contact-title-prefix">Get in Touch | </span>Contact Us
       </h2>
