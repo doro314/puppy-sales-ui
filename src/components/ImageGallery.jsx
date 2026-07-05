@@ -13,6 +13,23 @@ const GENDER_COLORS = {
 
 const AUTOPLAY_INTERVAL_MS = 8000;
 
+function DepositBanner({ onNavigate }) {
+  return (
+    <div className="deposit-banner">
+      <span className="deposit-banner-left">
+        <PawSvg className="deposit-banner-paw" fill="rgba(255,255,255,0.75)" />
+        <span className="deposit-banner-text">
+          Reserve today<span className="deposit-banner-dash"> —</span>
+          <br className="deposit-banner-br" />
+          {' '}<span className="deposit-banner-amount">$100</span>
+          {' '}holds your pup
+        </span>
+      </span>
+      <button className="deposit-banner-btn" onClick={() => onNavigate('contact')}>Inquire now →</button>
+    </div>
+  );
+}
+
 function ParentsSection({ dadName, momName }) {
   return (
     <div className="parents-section">
@@ -293,6 +310,7 @@ function ImageGallery({ activeCategory, onInquire, onNavigate, categories = [], 
             {categoryName}
           </h2>
         </header>
+        {isHome && <DepositBanner onNavigate={onNavigate} />}
         {activeCategory === 'home' && showParents && <ParentsSection dadName={litterInfo?.details?.dad} momName={litterInfo?.details?.mom} />}
         <PuppyDetails details={categoryInfo?.details} genderColor={accentColor} isAvailableSoon={isAvailableSoon} />
         <div className="paw-placeholder-container">
@@ -329,6 +347,7 @@ function ImageGallery({ activeCategory, onInquire, onNavigate, categories = [], 
         </h2>
       </header>
 
+      {isHome && <DepositBanner onNavigate={onNavigate} />}
       {activeCategory === 'home' && showParents && <ParentsSection dadName={litterInfo?.details?.dad} momName={litterInfo?.details?.mom} />}
       <PuppyDetails details={categoryInfo?.details} genderColor={accentColor} isAvailableSoon={isAvailableSoon} />
 
