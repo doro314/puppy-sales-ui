@@ -1,0 +1,27 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(//Users/dustindoro/Documents/dev-work/**)",
+      "Skill(code-review)",
+      "Skill(code-review:*)",
+      "Bash(git commit -m ' *)",
+      "Bash(git push *)",
+      "Bash(git pull *)",
+      "WebFetch(domain:counterapi.dev)",
+      "WebFetch(domain:docs.counterapi.dev)",
+      "Bash(npm test *)",
+      "Bash(python3 -c ' *)",
+      "Bash(pip3 install *)",
+      "Bash(python3 -c \"from PIL import Image; import numpy; print\\('ready'\\)\")",
+      "Bash(ls \"/Users/dustindoro/Desktop/untitled folder/\")",
+      "Read(//Users/dustindoro/Desktop/untitled folder/**)",
+      "Bash(python3)",
+      "Bash(git -C /Users/dustindoro/Documents/dev-work/puppy-sales-ui diff --stat)",
+      "Bash(git -C /Users/dustindoro/Documents/dev-work/puppy-sales-ui commit -m ' *)",
+      "Bash(git -C /Users/dustindoro/Documents/dev-work/puppy-sales-ui push)"
+    ],
+    "additionalDirectories": [
+      "/Users/dustindoro/Documents/dev-work"
+    ]
+  }
+}
