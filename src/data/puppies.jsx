@@ -66,7 +66,7 @@ const categories = [
       weightAsOf: { value: "29.6 oz", asOf: "2026-06-28" },
       markings: "White toes",
       personality: "Cautious Explorer",
-      available: "sold",
+      available: "adopted",
     },
   },
   {
