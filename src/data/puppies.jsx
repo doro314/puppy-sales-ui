@@ -52,7 +52,7 @@ const categories = [
       weightAsOf: { value: "27.8 oz", asOf: "2026-06-28" },
       markings: "Black face mask and side spot",
       personality: "Curiously energetic",
-      available: "available",
+      available: "adopted",
     },
   },
   {
