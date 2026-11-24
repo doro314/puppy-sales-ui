@@ -1,0 +1,1478 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Puppy data — options</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<style>
+/* ── Doc chrome tokens (paper) ─────────────────────────────────────────────
+   Every text/background pair below measures ≥ 5:1. */
+:root {
+  --serif: "Instrument Serif", Georgia, "Times New Roman", serif;
+  --sans:  -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;  /* the app's own stack */
+  --mono:  ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  --paper: #fbfaf7;
+  --card: #ffffff;
+  --card-deep: #f3f1ec;
+  --ink: #1d2733;
+  --ink-2: #3d4b5a;
+  --ink-3: #5a6878;
+  --ink-4: #98a3ae;
+  --hair: rgba(29, 39, 51, 0.10);
+  --hair-2: rgba(29, 39, 51, 0.18);
+  --pick: #a4500f;
+  --pick-soft: rgba(224, 123, 26, 0.10);
+  --pick-border: rgba(164, 80, 15, 0.32);
+  --stack: #1d7446;
+  --stack-soft: rgba(30, 132, 73, 0.09);
+  --stack-border: rgba(29, 116, 70, 0.30);
+  --bad: #b3261e;
+  --bad-soft: rgba(179, 38, 30, 0.07);
+  --shadow: 0 10px 30px rgba(29, 39, 51, 0.10), 0 2px 6px rgba(29, 39, 51, 0.06);
+
+  /* App tokens, redeclared from src/App.css so drawings read as the site */
+  --a-bg: #f4f4f4;
+  --a-ink: #2c3e50;
+  --a-grey: #8a9bb0;
+  --a-text-2: #5d718a;   /* proposed AA secondary text (site-design FIX-1) */
+  --a-boy: #4a90d9;
+  --a-girl: #e91e8c;
+  --a-ok-ink: #1d8047; --a-ok-bg: #e8f8f0; --a-ok-line: #a9dfbf;
+  --a-res-ink: #7a4f00; --a-res-bg: #fff8e1; --a-res-line: #ffd666;
+  --a-gone-ink: #c0392b; --a-gone-bg: #fdf0f0; --a-gone-line: #f5b7b1;
+  --a-soon-ink: #5a6a7a; --a-soon-bg: #f0f2f5; --a-soon-line: #c4cdd6;
+}
+
+* { box-sizing: border-box; }
+body {
+  margin: 0; padding: 48px 32px 120px;
+  background: var(--paper); color: var(--ink);
+  font-family: var(--sans); -webkit-font-smoothing: antialiased;
+}
+main { max-width: 1120px; }
+h1 { font-family: var(--serif); font-size: 38px; font-weight: 400; margin: 0 0 10px; letter-spacing: -0.2px; line-height: 1.15; }
+h1 em { font-style: italic; color: var(--pick); }
+.subtitle { color: var(--ink-3); font-size: 14px; max-width: 780px; line-height: 1.65; margin: 0 0 8px; }
+.subtitle b { color: var(--ink-2); font-weight: 600; }
+.subtitle a, .option-note a, .tradeoff a, .findings a, .key a { color: var(--pick); }
+code { font-family: var(--mono); font-size: 12.5px; color: var(--ink-2); background: var(--card-deep); padding: 1px 5px; border-radius: 4px; }
+
+/* Section headers */
+.doc-sec { margin: 80px 0 0; padding-top: 26px; border-top: 2px solid var(--hair-2); }
+.doc-sec__num { font-size: 11px; text-transform: uppercase; letter-spacing: 1.8px; color: var(--pick); margin: 0 0 10px; font-weight: 600; }
+.doc-sec__title { font-family: var(--serif); font-size: 30px; font-weight: 400; margin: 0 0 12px; }
+
+/* Census tables */
+.census { border-collapse: collapse; margin: 22px 0 8px; font-size: 13px; width: 100%; max-width: 860px; }
+.census th { text-align: left; font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.8px; color: var(--ink-3); font-weight: 600; padding: 0 14px 9px 0; border-bottom: 1px solid var(--hair-2); }
+.census td { padding: 9px 14px 9px 0; border-bottom: 1px solid var(--hair); color: var(--ink-2); vertical-align: top; line-height: 1.5; }
+.census td:first-child { color: var(--ink); }
+.census tr.hot td, .census tr.hot td:first-child { color: var(--bad); font-weight: 600; }
+.census tfoot td { border-bottom: 0; color: var(--ink-3); font-weight: 600; }
+.census .num { font-variant-numeric: tabular-nums; white-space: nowrap; }
+.census code { font-size: 11.5px; }
+.census--wide { max-width: 1060px; }
+.pill-ok, .pill-bad, .pill-meh { display: inline-block; font-size: 10.5px; font-weight: 700; letter-spacing: 0.4px; padding: 2px 7px; border-radius: 999px; white-space: nowrap; }
+.pill-ok { color: var(--stack); background: var(--stack-soft); border: 1px solid var(--stack-border); }
+.pill-bad { color: var(--bad); background: var(--bad-soft); border: 1px solid rgba(179,38,30,.25); }
+.pill-meh { color: var(--ink-3); background: var(--card-deep); border: 1px solid var(--hair-2); }
+
+/* Findings */
+.findings { max-width: 800px; margin: 26px 0 0; padding: 0; list-style: none; counter-reset: f; }
+.findings li { position: relative; padding: 0 0 0 32px; margin-bottom: 16px; font-size: 14px; line-height: 1.65; color: var(--ink-3); }
+.findings li::before {
+  content: counter(f); counter-increment: f; position: absolute; left: 0; top: 2px;
+  width: 21px; height: 21px; border-radius: 50%; background: var(--card); border: 1px solid var(--hair-2);
+  font-size: 10.5px; font-weight: 600; color: var(--ink-3); display: flex; align-items: center; justify-content: center;
+}
+.findings b { color: var(--ink); font-weight: 600; }
+.findings--fix li { padding-left: 70px; }
+.findings--fix li.done { opacity: .62; }
+.findings--fix li.done s { text-decoration-thickness: 1px; }
+.state__here { display: inline-block; margin-top: 7px; font: 700 10px/1.4 var(--sans); letter-spacing: .06em; text-transform: uppercase; color: var(--stack); background: var(--stack-soft); border: 1px solid var(--stack-border); border-radius: 5px; padding: 2px 7px; }
+.findings--fix li::before { content: "DFIX-" counter(f); width: 54px; height: 21px; border-radius: 6px; font-family: var(--mono); font-size: 10px; letter-spacing: 0.4px; color: var(--ink-2); }
+
+/* Key — the names you say back */
+.key { max-width: 960px; margin: 30px 0 0; background: var(--card); border: 1px solid var(--hair-2); border-radius: 16px; overflow: hidden; box-shadow: var(--shadow); }
+.key__hd { font-size: 11px; text-transform: uppercase; letter-spacing: 1.8px; color: var(--ink-3); font-weight: 600; padding: 15px 20px 12px; border-bottom: 1px solid var(--hair); margin: 0; }
+.key__grp { display: flex; gap: 18px; padding: 14px 20px; border-bottom: 1px solid var(--hair); align-items: flex-start; flex-wrap: wrap; }
+.key__rule { flex: 0 0 160px; font-size: 12px; color: var(--ink-3); line-height: 1.5; padding-top: 3px; margin: 0; }
+.key__rule b { display: block; color: var(--ink); font-size: 13px; font-weight: 600; margin-bottom: 2px; }
+.key__items { flex: 1 1 460px; display: flex; flex-direction: column; gap: 9px; }
+.key__item { display: flex; gap: 11px; align-items: baseline; font-size: 13px; color: var(--ink-3); line-height: 1.5; margin: 0; }
+.key__item .code { flex-shrink: 0; min-width: 62px; text-align: center; }
+.key__item b { color: var(--ink); font-weight: 600; }
+.key__star { color: var(--pick); }
+.key__eg { padding: 15px 20px; background: var(--card-deep); font-size: 13px; color: var(--ink-3); line-height: 1.7; margin: 0; }
+.key__eg b { color: var(--ink-2); }
+
+.code {
+  display: inline-block; font-family: var(--mono); font-size: 11px; font-weight: 600; letter-spacing: 0.5px;
+  padding: 3px 8px; border-radius: 6px; background: var(--card-deep); border: 1px solid var(--hair-2); color: var(--ink-2);
+}
+.code--pick  { color: var(--pick); border-color: var(--pick-border); background: var(--pick-soft); }
+.code--stack { color: var(--stack); border-color: var(--stack-border); background: var(--stack-soft); }
+
+/* Options */
+.options { display: flex; flex-wrap: wrap; gap: 40px; align-items: flex-start; margin-top: 36px; }
+.option-block { flex: 1 1 420px; max-width: 520px; padding-top: 22px; border-top: 1px solid var(--hair-2); }
+.option-block--wide { flex: 1 1 100%; max-width: 1060px; }
+.band { flex: 1 0 100%; margin: 14px 0 -10px; display: flex; align-items: center; gap: 14px; }
+.band__t { font-size: 11px; text-transform: uppercase; letter-spacing: 1.8px; color: var(--stack); font-weight: 700; white-space: nowrap; }
+.band__t--pick { color: var(--pick); }
+.band__line { flex: 1; height: 1px; background: var(--hair-2); }
+.band__sub { font-size: 12px; color: var(--ink-3); white-space: nowrap; }
+.option-label { font-size: 11px; text-transform: uppercase; letter-spacing: 1.8px; color: var(--ink-3); margin: 0 0 8px; }
+.option-name { font-family: var(--serif); font-size: 25px; margin: 0 0 6px; font-weight: 400; }
+.option-pos { font-size: 12.5px; color: var(--ink-3); font-style: italic; margin: 0 0 10px; }
+.tag { font-family: var(--sans); font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; border-radius: 999px; padding: 3px 8px; vertical-align: 5px; margin-left: 8px; color: var(--pick); border: 1px solid var(--pick); }
+.tag--no { color: var(--ink-4); border-color: var(--ink-4); }
+.tag--ok { color: var(--stack); border-color: var(--stack); }
+.option-note { font-size: 13.5px; color: var(--ink-3); line-height: 1.65; margin: 0 0 16px; }
+.option-note b { color: var(--ink-2); font-weight: 600; }
+.tradeoff { font-size: 13px; line-height: 1.65; margin: 16px 0 0; padding: 12px 14px; border-radius: 10px; background: var(--card); border: 1px solid var(--hair); color: var(--ink-3); }
+.tradeoff b { color: var(--ink-2); }
+.tradeoff .plus { color: var(--stack); font-weight: 700; }
+.tradeoff .minus { color: var(--bad); font-weight: 700; }
+.caption { font-size: 11px; color: var(--ink-3); margin: 10px 0 0; text-transform: uppercase; letter-spacing: 0.8px; line-height: 1.5; }
+.caption code { text-transform: none; letter-spacing: 0; font-size: 11px; }
+.callout { max-width: 860px; margin: 26px 0 0; padding: 16px 18px; border-radius: 12px; background: var(--pick-soft); border: 1px solid var(--pick-border); font-size: 14px; line-height: 1.65; color: var(--ink-2); }
+.callout b { color: var(--ink); }
+.callout--plain { background: var(--card); border-color: var(--hair-2); }
+
+/* ── Code drawings ──────────────────────────────────────────────────────── */
+.codebox { position: relative; background: #fff; border: 1px solid var(--hair-2); border-radius: 12px; overflow: hidden; box-shadow: var(--shadow); }
+.codebox__hd { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 9px 14px; background: var(--card-deep); border-bottom: 1px solid var(--hair); font-family: var(--mono); font-size: 11.5px; color: var(--ink-3); }
+pre.src { margin: 0; padding: 14px 16px; font-family: var(--mono); font-size: 12.3px; line-height: 1.6; color: var(--ink); overflow-x: auto; white-space: pre; tab-size: 2; }
+pre.src--tall { max-height: 520px; overflow: auto; }
+.j-key { color: #0b5394; } .j-str { color: #8a3f0a; } .j-num { color: #1d7446; } .j-lit { color: #7b2fa8; }
+.js-com { color: #6b7684; font-style: italic; } .js-str { color: #8a3f0a; } .js-kw { color: #7b2fa8; }
+.ann { color: var(--pick); font-family: var(--sans); font-size: 11.5px; font-weight: 600; }
+.ann--bad { color: var(--bad); }
+.hl { background: rgba(224, 123, 26, 0.13); border-radius: 3px; }
+.copy { font: 600 11px var(--sans); color: var(--pick); background: var(--card); border: 1px solid var(--pick-border); border-radius: 6px; padding: 4px 10px; cursor: pointer; }
+.copy:hover { background: var(--pick-soft); }
+details.deliver { max-width: 1060px; margin: 18px 0 0; border: 1px solid var(--hair-2); border-radius: 12px; background: var(--card); overflow: hidden; }
+details.deliver > summary { list-style: none; cursor: pointer; padding: 14px 18px; display: flex; align-items: baseline; gap: 10px; font-size: 14px; color: var(--ink); font-weight: 600; }
+details.deliver > summary::after { margin-left: auto; flex-shrink: 0; }
+details.deliver > summary::-webkit-details-marker { display: none; }
+details.deliver > summary span.s { font-weight: 400; color: var(--ink-3); font-size: 13px; }
+details.deliver > summary::after { content: "Show"; font: 600 11px var(--sans); color: var(--pick); border: 1px solid var(--pick-border); border-radius: 6px; padding: 4px 10px; }
+details.deliver[open] > summary::after { content: "Hide"; }
+details.deliver .codebox { border: 0; border-top: 1px solid var(--hair); border-radius: 0; box-shadow: none; }
+
+/* VS Code mock */
+.vsc { background: #1f1f1f; border-radius: 12px; overflow: visible; box-shadow: var(--shadow); font-family: var(--mono); font-size: 12.5px; color: #cccccc; position: relative; }
+.vsc__tabs { display: flex; background: #181818; border-radius: 12px 12px 0 0; border-bottom: 1px solid #2b2b2b; }
+.vsc__tab { padding: 8px 14px; font-family: var(--sans); font-size: 12px; color: #ffffff; background: #1f1f1f; border-top: 1px solid #0078d4; border-radius: 12px 0 0 0; }
+.vsc__tab span { color: #cbcb41; margin-right: 6px; font-family: var(--mono); }
+.vsc__body { padding: 10px 0 14px; position: relative; }
+.vsc__ln { display: flex; line-height: 20px; white-space: pre; }
+.vsc__n { width: 40px; text-align: right; padding-right: 14px; color: #6e7681; flex-shrink: 0; }
+.vsc__ln--cur { background: #282828; }
+.vk { color: #9cdcfe; } .vs { color: #ce9178; } .vn { color: #b5cea8; } .vp { color: #cccccc; } .vl { color: #569cd6; }
+.squig { text-decoration: underline wavy #cca700; text-underline-offset: 3px; text-decoration-thickness: 1px; }
+.caret { display: inline-block; width: 2px; height: 16px; background: #aeafad; vertical-align: -3px; }
+.vsc__pop { position: absolute; z-index: 3; background: #252526; border: 1px solid #454545; border-radius: 6px; box-shadow: 0 8px 24px rgba(0,0,0,.45); font-size: 12px; min-width: 210px; }
+.vsc__item { display: flex; align-items: center; gap: 8px; padding: 3px 10px; color: #cccccc; white-space: nowrap; }
+.vsc__item--sel { background: #04395e; color: #ffffff; }
+.vsc__ico { width: 14px; height: 14px; border-radius: 2px; background: #3794ff; display: inline-flex; align-items: center; justify-content: center; font-size: 9px; color: #fff; font-family: var(--sans); font-weight: 700; flex-shrink: 0; }
+.vsc__ico--snip { background: #c5a332; }
+.vsc__doc { position: absolute; z-index: 3; background: #252526; border: 1px solid #454545; border-radius: 6px; padding: 8px 11px; font-family: var(--sans); font-size: 12px; line-height: 1.5; color: #cccccc; width: 230px; box-shadow: 0 8px 24px rgba(0,0,0,.45); }
+.vsc__hover { position: absolute; z-index: 3; background: #252526; border: 1px solid #454545; border-radius: 6px; padding: 8px 11px; font-family: var(--sans); font-size: 12px; line-height: 1.5; color: #cccccc; width: 330px; box-shadow: 0 8px 24px rgba(0,0,0,.45); }
+.vsc__hover b { color: #cca700; font-weight: 600; }
+.vsc__det { border-top: 1px solid #454545; margin-top: 3px; padding: 7px 10px 8px; font-family: var(--sans); font-size: 11.5px; line-height: 1.5; color: #bdbdbd; white-space: normal; }
+.vsc-step { font-size: 12.5px; color: var(--ink-3); margin: 16px 0 7px; }
+.vsc-step b { color: var(--ink-2); }
+.vsc + .vsc-step { margin-top: 14px; }
+
+/* Terminal mock */
+.term { background: #11161c; color: #d6dde5; border-radius: 12px; padding: 14px 18px 16px; font-family: var(--mono); font-size: 12.3px; line-height: 1.65; box-shadow: var(--shadow); white-space: pre-wrap; overflow-x: auto; }
+.t-dim { color: #7f8c98; } .t-bad { color: #ff7b72; font-weight: 600; } .t-warn { color: #e3b341; } .t-ok { color: #7ee787; } .t-path { color: #79c0ff; } .t-str { color: #ffa657; }
+
+/* Sheet mock */
+.sheet { background: #fff; border: 1px solid #c9ced6; border-radius: 10px; overflow: hidden; box-shadow: var(--shadow); font-size: 12px; }
+.sheet table { border-collapse: collapse; width: 100%; }
+.sheet th { background: #f1f3f4; color: #5f6368; font-weight: 500; font-size: 11px; padding: 5px 8px; border: 1px solid #e0e3e7; text-align: left; }
+.sheet td { padding: 6px 8px; border: 1px solid #e0e3e7; color: #202124; white-space: nowrap; }
+.sheet td.dd { position: relative; padding-right: 20px; }
+.sheet td.dd::after { content: "▾"; position: absolute; right: 6px; color: #5f6368; font-size: 10px; }
+.sheet .chip-ok { background: #e6f4ea; color: #137333; border-radius: 10px; padding: 1px 7px; }
+.sheet .chip-res { background: #fef7e0; color: #7a4f00; border-radius: 10px; padding: 1px 7px; }
+
+/* Architecture boxes */
+.arch { display: flex; align-items: stretch; gap: 0; flex-wrap: wrap; }
+.arch__box { flex: 1 1 150px; background: var(--card); border: 1px solid var(--hair-2); border-radius: 10px; padding: 12px 14px; font-size: 12.5px; line-height: 1.55; color: var(--ink-3); }
+.arch__box b { display: block; color: var(--ink); font-size: 13px; margin-bottom: 3px; }
+.arch__arrow { flex: 0 0 34px; display: flex; align-items: center; justify-content: center; color: var(--ink-4); font-size: 20px; }
+.arch__adds { margin-top: 10px; display: flex; flex-wrap: wrap; gap: 6px; }
+.arch__adds span { font-size: 11.5px; padding: 3px 8px; border-radius: 999px; background: var(--bad-soft); color: var(--bad); border: 1px solid rgba(179,38,30,.22); }
+
+/* Model diagram */
+.model { background: var(--card); border: 1px solid var(--hair-2); border-radius: 14px; padding: 16px; box-shadow: var(--shadow); }
+.model__litter { border: 1.5px solid var(--pick-border); border-radius: 12px; padding: 12px 14px; background: var(--pick-soft); }
+.model__t { font-size: 11px; text-transform: uppercase; letter-spacing: 1.4px; color: var(--pick); font-weight: 700; margin: 0 0 6px; }
+.model__fields { font-family: var(--mono); font-size: 12px; color: var(--ink-2); line-height: 1.7; margin: 0; }
+.model__pups { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
+.model__pup { flex: 1 1 120px; border: 1px solid var(--hair-2); background: var(--card); border-radius: 10px; padding: 8px 10px; }
+.model__pup .model__t { color: var(--ink-3); }
+
+/* Status chips (app style) */
+.chip { display: inline-block; font-size: 10.5px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; padding: 3px 8px; border-radius: 5px; white-space: nowrap; font-family: var(--sans); }
+.chip--ok { color: var(--a-ok-ink); background: var(--a-ok-bg); border: 1.5px solid var(--a-ok-line); }
+.chip--res { color: var(--a-res-ink); background: var(--a-res-bg); border: 1.5px solid var(--a-res-line); }
+.chip--gone { color: var(--a-gone-ink); background: var(--a-gone-bg); border: 1.5px solid var(--a-gone-line); }
+.chip--soon { color: var(--a-soon-ink); background: var(--a-soon-bg); border: 1.5px solid var(--a-soon-line); }
+
+/* Weight table */
+.weights td.big { font-size: 15px; font-weight: 700; color: var(--ink); }
+.weights td.win { color: var(--stack); font-weight: 700; }
+
+/* Cover photo cards */
+.cards2 { display: flex; gap: 18px; flex-wrap: wrap; }
+.pcard { width: 190px; background: #fff; border-radius: 12px; overflow: hidden; box-shadow: 0 1px 6px rgba(0,0,0,.08); font-family: var(--sans); }
+.pcard img { display: block; width: 100%; aspect-ratio: 1 / 1; object-fit: cover; }
+.pcard__row { display: flex; align-items: center; justify-content: space-between; gap: 6px; padding: 9px 11px 11px; }
+.pcard__name { font-size: 15px; font-weight: 700; color: var(--a-ink); display: flex; align-items: center; gap: 5px; }
+.pcard__name svg { width: 13px; height: 13px; }
+.pcard-cap { font-size: 11.5px; color: var(--ink-3); margin: 8px 0 0; line-height: 1.5; width: 190px; }
+
+/* Lifecycle states */
+.states { display: flex; flex-direction: column; gap: 14px; margin-top: 26px; max-width: 1060px; }
+.state { display: grid; grid-template-columns: 170px minmax(0, 1.15fr) minmax(0, 1fr) minmax(0, 1fr); gap: 16px; background: var(--card); border: 1px solid var(--hair-2); border-radius: 14px; padding: 16px 18px; align-items: start; }
+.state__name { font-family: var(--serif); font-size: 21px; line-height: 1.15; margin: 0; }
+.state__n { display: block; font-family: var(--sans); font-size: 10.5px; text-transform: uppercase; letter-spacing: 1.4px; color: var(--pick); font-weight: 700; margin-bottom: 4px; }
+.state__col-t { font-size: 10.5px; text-transform: uppercase; letter-spacing: 1px; color: var(--ink-3); font-weight: 600; margin: 0 0 6px; }
+.state pre.src { padding: 8px 10px; font-size: 11.3px; background: var(--card-deep); border-radius: 8px; white-space: pre-wrap; }
+.state p { margin: 0; font-size: 13px; line-height: 1.6; color: var(--ink-3); }
+.state p b { color: var(--ink); }
+.state__today { border-left: 2px solid var(--hair-2); padding-left: 12px; }
+.state__today--bad { border-left-color: var(--bad); }
+.state__today--ok { border-left-color: var(--stack); }
+
+/* Catalog */
+.catalog { border-collapse: collapse; width: 100%; max-width: 1060px; font-size: 13px; margin: 16px 0 6px; background: var(--card); border: 1px solid var(--hair-2); border-radius: 12px; overflow: hidden; }
+.catalog th { text-align: left; font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.8px; color: var(--ink-3); font-weight: 600; padding: 10px 12px; background: var(--card-deep); border-bottom: 1px solid var(--hair-2); }
+.catalog td { padding: 10px 12px; border-bottom: 1px solid var(--hair); color: var(--ink-3); vertical-align: top; line-height: 1.55; }
+.catalog tr:last-child td { border-bottom: 0; }
+.catalog td:first-child { white-space: nowrap; }
+.catalog td:first-child code { color: var(--ink); font-weight: 600; background: none; padding: 0; font-size: 12.5px; }
+.catalog .req { color: var(--pick); font-weight: 700; margin-left: 3px; }
+.catalog .vals { display: flex; flex-wrap: wrap; gap: 5px; }
+.catalog .vals code { background: var(--stack-soft); color: var(--stack); border: 1px solid var(--stack-border); font-size: 11.5px; }
+.catalog-h { font-family: var(--serif); font-size: 22px; font-weight: 400; margin: 34px 0 0; }
+.enum-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; max-width: 1060px; margin-top: 16px; }
+.enum { background: var(--card); border: 1px solid var(--hair-2); border-radius: 12px; overflow: hidden; }
+.enum__hd { padding: 10px 14px; background: var(--card-deep); border-bottom: 1px solid var(--hair); font-size: 13px; color: var(--ink); font-weight: 600; display: flex; justify-content: space-between; gap: 8px; }
+.enum__hd span { font-weight: 400; color: var(--ink-3); font-size: 12px; }
+.enum__row { display: grid; grid-template-columns: 92px 1fr; gap: 10px; padding: 8px 14px; border-bottom: 1px solid var(--hair); font-size: 12.5px; line-height: 1.5; color: var(--ink-3); }
+.enum__row:last-child { border-bottom: 0; }
+.enum__row code { background: none; padding: 0; color: var(--stack); font-weight: 600; font-size: 12px; }
+
+/* The set */
+.delta td.after { color: var(--stack); font-weight: 600; }
+.order { counter-reset: o; list-style: none; padding: 0; margin: 18px 0 0; max-width: 860px; }
+.order li { counter-increment: o; position: relative; padding: 10px 0 10px 40px; border-bottom: 1px solid var(--hair); font-size: 13.5px; line-height: 1.6; color: var(--ink-3); }
+.order li::before { content: counter(o); position: absolute; left: 0; top: 10px; width: 26px; height: 26px; border-radius: 8px; background: var(--card-deep); border: 1px solid var(--hair-2); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; color: var(--ink-2); }
+.order b { color: var(--ink); }
+
+.foot { margin-top: 90px; padding-top: 18px; border-top: 1px solid var(--hair-2); font-size: 12.5px; color: var(--ink-3); line-height: 1.7; max-width: 860px; }
+
+@media (max-width: 720px) {
+  body { padding: 28px 16px 80px; }
+  h1 { font-size: 30px; }
+  .state { grid-template-columns: 1fr; }
+  .key__rule { flex-basis: 100%; }
+  .option-block { flex-basis: 100%; }
+}
+</style>
+</head>
+<body>
+<main>
+
+<h1>Puppy data — getting the next litter on the site<em>.</em></h1>
+<p class="subtitle">
+  How puppy details are stored, edited and checked, and the full list of allowed values.
+  Measured against the code at <code>b7313d8</code> on Nov 24, 2026; every failure in §01 was <b>run against the real components</b>, not read off the source.
+  What visitors see is the sibling decision: <a href="site-design-options.html">site-design-options.html</a>.
+</p>
+
+<div class="key">
+  <p class="key__hd">The names — say these back to me</p>
+
+  <div class="key__grp">
+    <p class="key__rule"><b>Pick one</b>Where the data lives</p>
+    <div class="key__items">
+      <p class="key__item"><span class="code code--pick">SRC-1</span><span><b>Typed module.</b> Keep a JavaScript file; describe its shape in comments the editor checks.</span></p>
+      <p class="key__item"><span class="code code--pick">SRC-2</span><span><b>JSON + schema.</b> <span class="key__star">★</span> <code>litters.json</code> beside <code>litters.schema.json</code>. VS Code lists every allowed value as you type and underlines anything else.</span></p>
+      <p class="key__item"><span class="code code--pick">SRC-3</span><span><b>Spreadsheet.</b> A shared Google Sheet with dropdown columns, downloaded at build.</span></p>
+      <p class="key__item"><span class="code code--pick">SRC-4</span><span><b>Database.</b> The README's Supabase plan: tables and a photo bucket, loaded live.</span></p>
+    </div>
+  </div>
+
+  <div class="key__grp">
+    <p class="key__rule"><b>Pick one</b>What a litter is</p>
+    <div class="key__items">
+      <p class="key__item"><span class="code code--pick">LIT-1</span><span><b>Overwrite.</b> One litter at a time; each new litter replaces the last.</span></p>
+      <p class="key__item"><span class="code code--pick">LIT-2</span><span><b>Litter list.</b> <span class="key__star">★</span> Each litter is a record holding its own parents, dates and puppies. Retiring one is a switch, not a delete.</span></p>
+      <p class="key__item"><span class="code code--pick">LIT-3</span><span><b>Relational.</b> Puppies in their own list, each pointing at a litter id.</span></p>
+    </div>
+  </div>
+
+  <div class="key__grp">
+    <p class="key__rule"><b>Pick one</b>Photos</p>
+    <div class="key__items">
+      <p class="key__item"><span class="code code--pick">IMG-1</span><span><b>Build-time sizes.</b> <span class="key__star">★</span> The build makes a 320, 1280 and 1920&nbsp;px WebP of every photo. Originals untouched, nothing to remember.</span></p>
+      <p class="key__item"><span class="code code--pick">IMG-2</span><span><b>Own script.</b> The same sizes, made by an <code>npm run photos</code> you run after adding photos.</span></p>
+      <p class="key__item"><span class="code code--pick">IMG-3</span><span><b>Shrink once.</b> Resize the originals to 1600&nbsp;px in place. No new code.</span></p>
+    </div>
+  </div>
+
+  <div class="key__grp">
+    <p class="key__rule"><b>Stack any</b>Independent of the picks above</p>
+    <div class="key__items">
+      <p class="key__item"><span class="code code--stack">DATA-1</span><span><b>Checker.</b> <span class="key__star">★</span> The build refuses bad puppy data and says what to fix; the live site stays as it was.</span></p>
+      <p class="key__item"><span class="code code--stack">DATA-2</span><span><b>Written facts list.</b> <span class="key__star">★</span> The page shows a fixed, labelled list of facts. Data keys stop being the layout.</span></p>
+      <p class="key__item"><span class="code code--stack">DATA-3</span><span><b>Weight log.</b> <span class="key__star">★</span> Weights become dated numbers; the page says “27.8&nbsp;oz at 3&nbsp;weeks”.</span></p>
+      <p class="key__item"><span class="code code--stack">DATA-4</span><span><b>Cover photo.</b> <span class="key__star">★</span> An optional <code>cover</code> picks each puppy's first photo. No more renaming files to A1.</span></p>
+      <p class="key__item"><span class="code code--stack">DATA-5</span><span><b>Owner's manual.</b> <span class="key__star">★</span> README becomes “how to add a litter”; SPEC.md, which documents the value that hides the inquiry button, goes.</span></p>
+    </div>
+  </div>
+
+  <div class="key__grp">
+    <p class="key__rule"><b>Cleanups</b>Small, unrelated to any option</p>
+    <div class="key__items">
+      <p class="key__item"><span class="code">DFIX-1 … DFIX-4</span><span>Four independent fixes in §08 — DFIX-3 is already resolved. Take all, some, or none.</span></p>
+    </div>
+  </div>
+
+  <p class="key__eg">
+    <b>To move forward, say something like:</b> “Build <span class="code code--pick">SRC-2</span> + <span class="code code--pick">LIT-2</span> + <span class="code code--pick">IMG-1</span>
+    with <span class="code code--stack">DATA-1</span> through <span class="code code--stack">DATA-5</span>, and DFIX-1 through DFIX-4.”
+    &nbsp;<span class="key__star">★</span> marks what I'd recommend — that exact combination. Codes here start DATA- and DFIX- so they can't be mistaken for the design doc's PLUS- and FIX-. The short answer to <i>“is this the best system?”</i> is in §02: keep the data in the repo, change its format and add a check.
+  </p>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════════ -->
+<section class="doc-sec">
+  <p class="doc-sec__num">01 · Diagnosis</p>
+  <h2 class="doc-sec__title">What adding one puppy takes today</h2>
+  <p class="subtitle">Counted from the code for one puppy with photos, following the how-to comment at the top of <code>src/data/puppies.jsx</code>.</p>
+
+  <table class="census">
+    <thead><tr><th>Step</th><th>Where</th><th>Must match</th><th>Checked by</th></tr></thead>
+    <tbody>
+      <tr><td>1 · Make the photo folder</td><td><code>src/images/bella/</code></td><td><code>folder</code> in the data, exact case</td><td>Nothing</td></tr>
+      <tr><td>2 · Drop in photos</td><td>same folder</td><td>.jpg .jpeg .png .gif only</td><td>Nothing — other formats are skipped silently</td></tr>
+      <tr><td>3 · <code>id</code></td><td><code>puppies.jsx</code></td><td>unique; by habit, the name</td><td>Nothing</td></tr>
+      <tr><td>4 · <code>name</code></td><td></td><td>the id, by habit</td><td>—</td></tr>
+      <tr class="hot"><td>5 · <code>icon</code></td><td></td><td><code>sex</code>: <code>"paw-pink"</code> ↔ <code>"Female"</code></td><td>Nothing</td></tr>
+      <tr class="hot"><td>6 · <code>folder</code></td><td></td><td>step 1's folder name</td><td>Nothing</td></tr>
+      <tr><td>7 · <code>details.sex</code></td><td></td><td><code>icon</code></td><td>Nothing</td></tr>
+      <tr><td>8 · <code>color</code>, <code>markings</code>, <code>personality</code></td><td></td><td>free text — no list exists</td><td>—</td></tr>
+      <tr><td>9 · <code>weightAsOf</code></td><td></td><td><code>"27.8 oz"</code> as text, plus a date</td><td>Nothing</td></tr>
+      <tr class="hot"><td>10 · <code>available</code></td><td></td><td>exactly <code>"available"</code>, <code>"reserved"</code> or <code>"adopted"</code></td><td>Nothing</td></tr>
+    </tbody>
+    <tfoot><tr><td>10 steps</td><td>2 files</td><td>3 pairs of values that must agree</td><td>0 checks</td></tr></tfoot>
+  </table>
+
+  <h3 class="catalog-h">What a typo does</h3>
+  <p class="subtitle">“Ran it” means: rendered the real <code>App</code> with only that value changed (a throwaway test, since deleted).</p>
+  <table class="census census--wide">
+    <thead><tr><th>What gets typed</th><th>What a visitor sees</th><th>Verified</th></tr></thead>
+    <tbody>
+      <tr class="hot"><td><code>available: true</code> — the format SPEC.md documents</td><td>“Adopted” badge, <b>no inquiry button</b></td><td><span class="pill-ok">Ran it</span></td></tr>
+      <tr class="hot"><td><code>available: "Available"</code> — one capital letter</td><td>“Adopted” badge, <b>no inquiry button</b></td><td><span class="pill-ok">Ran it</span></td></tr>
+      <tr><td><code>folder: "Bella"</code> for the folder <code>bella/</code></td><td>“Photos coming soon” — the photos exist</td><td><span class="pill-ok">Ran it</span></td></tr>
+      <tr><td><code>icon: "paw-blue"</code> on a girl</td><td>Blue page with a blue “Female” pill</td><td><span class="pill-ok">Ran it</span></td></tr>
+      <tr class="hot"><td>A sixth fact, e.g. <code>microchipped: true</code></td><td><b>Status badge and sex pill vanish</b> — the layout flips to the litter grid</td><td><span class="pill-ok">Ran it</span></td></tr>
+      <tr><td><code>vaccinations: ""</code></td><td>“Vaccinations ——”, which reads as <i>none</i></td><td><span class="pill-meh">Live site</span></td></tr>
+      <tr><td>A photo saved as .HEIC or .webp</td><td>Missing, with no warning</td><td><span class="pill-meh">Read from the glob</span></td></tr>
+    </tbody>
+  </table>
+
+  <ol class="findings">
+    <li><b>Every mistake is silent.</b> Nothing between your editor and the live site checks a single value. The costliest one — an available puppy shown as Adopted with no way to inquire — is one capital letter away, and <code>SPEC.md</code> in this repo still documents <code>true | false | null</code>, the exact format that triggers it.</li>
+    <li><b>The data's shape is the page's layout.</b> <code>PuppyDetails</code> renders <code>Object.entries(details)</code>: key order is display order, key names are labels (<code>weightAsOf</code> → “Weight As Of”; <code>specialMarkings</code> was renamed in <code>b7cdc21</code> just to change a label), and the <i>number</i> of keys picks the layout. Six facts flips a puppy into the litter grid, which has no status badge.</li>
+    <li><b>The litter is a nav tab.</b> Breed, parents and dates live on the record whose id is <code>"home"</code>, and <code>ImageGallery</code> finds them by that id. So readiness is site-wide: the day you type in the next litter's ready date, every unsold puppy from this litter turns “Available Soon”. Two litters can't be on the site at once — which is exactly the situation “new puppies” creates.</li>
+    <li><b>Same fact, two fields.</b> <code>icon</code> restates <code>sex</code>. <code>id</code>, <code>name</code> and <code>folder</code> say one thing three ways. <code>litterSize</code> restates the puppy count. <code>mom: "Coco / Havapoo"</code> packs two facts into one string, which is why the parents card reads “Coco / Havapoo”.</li>
+    <li><b>Parents live in code.</b> <code>/Leo.jpg</code> and <code>/Coco.jpg</code> are hard-coded in <code>ImageGallery.jsx</code>. A litter with a different sire is a code change, not a data change.</li>
+    <li><b>Photos ship at camera size.</b> 2000–4284&nbsp;px originals, about 0.8&nbsp;MB each after the build's compression, used for the 73&nbsp;px thumbnails too. Opening Bella on a phone downloads <b>7.9&nbsp;MB</b> (§04).</li>
+    <li><b>Photo order is a file-naming trick.</b> Photos sort alphabetically, so Bella, Olive and Pepper had recent shots renamed <code>A1</code>–<code>A3</code> to lead. Brownie and Jasper didn't, so their first photo is a two-week-old pup on a patterned blanket.</li>
+    <li><b>The written instructions point backwards.</b> <code>README.md</code> is Create React App boilerplate plus a Supabase plan for a schema two refactors old (<code>id: 'all'</code>, <code>available boolean</code>). <code>SPEC.md</code> describes the boolean.</li>
+  </ol>
+
+  <div class="options">
+    <div class="option-block">
+      <p class="option-label">Today</p>
+      <h3 class="option-name">One puppy, as stored <span class="tag tag--no">Before</span></h3>
+      <p class="option-note">The real Bella record and the litter record it depends on, from <code>src/data/puppies.jsx</code>. Annotations mark every value that has to agree with something else.</p>
+      <div class="codebox">
+        <div class="codebox__hd"><span>src/data/puppies.jsx</span><span>excerpt</span></div>
+<pre class="src">{
+  id: <span class="js-str">"home"</span>,                 <span class="ann">◀ the litter is a nav tab</span>
+  folder: <span class="js-kw">null</span>,
+  details: {
+    mom: <span class="js-str">"Coco / Havapoo"</span>,     <span class="ann">◀ two facts, one string</span>
+    readyToAdoptDate: <span class="js-str">"2026-07-28"</span>,
+                              <span class="ann ann--bad">◀ applies to every puppy</span>
+    vaccinations: <span class="js-str">""</span>,          <span class="ann">◀ shows as “——”</span>
+  },
+},
+{
+  <span class="hl">id: <span class="js-str">"Bella"</span></span>,                <span class="ann">◀ three names for</span>
+  <span class="hl">name: <span class="js-str">"Bella"</span></span>,              <span class="ann">  one puppy</span>
+  <span class="hl">folder: <span class="js-str">"bella"</span></span>,            <span class="ann">◀ exact case of the folder</span>
+  icon: <span class="js-str">"paw-pink"</span>,            <span class="ann">◀ must agree with sex</span>
+  details: {
+    sex: <span class="js-str">"Female"</span>,
+    color: <span class="js-str">"White/Black"</span>,       <span class="ann">◀ free text</span>
+    weightAsOf: { value: <span class="js-str">"27.8 oz"</span>, asOf: <span class="js-str">"2026-06-28"</span> },
+                              <span class="ann">◀ key name is the label</span>
+    markings: <span class="js-str">"Black face mask and side spot"</span>,
+    personality: <span class="js-str">"Curiously energetic"</span>,
+    available: <span class="js-str">"available"</span>,   <span class="ann ann--bad">◀ anything else = “Adopted”</span>
+  },
+}</pre>
+      </div>
+    </div>
+
+    <div class="option-block">
+      <p class="option-label">The shape of the fix</p>
+      <h3 class="option-name">Readiness belongs to a litter</h3>
+      <p class="option-note">
+        One state the current model can produce is impossible in real life: <b>a six-month-old puppy marked “Available Soon”</b>. That is the model telling you what's missing — a litter owns the dates, and a puppy belongs to a litter. Put the litter back and the status question gets small.
+      </p>
+      <div class="model">
+        <div class="model__litter">
+          <p class="model__t">Litter</p>
+          <p class="model__fields">id · listed · breed · mom · dad<br>due · born · readyDate · care · facts</p>
+          <div class="model__pups">
+            <div class="model__pup"><p class="model__t">Puppy</p><p class="model__fields">slug · name<br>sex · status</p></div>
+            <div class="model__pup"><p class="model__t">Puppy</p><p class="model__fields">color · pattern<br>weights · cover</p></div>
+            <div class="model__pup"><p class="model__t">…</p><p class="model__fields">markings<br>personality</p></div>
+          </div>
+        </div>
+      </div>
+      <table class="census" style="margin-top:18px">
+        <thead><tr><th>You type <code>status</code></th><th>Before the litter's <code>readyDate</code></th><th>After</th></tr></thead>
+        <tbody>
+          <tr><td><code>available</code></td><td><span class="chip chip--soon">Ready Jul 28</span></td><td><span class="chip chip--ok">Available</span></td></tr>
+          <tr><td><code>reserved</code></td><td><span class="chip chip--res">Reserved</span></td><td><span class="chip chip--res">Reserved</span></td></tr>
+          <tr><td><code>adopted</code></td><td><span class="chip chip--gone">Adopted</span></td><td><span class="chip chip--gone">Adopted</span></td></tr>
+        </tbody>
+      </table>
+      <div class="tradeoff">
+        <b>Three values you type; four labels the site shows.</b> “Ready Jul 28” is never typed — it's a date comparison against the puppy's own litter. And <code>null</code> goes away: every puppy always has a status.
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════════════ -->
+<section class="doc-sec">
+  <p class="doc-sec__num">02 · Where the data lives</p>
+  <h2 class="doc-sec__title">Is this the best system?</h2>
+  <p class="subtitle">
+    Four homes for the same records, from fewest to most moving parts. Each answers three questions differently: <b>who edits it, with what tool, and what stops a mistake.</b>
+  </p>
+
+  <div class="options">
+    <div class="band"><span class="band__t band__t--pick">Pick one</span><span class="band__line"></span><span class="band__sub">SRC-1 · SRC-2 · SRC-3 · SRC-4</span></div>
+
+    <!-- SRC-1 -->
+    <div class="option-block">
+      <p class="option-label"><span class="code code--pick">SRC-1</span></p>
+      <h3 class="option-name">Typed module</h3>
+      <p class="option-pos">Smallest change of the four.</p>
+      <p class="option-note">Keep <code>puppies.jsx</code> as code and describe its shape in JSDoc comments. With <code>// @ts-check</code> at the top, VS Code's built-in TypeScript checker underlines a value that isn't in the list.</p>
+      <div class="codebox">
+        <div class="codebox__hd"><span>src/data/puppies.jsx</span><span>sketch</span></div>
+<pre class="src"><span class="js-com">// @ts-check</span>
+<span class="js-com">/** @typedef {'available'|'reserved'|'adopted'} Status */</span>
+<span class="js-com">/** @typedef {'female'|'male'} Sex */</span>
+<span class="js-com">/** @typedef {{ slug: string, name: string, sex: Sex,
+               status: Status, color?: string[] }} Puppy */</span>
+
+<span class="js-com">/** @type {Litter[]} */</span>
+<span class="js-kw">const</span> litters = [
+  { id: <span class="js-str">'2026-06-coco-leo'</span>, puppies: [
+    { slug: <span class="js-str">'bella'</span>, name: <span class="js-str">'Bella'</span>, sex: <span class="js-str">'female'</span>,
+      status: <span class="js-str">'available'</span> },  <span class="js-com">// comments still work</span>
+  ]},
+];</pre>
+      </div>
+      <div class="tradeoff">
+        <span class="plus">+</span> Comments and trailing commas keep working; no format change.<br>
+        <span class="minus">−</span> The allowed values live in a comment block, in a second dialect (JSDoc) you have to keep learning.<br>
+        <span class="minus">−</span> Type errors are editor hints only: <code>vite build</code> doesn't type-check, so a bad value still deploys unless DATA-1 runs.<br>
+        <span class="minus">−</span> Only JavaScript can read it.
+      </div>
+    </div>
+
+    <!-- SRC-2 -->
+    <div class="option-block">
+      <p class="option-label"><span class="code code--pick">SRC-2</span></p>
+      <h3 class="option-name">JSON + schema <span class="tag">★ Recommended</span></h3>
+      <p class="option-pos">The one that puts the list of allowed values where you type.</p>
+      <p class="option-note">
+        <code>litters.json</code> holds the records. Its first line points at <code>litters.schema.json</code>, which names every field and every allowed value with a one-line explanation. VS Code reads it with <b>no extension and no setting</b>: it suggests values as you type, explains each on hover, underlines anything not on the list, and offers a whole <i>New puppy</i> template inside the puppies list.
+      </p>
+      <p class="vsc-step"><b>1 · Typing a value</b> — the three choices, each explained</p>
+      <div class="vsc" aria-label="Drawing: VS Code suggesting status values">
+        <div class="vsc__tabs"><div class="vsc__tab"><span>{}</span>litters.json</div></div>
+        <div class="vsc__body" style="height:212px">
+          <div class="vsc__ln"><span class="vsc__n">31</span><span class="vp">  { </span><span class="vk">"slug"</span><span class="vp">: </span><span class="vs">"olive"</span><span class="vp">, </span><span class="vk">"name"</span><span class="vp">: </span><span class="vs">"Olive"</span><span class="vp">,</span></div>
+          <div class="vsc__ln"><span class="vsc__n">32</span><span class="vp">    </span><span class="vk">"sex"</span><span class="vp">: </span><span class="vs">"female"</span><span class="vp">,</span></div>
+          <div class="vsc__ln vsc__ln--cur"><span class="vsc__n">33</span><span class="vp">    </span><span class="vk">"status"</span><span class="vp">: </span><span class="vs">"</span><span class="caret"></span><span class="vs">"</span></div>
+          <div class="vsc__pop" style="left:146px; top:70px; width:300px">
+            <div class="vsc__item vsc__item--sel"><span class="vsc__ico">E</span>"available"</div>
+            <div class="vsc__item"><span class="vsc__ico">E</span>"reserved"</div>
+            <div class="vsc__item"><span class="vsc__ico">E</span>"adopted"</div>
+            <div class="vsc__det">Shows the Inquire button. Before the litter's readyDate the badge reads Ready and the date, e.g. Ready Jul 28.</div>
+          </div>
+        </div>
+      </div>
+
+      <p class="vsc-step"><b>2 · A typo</b> — underlined the moment it's typed</p>
+      <div class="vsc" aria-label="Drawing: VS Code underlining a value that is not allowed">
+        <div class="vsc__body" style="height:118px">
+          <div class="vsc__ln"><span class="vsc__n">37</span><span class="vp">  { </span><span class="vk">"slug"</span><span class="vp">: </span><span class="vs">"pepper"</span><span class="vp">,</span></div>
+          <div class="vsc__ln"><span class="vsc__n">38</span><span class="vp">    </span><span class="vk">"status"</span><span class="vp">: </span><span class="vs squig">"Available"</span><span class="vp">,</span></div>
+          <div class="vsc__hover" style="left:96px; top:52px"><b>⚠</b> Value is not accepted. Valid values: "available", "reserved", "adopted".</div>
+        </div>
+      </div>
+
+      <p class="vsc-step"><b>3 · Adding a puppy</b> — inside <code>"puppies": [ ]</code>, press <code>⌃Space</code></p>
+      <div class="vsc" aria-label="Drawing: VS Code offering a New puppy template">
+        <div class="vsc__body" style="height:150px">
+          <div class="vsc__ln"><span class="vsc__n">45</span><span class="vp">  </span><span class="vk">"puppies"</span><span class="vp">: [</span></div>
+          <div class="vsc__ln vsc__ln--cur"><span class="vsc__n">46</span><span class="vp">    </span><span class="caret"></span></div>
+          <div class="vsc__ln"><span class="vsc__n">47</span><span class="vp">  ]</span></div>
+          <div class="vsc__pop" style="left:74px; top:50px; width:330px">
+            <div class="vsc__item vsc__item--sel"><span class="vsc__ico vsc__ico--snip">S</span>New puppy</div>
+            <div class="vsc__det">Inserts slug, name, sex, status, color, markings, personality and an empty weight log, with Tab between them. Then make the folder <span style="font-family:var(--mono)">src/images/(litter)/(slug)/</span>.</div>
+          </div>
+        </div>
+      </div>
+      <p class="caption">Drawn from VS Code's built-in JSON support · <code>enumDescriptions</code> and <code>defaultSnippets</code> are VS Code's own schema extensions</p>
+      <div class="tradeoff">
+        <span class="plus">+</span> The list of allowed values exists <b>once</b>, in a file that the editor, the checker (DATA-1) and §07 of this doc all read.<br>
+        <span class="plus">+</span> JSON is readable by anything — a future admin page, a spreadsheet export, a <code>fetch</code>.<br>
+        <span class="minus">−</span> No comments and no trailing commas. VS Code flags both instantly, and the schema's descriptions take over the comments' job.<br>
+        <span class="minus">−</span> An underline doesn't stop a push. Pair it with DATA-1.<br>
+        <span class="minus">−</span> A one-time conversion of <code>puppies.jsx</code> (~120 lines; the result is in §07).
+      </div>
+    </div>
+
+    <!-- SRC-3 -->
+    <div class="option-block">
+      <p class="option-label"><span class="code code--pick">SRC-3</span></p>
+      <h3 class="option-name">Spreadsheet <span class="tag tag--no">Not now</span></h3>
+      <p class="option-pos">The one other people can edit from a phone.</p>
+      <p class="option-note">A Google Sheet with dropdown columns, published as CSV. The build downloads it and turns rows into litters and puppies.</p>
+      <div class="sheet">
+        <table>
+          <thead><tr><th></th><th>A slug</th><th>B name</th><th>C sex</th><th>D status</th><th>E oz</th><th>F weighed</th></tr></thead>
+          <tbody>
+            <tr><th>2</th><td>bella</td><td>Bella</td><td class="dd">female</td><td class="dd"><span class="chip-ok">available</span></td><td>27.8</td><td>2026-06-28</td></tr>
+            <tr><th>3</th><td>brownie</td><td>Brownie</td><td class="dd">male</td><td class="dd"><span class="chip-res">reserved</span></td><td>29.6</td><td>2026-06-28</td></tr>
+            <tr><th>4</th><td>jasper</td><td>Jasper</td><td class="dd">male</td><td class="dd"><span class="chip-res">reserved</span></td><td>26.5</td><td>2026-06-28</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="tradeoff">
+        <span class="plus">+</span> Anyone in the family can update a weight from their phone; dropdowns stop typos at the cell.<br>
+        <span class="minus">−</span> A published sheet is readable by anyone with the link.<br>
+        <span class="minus">−</span> Changing a cell doesn't redeploy. Someone still pushes, or presses a deploy hook.<br>
+        <span class="minus">−</span> Photos still go in the repo, so adding a puppy still needs the repo.<br>
+        <span class="minus">−</span> The build fails whenever Google is unreachable, and data errors show up only in the Cloudflare build log.
+      </div>
+    </div>
+
+    <!-- SRC-4 -->
+    <div class="option-block">
+      <p class="option-label"><span class="code code--pick">SRC-4</span></p>
+      <h3 class="option-name">Database <span class="tag tag--no">Not recommended</span></h3>
+      <p class="option-pos">Most moving parts; the only one where edits skip the deploy.</p>
+      <p class="option-note">The plan in <code>README.md</code>: <code>litters</code> and <code>puppies</code> tables in Supabase, photos in a storage bucket, all fetched when the page loads.</p>
+      <div class="arch">
+        <div class="arch__box"><b>Visitor's browser</b>Every page waits for data before it can draw.</div>
+        <div class="arch__arrow">→</div>
+        <div class="arch__box"><b>Supabase (free plan)</b>Tables · photo bucket · row-level security · API key.</div>
+      </div>
+      <div class="arch__adds"><span>loading state</span><span>error state</span><span>paused after 7 idle days</span><span>no build-time resizing</span></div>
+      <div class="tradeoff">
+        <span class="plus">+</span> Edits go live without a deploy; there's a table editor in the browser.<br>
+        <span class="minus">−</span> Supabase <a href="https://supabase.com/docs/guides/platform/free-project-pausing">pauses free projects</a> after 7 days of low activity. That's the weeks between litters: the site would show an error until someone restores the project.<br>
+        <span class="minus">−</span> Loading and error states on every page, keys and access rules to manage, and photos lose build-time resizing.<br>
+        <span class="minus">−</span> The README's plan targets a schema two refactors old; it would be rewritten before it was built.<br>
+        <span class="minus">−</span> The largest change by far — for about six records, twice a year.
+      </div>
+    </div>
+  </div>
+
+  <div class="callout">
+    <b>The answer to “is this the best system?”:</b> keeping the data in the repo is right. At six puppies twice a year, git is the database, a push is the deploy (Cloudflare builds <code>main</code>), and the commit log is the history — free, nothing to pause, nothing to log in to.
+    What's missing is a <b>written list of allowed values</b> and <b>something that enforces it</b>. SRC-2 adds the first and DATA-1 the second, without adding a service.
+  </div>
+  <div class="callout callout--plain">
+    <b>Holds whichever wins:</b> components keep importing query functions from <code>src/data/puppies.jsx</code> and never the raw records (CLAUDE.md › Data Layer). That's what keeps SRC-2 → SRC-4 a one-file swap if a database ever earns its keep.
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════════════ -->
+<section class="doc-sec">
+  <p class="doc-sec__num">03 · What a litter is</p>
+  <h2 class="doc-sec__title">The day the next litter arrives</h2>
+  <p class="subtitle">
+    Three shapes for the same five puppies. The test that separates them is a likely day: <b>Olive is still available when Coco's next litter is born.</b>
+  </p>
+
+  <div class="options">
+    <div class="band"><span class="band__t band__t--pick">Pick one</span><span class="band__line"></span><span class="band__sub">LIT-1 · LIT-2 · LIT-3</span></div>
+
+    <div class="option-block">
+      <p class="option-label"><span class="code code--pick">LIT-1</span></p>
+      <h3 class="option-name">Overwrite <span class="tag tag--no">Fails the test</span></h3>
+      <p class="option-pos">Least change.</p>
+      <p class="option-note">Rename the <code>"home"</code> record to a real litter and structure its parents, but keep one litter. When the next one arrives, replace it.</p>
+      <div class="codebox">
+        <div class="codebox__hd"><span>litters.json</span><span>shape</span></div>
+<pre class="src json">{
+  "litter": { "breed": "Havapoo", "born": "2026-06-02",
+              "readyDate": "2026-07-28" },
+  "puppies": [ { "slug": "olive", "status": "available" } ]
+}</pre>
+      </div>
+      <div class="tradeoff">
+        <span class="plus">+</span> Smallest edit to today's code.<br>
+        <span class="minus">−</span> <b>The test fails:</b> entering the new litter's dates either deletes Olive or turns her “Available soon” at six months old.<br>
+        <span class="minus">−</span> Past litters live on only in git history.
+      </div>
+    </div>
+
+    <div class="option-block">
+      <p class="option-label"><span class="code code--pick">LIT-2</span></p>
+      <h3 class="option-name">Litter list <span class="tag">★ Recommended</span></h3>
+      <p class="option-pos">Passes the test with nothing to keep in sync.</p>
+      <p class="option-note">Each litter carries its own parents, dates and care log, and its puppies sit <i>inside</i> it, so there is no id to match. The site shows every litter with <code>"listed": true</code>, newest first.</p>
+      <div class="codebox">
+        <div class="codebox__hd"><span>litters.json</span><span>shape — full file in §07</span></div>
+<pre class="src json">{
+  "litters": [
+    { "id": "2027-01-coco-leo", "listed": true,
+      "due": "2027-01-12", "puppies": [] },
+    { "id": "2026-06-coco-leo", "listed": true,
+      "born": "2026-06-02", "readyDate": "2026-07-28",
+      "puppies": [ { "slug": "olive", "status": "available" } ] }
+  ]
+}</pre>
+      </div>
+      <div class="tradeoff">
+        <span class="plus">+</span> <b>The test passes:</b> Olive keeps her own litter's dates while the next litter shows as expecting.<br>
+        <span class="plus">+</span> Retiring a litter is <code>"listed": false</code> — nothing deleted, photos included.<br>
+        <span class="plus">+</span> Parents and their photos are data; a new sire is a JSON edit.<br>
+        <span class="minus">−</span> Puppies sit one level deeper in the file.<br>
+        <span class="minus">−</span> Photo folders move to <code>src/images/&lt;litter&gt;/&lt;puppy&gt;/</code> — one <code>git mv</code> per folder, once. <code>Coco.jpg</code> and <code>Leo.jpg</code> move from <code>public/</code> to <code>src/images/parents/</code> so they get resized too.<br>
+        <span class="minus">−</span> <code>ImageGallery</code> and <code>PuppyDetails</code> stop reading the <code>"home"</code> record.
+      </div>
+    </div>
+
+    <div class="option-block">
+      <p class="option-label"><span class="code code--pick">LIT-3</span></p>
+      <h3 class="option-name">Relational <span class="tag tag--no">Not recommended</span></h3>
+      <p class="option-pos">The database shape, in a hand-edited file.</p>
+      <p class="option-note">Litters and puppies as two flat lists; each puppy names its litter.</p>
+      <div class="codebox">
+        <div class="codebox__hd"><span>litters.json</span><span>shape</span></div>
+<pre class="src json">{
+  "litters": [ { "id": "2026-06-coco-leo", "born": "2026-06-02" } ],
+  "puppies": [ { "slug": "olive",
+                 "litter": "2026-06-coco-leo" } ]
+}</pre>
+      </div>
+      <div class="tradeoff">
+        <span class="plus">+</span> Passes the test, and matches database tables — the right shape if SRC-4 ever happens.<br>
+        <span class="minus">−</span> Every puppy carries an id that must match another record: <b>the kind of must-agree pair this doc is removing.</b> In a file you edit by hand, nesting makes the link impossible to get wrong.
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════════════ -->
+<section class="doc-sec">
+  <p class="doc-sec__num">04 · Photos</p>
+  <h2 class="doc-sec__title">7.9&nbsp;MB to look at Bella</h2>
+  <p class="subtitle">
+    “Today” is measured: the production build on a 390&nbsp;px phone, cache off. The option columns come from encoding 25 of the real photos at each size with sharp (WebP, quality&nbsp;75) and multiplying by Bella's ten.
+  </p>
+
+  <table class="census weights" style="max-width:980px">
+    <thead><tr><th></th><th>Today</th><th>IMG-1 build sizes</th><th>IMG-2 own script</th><th>IMG-3 shrink once</th></tr></thead>
+    <tbody>
+      <tr><td>Bella's page on a phone (10 photos)</td><td class="big num" style="color:var(--bad)">7.9 MB</td><td class="big num win">≈ 0.27 MB</td><td class="big num win">≈ 0.27 MB</td><td class="big num">≈ 2.6 MB</td></tr>
+      <tr><td>Home's first slide</td><td class="num">1.3 MB</td><td class="num win">133 KB</td><td class="num win">133 KB</td><td class="num">≈ 260 KB</td></tr>
+      <tr><td>One 73&nbsp;px thumbnail</td><td class="num">≈ 790 KB</td><td class="num win">14 KB</td><td class="num win">14 KB</td><td class="num">≈ 260 KB</td></tr>
+      <tr><td>Files in the repo per photo</td><td class="num">1</td><td class="num">1</td><td class="num">4</td><td class="num">1 (smaller, lossy)</td></tr>
+      <tr><td>Extra work at build</td><td>—</td><td>3 encodes per photo</td><td>none</td><td>none</td></tr>
+      <tr><td>Remember to…</td><td>—</td><td>nothing</td><td>run <code>npm run photos</code></td><td>nothing, after once</td></tr>
+    </tbody>
+  </table>
+
+  <div class="options">
+    <div class="band"><span class="band__t band__t--pick">Pick one</span><span class="band__line"></span><span class="band__sub">IMG-1 · IMG-2 · IMG-3</span></div>
+
+    <div class="option-block">
+      <p class="option-label"><span class="code code--pick">IMG-1</span></p>
+      <h3 class="option-name">Build-time sizes <span class="tag">★ Recommended</span></h3>
+      <p class="option-pos">29× lighter, and nothing new to remember.</p>
+      <p class="option-note">The image loader asks Vite for three sizes of every photo; the page uses 320&nbsp;px for thumbnails and a <code>srcset</code> of 1280/1920 for the main photo and fullscreen.</p>
+      <div class="codebox">
+        <div class="codebox__hd"><span>src/data/imageLoader.jsx</span><span>sketch</span></div>
+<pre class="src"><span class="js-kw">const</span> thumbs = <span class="js-kw">import</span>.meta.glob(PHOTOS, { eager: <span class="js-kw">true</span>,
+  <span class="js-kw">import</span>: <span class="js-str">'default'</span>,
+  query: <span class="js-str">'?w=320&amp;format=webp'</span> });
+
+<span class="js-kw">const</span> mains = <span class="js-kw">import</span>.meta.glob(PHOTOS, { eager: <span class="js-kw">true</span>,
+  <span class="js-kw">import</span>: <span class="js-str">'default'</span>,
+  query: <span class="js-str">'?w=1280;1920&amp;format=webp&amp;as=srcset'</span> });</pre>
+      </div>
+      <div class="tradeoff">
+        <span class="plus">+</span> Bella's page goes from 7.9&nbsp;MB to about 0.27&nbsp;MB. Originals stay untouched in the repo, so the sizes can change later.<br>
+        <span class="plus">+</span> Drop a photo in a folder; that's all.<br>
+        <span class="minus">−</span> One new dev dependency, <code>vite-imagetools</code> 12 — made for Vite 8, and built on sharp, which the build already uses. The existing image optimizer narrows to SVGs: left on photos, it would compress every WebP size a second time.<br>
+        <span class="minus">−</span> Three encodes per photo at build. Done one after another, all 69 of today's photos took 25&nbsp;s on this Mac; today's whole build takes 9&nbsp;s.
+      </div>
+    </div>
+
+    <div class="option-block">
+      <p class="option-label"><span class="code code--pick">IMG-2</span></p>
+      <h3 class="option-name">Own script</h3>
+      <p class="option-pos">Same weights, no new dependency, one more step.</p>
+      <p class="option-note"><code>npm run photos</code> uses sharp to write <code>_320.webp</code>, <code>_1280.webp</code> and <code>_1920.webp</code> next to each photo; the loader picks those up.</p>
+      <div class="tradeoff">
+        <span class="plus">+</span> No new dependency; the build stays at 9&nbsp;s.<br>
+        <span class="minus">−</span> A step to remember after every photo drop. DATA-1 can flag a photo without its sizes, but it's still a step.<br>
+        <span class="minus">−</span> Four files per photo in the repo, plus ~60 lines of resize script to maintain.
+      </div>
+    </div>
+
+    <div class="option-block">
+      <p class="option-label"><span class="code code--pick">IMG-3</span></p>
+      <h3 class="option-name">Shrink once <span class="tag tag--no">Not recommended</span></h3>
+      <p class="option-pos">Zero code, but pages stay ten times IMG-1's weight.</p>
+      <p class="option-note">Resize every original to 1600&nbsp;px wide in place and commit.</p>
+      <div class="tradeoff">
+        <span class="plus">+</span> No code; the repo gets smaller.<br>
+        <span class="minus">−</span> Thumbnails still weigh ~260&nbsp;KB each, so Bella's page is ~2.6&nbsp;MB.<br>
+        <span class="minus">−</span> Destructive: the full-resolution originals leave the repo.
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════════════ -->
+<section class="doc-sec">
+  <p class="doc-sec__num">05 · Stack any</p>
+  <h2 class="doc-sec__title">Worth having under every pick</h2>
+  <p class="subtitle">Five additions that don't depend on §02–§04. Take all, some, or none.</p>
+
+  <div class="options">
+    <div class="band"><span class="band__t">Stack any</span><span class="band__line"></span><span class="band__sub">DATA-1 … DATA-5</span></div>
+
+    <!-- DATA-1 -->
+    <div class="option-block option-block--wide">
+      <p class="option-label"><span class="code code--stack">DATA-1</span></p>
+      <h3 class="option-name">Checker <span class="tag tag--ok">★ Take first</span></h3>
+      <p class="option-note">
+        A ~120-line validator with no dependencies. It reads the allowed values <i>from the schema</i>, so the list still exists once. It runs in three places:
+        <b>inside <code>vite build</code></b> (so whatever command Cloudflare runs, a bad push stops and the previous deploy stays live), <b>inside <code>vite dev</code></b> (terminal and error overlay as you save), and in <b><code>npm test</code></b>.
+      </p>
+      <div class="options" style="margin-top:0; gap:28px">
+        <div style="flex: 1 1 560px; max-width: 640px">
+<div class="term"><span class="t-dim">$ npm run build</span>
+
+<span class="t-bad">✗ Puppy data has 2 problems — build stopped. The live site is unchanged.</span>
+
+  <span class="t-path">2026-06-coco-leo › olive › status</span>
+    <span class="t-str">"Available"</span> isn't an allowed value. Use one of: available, reserved, adopted.
+    Did you mean <span class="t-str">"available"</span>?
+
+  <span class="t-path">2026-06-coco-leo › pepper › weights[2] › date</span>
+    <span class="t-str">"2026-7-4"</span> isn't a date. Write it as YYYY-MM-DD, e.g. 2026-07-04.
+
+<span class="t-warn">⚠ 2 warnings — the build would continue</span>
+  <span class="t-path">src/images/2026-06-coco-leo/bella/IMG_2041.HEIC</span>
+    Not a web format, so it's skipped. Export it as JPEG.
+  <span class="t-path">2026-06-coco-leo › jasper</span>
+    No photo folder yet — the page will say “Photos coming soon”.</div>
+        </div>
+        <div style="flex: 1 1 300px; max-width: 400px">
+          <table class="census" style="margin-top:0">
+            <thead><tr><th>Stops the build</th></tr></thead>
+            <tbody>
+              <tr><td>A value not in the schema's list (status, sex, color, pattern, care type)</td></tr>
+              <tr><td>A required field missing (slug, name, sex, status; litter id, breed, parents)</td></tr>
+              <tr><td>A date that isn't a real YYYY-MM-DD</td></tr>
+              <tr><td><code>readyDate</code> before <code>born</code>; a weight before <code>born</code></td></tr>
+              <tr><td>The same slug twice, in any litters — or the slug <code>contact</code>, which is a page</td></tr>
+              <tr><td>No litter listed — Home would have nothing to say; a sold-out litter carries the time between litters</td></tr>
+              <tr><td>A puppy or litter <code>cover</code>, or a parent photo, that isn't in its folder</td></tr>
+            </tbody>
+          </table>
+          <table class="census" style="margin-top:6px">
+            <thead><tr><th>Warns, build continues</th></tr></thead>
+            <tbody>
+              <tr><td>No photo folder or an empty one (“Photos coming soon” is allowed)</td></tr>
+              <tr><td>A file the site can't show (.heic, .mov…)</td></tr>
+              <tr><td><code>litterSize</code> smaller than the puppies listed</td></tr>
+              <tr><td>Text starting lowercase (<code>"brown face mask…"</code>)</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="tradeoff" style="max-width:1060px">
+        <span class="plus">+</span> Turns every silent failure in §01 into a sentence that says what to type. Protects every later step, which is why it goes first.<br>
+        <span class="plus">+</span> It's the first test that reads the <i>real</i> data — today's suite mocks <code>puppies.jsx</code> entirely.<br>
+        <span class="minus">−</span> ~120 lines of our own code, plus a 15-line inline plugin in <code>vite.config.js</code>.
+      </div>
+    </div>
+
+    <!-- DATA-2 -->
+    <div class="option-block">
+      <p class="option-label"><span class="code code--stack">DATA-2</span></p>
+      <h3 class="option-name">Written facts list <span class="tag tag--ok">★</span></h3>
+      <p class="option-note">The puppy page stops printing whatever keys the data has. A short list at the top of the puppy page's component says which facts show, in what order, under what label; the formatters it calls live in <code>utils.js</code>.</p>
+      <div class="codebox">
+        <div class="codebox__hd"><span>src/components/PuppyPage.jsx</span><span>sketch</span></div>
+<pre class="src"><span class="js-com">// Today — the data decides the page</span>
+<span class="js-kw">const</span> statEntries = Object.entries(fields);
+<span class="js-kw">const</span> isGrid = statEntries.length &gt; <span class="j-num">5</span>;
+
+<span class="js-com">// DATA-2 — the page decides, empty facts skipped</span>
+<span class="js-kw">const</span> PUPPY_FACTS = [  <span class="js-com">// [label, value]</span>
+  [<span class="js-str">'Color'</span>,       (p) =&gt; formatCoat(p.color, p.pattern)],
+  [<span class="js-str">'Markings'</span>,    (p) =&gt; p.markings],
+  [<span class="js-str">'Weight'</span>,      (p, l) =&gt; formatWeight(p.weights, l.born)],
+  [<span class="js-str">'Personality'</span>, (p) =&gt; p.personality],
+];</pre>
+      </div>
+      <div class="tradeoff">
+        <span class="plus">+</span> Labels are words (“Ready to go home”), not key names. Adding a field to the data never moves or hides anything.<br>
+        <span class="plus">+</span> Empty facts are skipped instead of printing “——”.<br>
+        <span class="minus">−</span> A new fact needs one line here as well as in the data — on purpose.
+      </div>
+    </div>
+
+    <!-- DATA-3 -->
+    <div class="option-block">
+      <p class="option-label"><span class="code code--stack">DATA-3</span></p>
+      <h3 class="option-name">Weight log <span class="tag tag--ok">★</span></h3>
+      <p class="option-note">Weekly weigh-ins append a line instead of overwriting one. Weights are numbers; the age comes from the litter's birth date.</p>
+      <div class="codebox">
+        <div class="codebox__hd"><span>today → DATA-3</span><span>Bella</span></div>
+<pre class="src"><span class="js-com">// today: text with the unit inside, one value</span>
+<span class="j-key">"weightAsOf"</span>: { <span class="j-key">"value"</span>: <span class="j-str">"27.8 oz"</span>, <span class="j-key">"asOf"</span>: <span class="j-str">"2026-06-28"</span> }
+<span class="js-com">→ “27.8 oz · Jun 28, 2026”</span>
+
+<span class="js-com">// DATA-3: a dated list; next week appends a line</span>
+<span class="j-key">"weights"</span>: [
+  { <span class="j-key">"date"</span>: <span class="j-str">"2026-06-28"</span>, <span class="j-key">"oz"</span>: <span class="j-num">27.8</span> }
+]
+<span class="js-com">→ “27.8 oz at 3 weeks”   ·   past 32 oz: “2 lb 4 oz”</span></pre>
+      </div>
+      <div class="tradeoff">
+        <span class="plus">+</span> History is kept, so a growth line or “+4 oz this week” is possible later without re-entering anything.<br>
+        <span class="plus">+</span> “At 3 weeks” means more to a buyer than a date they have to subtract.<br>
+        <span class="minus">−</span> A list instead of a single value.
+      </div>
+    </div>
+
+    <!-- DATA-4 -->
+    <div class="option-block">
+      <p class="option-label"><span class="code code--stack">DATA-4</span></p>
+      <h3 class="option-name">Cover photo <span class="tag tag--ok">★</span></h3>
+      <p class="option-note">Same folder, same files. Left: the first file alphabetically, which is what Brownie leads with today. Right: <code>"cover": "IMG_1876.jpeg"</code>.</p>
+      <div class="cards2">
+        <div>
+          <div class="pcard">
+            <img src="img/cover-brownie-alpha.webp" alt="Brownie at two weeks on a patterned blanket">
+            <div class="pcard__row"><span class="pcard__name"><svg viewBox="0 0 24 24" fill="#4a90d9"><ellipse cx="12" cy="19" rx="5" ry="4"/><ellipse cx="6" cy="11" rx="2.5" ry="3"/><ellipse cx="18" cy="11" rx="2.5" ry="3"/><ellipse cx="9" cy="6" rx="2" ry="2.5"/><ellipse cx="15" cy="6" rx="2" ry="2.5"/></svg>Brownie</span><span class="chip chip--res">Reserved</span></div>
+          </div>
+          <p class="pcard-cap">Today · <code>IMG_1056.jpg</code> sorts first</p>
+        </div>
+        <div>
+          <div class="pcard">
+            <img src="img/cover-brownie.webp" alt="Brownie sitting, at about four weeks">
+            <div class="pcard__row"><span class="pcard__name"><svg viewBox="0 0 24 24" fill="#4a90d9"><ellipse cx="12" cy="19" rx="5" ry="4"/><ellipse cx="6" cy="11" rx="2.5" ry="3"/><ellipse cx="18" cy="11" rx="2.5" ry="3"/><ellipse cx="9" cy="6" rx="2" ry="2.5"/><ellipse cx="15" cy="6" rx="2" ry="2.5"/></svg>Brownie</span><span class="chip chip--res">Reserved</span></div>
+          </div>
+          <p class="pcard-cap">DATA-4 · <code>"cover": "IMG_1876.jpeg"</code></p>
+        </div>
+      </div>
+      <div class="tradeoff">
+        <span class="plus">+</span> You choose the photo that leads (and the one on Home's cards, if that design is picked) without renaming files. The A1–A3 names keep working.<br>
+        <span class="minus">−</span> One more optional field; the checker confirms the file exists.
+      </div>
+    </div>
+
+    <!-- DATA-5 -->
+    <div class="option-block">
+      <p class="option-label"><span class="code code--stack">DATA-5</span></p>
+      <h3 class="option-name">Owner's manual <span class="tag tag--ok">★</span></h3>
+      <p class="option-note">The steps you follow every litter, written down in the repo next to the data, instead of in a comment block and a chat history.</p>
+      <div class="codebox">
+        <div class="codebox__hd"><span>README.md</span><span>outline</span></div>
+<pre class="src"><span class="js-kw"># Doro Family Puppies — owner's manual</span>
+<span class="js-kw">## Add a litter</span>       <span class="js-com">in "litters", type { → pick “New litter”</span>
+<span class="js-kw">## Add a puppy</span>        <span class="js-com">“New puppy” + a folder named after its slug</span>
+<span class="js-kw">## Weekly update</span>      <span class="js-com">append a weight, drop in photos</span>
+<span class="js-kw">## Reserved / adopted</span> <span class="js-com">change one word</span>
+<span class="js-kw">## Retire a litter</span>    <span class="js-com">"listed": false</span>
+<span class="js-kw">## Photos</span>             <span class="js-com">formats · order · cover</span>
+<span class="js-kw">## When the build says no</span>  <span class="js-com">every checker message, explained</span>
+<span class="js-kw">## Going live</span>         <span class="js-com">push to main; Cloudflare builds it</span></pre>
+      </div>
+      <div class="tradeoff">
+        <span class="plus">+</span> Replaces Create React App boilerplate and a stale migration plan with the thing you actually do.<br>
+        <span class="plus">+</span> Once everything is built, a plain-language tutorial joins it: <code>docs/data-tutorial.html</code> walks through a litter's life step by step, with a small working editor to practise in that checks what you type the way the build does.<br>
+        <span class="minus">−</span> Docs only. <code>SPEC.md</code> is deleted: its phases are done, and it documents the value that hides the inquiry button.
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════════════ -->
+<section class="doc-sec">
+  <p class="doc-sec__num">06 · Every state</p>
+  <h2 class="doc-sec__title">A litter's life, start to finish</h2>
+  <p class="subtitle">
+    Drawn for LIT-2. What you type at each stage, what the site shows, and what today's model does at the same moment. Two of the seven are impossible today, and one is wrong.
+  </p>
+
+  <div class="states">
+    <div class="state">
+      <h3 class="state__name"><span class="state__n">1 · Before birth</span>Expecting</h3>
+      <div><p class="state__col-t">You type</p>
+<pre class="src json">{ "id": "2027-01-coco-leo",
+  "listed": true,
+  "due": "2027-01-12",
+  "puppies": [] }</pre></div>
+      <div><p class="state__col-t">Site shows</p><p><b>“Coco is expecting — due Jan 12”</b>, the parents as icons, and a waitlist button that opens the form pre-filled.</p></div>
+      <div class="state__today state__today--bad"><p class="state__col-t">Today</p><p><b>Can't be shown.</b> There's no litter without puppies.</p></div>
+    </div>
+
+    <div class="state">
+      <h3 class="state__name"><span class="state__n">2 · Week 0–2</span>Born, no photos</h3>
+      <div><p class="state__col-t">You type</p>
+<pre class="src json">"born": "2027-01-10",
+"readyDate": "2027-03-07",
+"puppies": [ { "slug": "maple",
+  "name": "Maple", "sex": "female",
+  "status": "available" } ]</pre></div>
+      <div><p class="state__col-t">Site shows</p><p>Each puppy with a paw placeholder, “Photos coming soon” and <span class="chip chip--soon">Ready Mar 7</span>. The checker lists the empty folders as warnings.</p></div>
+      <div class="state__today state__today--ok"><p class="state__col-t">Today</p><p><b>Works</b> — empty folders already show “Photos coming soon”.</p></div>
+    </div>
+
+    <div class="state">
+      <h3 class="state__name"><span class="state__n">3 · Week 2–8</span>Growing</h3>
+      <div><p class="state__col-t">You type</p>
+<pre class="src json">"weights": [ …,
+  { "date": "2027-02-14",
+    "oz": 31.5 } ]</pre></div>
+      <div><p class="state__col-t">Site shows</p><p>Every available puppy reads <span class="chip chip--soon">Ready Mar 7</span>, worked out from <i>its</i> litter. Weights read “31.5 oz at 5 weeks”.</p></div>
+      <div class="state__today state__today--ok"><p class="state__col-t">Today</p><p><b>Works</b>, but the date is site-wide — fine only while there's one litter.</p></div>
+    </div>
+
+    <div class="state">
+      <h3 class="state__name"><span class="state__n">4 · Ready</span>Choosing</h3>
+      <div><p class="state__col-t">You type</p>
+<pre class="src json">"status": "reserved"</pre></div>
+      <div><p class="state__col-t">Site shows</p><p>Each puppy's own badge and button: inquire, or see who's still available.</p></div>
+      <div class="state__today state__today--ok"><p class="state__col-t">Today</p><p><b>Works.</b></p></div>
+    </div>
+
+    <div class="state">
+      <h3 class="state__name"><span class="state__n">5 · The last one goes</span>Spoken for<br><span class="state__here">The June litter, now</span></h3>
+      <div><p class="state__col-t">You type</p>
+<pre class="src json">every "status":
+  "reserved" or "adopted"</pre></div>
+      <div><p class="state__col-t">Site shows</p><p><b>“Every puppy has a home”</b>, with a button to join the list for the next litter. The $100 deposit banner hides itself.</p></div>
+      <div class="state__today state__today--bad"><p class="state__col-t">Today</p><p><b>Wrong.</b> Puppy pages show no button at all, and Home still says “Reserve today — $100 holds your pup”.</p></div>
+    </div>
+
+    <div class="state">
+      <h3 class="state__name"><span class="state__n">6 · Litters overlap</span>One left, next expecting</h3>
+      <div><p class="state__col-t">You type</p>
+<pre class="src json">two litters, both
+"listed": true</pre></div>
+      <div><p class="state__col-t">Site shows</p><p>The expecting litter first, then the older one with its one available pup — each with its own dates.</p></div>
+      <div class="state__today state__today--bad"><p class="state__col-t">Today</p><p><b>Can't be shown.</b> One litter only (§03's test).</p></div>
+    </div>
+
+    <div class="state">
+      <h3 class="state__name"><span class="state__n">7 · Done</span>Retired</h3>
+      <div><p class="state__col-t">You type</p>
+<pre class="src json">"listed": false</pre></div>
+      <div><p class="state__col-t">Site shows</p><p>Nothing from that litter. Its records and photos stay in the repo; flip it back any time.</p></div>
+      <div class="state__today"><p class="state__col-t">Today</p><p>Delete the records and the folders.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════════════ -->
+<section class="doc-sec">
+  <p class="doc-sec__num">07 · The catalog</p>
+  <h2 class="doc-sec__title">Every field, every allowed value</h2>
+  <p class="subtitle">
+    The list you asked for. Under SRC-2 these tables <i>are</i> <code>litters.schema.json</code> — VS Code shows each description on hover and offers each value as you type.
+    <span style="color:var(--pick);font-weight:700">★</span> marks a required field. The value lists are a starting vocabulary, not a breed standard: when a litter needs a new word, add it to the schema and both the editor and the checker know it.
+  </p>
+
+  <h3 class="catalog-h">A litter</h3>
+  <table class="catalog">
+    <thead><tr><th>Field</th><th>Holds</th><th>Allowed values / format</th><th>On the site</th></tr></thead>
+    <tbody>
+      <tr><td><code>id</code><span class="req">★</span></td><td>text</td><td>lowercase and dashes, e.g. <code>2026-06-coco-leo</code>. Never rename once photos exist — it's the folder name.</td><td>Photo folder <code>src/images/&lt;id&gt;/</code></td></tr>
+      <tr><td><code>listed</code><span class="req">★</span></td><td>yes/no</td><td><div class="vals"><code>true</code><code>false</code></div></td><td><code>false</code> hides the whole litter</td></tr>
+      <tr><td><code>breed</code><span class="req">★</span></td><td>text</td><td>e.g. <code>Havapoo</code></td><td>Litter header</td></tr>
+      <tr><td><code>mom</code>, <code>dad</code><span class="req">★</span></td><td>parent</td><td><code>name</code>★ · <code>breed</code>★ · <code>photo</code> (a file in <code>src/images/parents/</code>)</td><td>Litter card: names, with the photo only as a small round icon</td></tr>
+      <tr><td><code>due</code></td><td>date</td><td>YYYY-MM-DD</td><td>“Due Jan 12” while there's no <code>born</code></td></tr>
+      <tr><td><code>born</code></td><td>date</td><td>YYYY-MM-DD</td><td>“Born Jun 2”; puppies' ages and weights</td></tr>
+      <tr><td><code>readyDate</code></td><td>date</td><td>YYYY-MM-DD, after <code>born</code></td><td>“Ready to go home Jul 28”; until then, available puppies' badges read “Ready Jul 28”</td></tr>
+      <tr><td><code>litterSize</code></td><td>number</td><td>whole number — only if not every puppy is listed</td><td>Litter header; otherwise the puppies are counted</td></tr>
+      <tr><td><code>care</code></td><td>list</td><td>entries of <code>type</code>★ · <code>date</code> · <code>note</code> — types below</td><td>“Care so far”, newest first; hidden while empty</td></tr>
+      <tr><td><code>description</code></td><td>text</td><td>a paragraph</td><td>Under the litter facts</td></tr>
+      <tr><td><code>facts</code></td><td>list of text</td><td>short sentences</td><td>“Key breed facts”</td></tr>
+      <tr><td><code>cover</code></td><td>file name</td><td>a file in the litter's folder</td><td>First photo of Home's gallery; leave it out and the first file by name leads, as today</td></tr>
+      <tr><td><code>puppies</code><span class="req">★</span></td><td>list</td><td>may be empty while expecting</td><td>Everything below</td></tr>
+    </tbody>
+  </table>
+
+  <h3 class="catalog-h">A puppy</h3>
+  <table class="catalog">
+    <thead><tr><th>Field</th><th>Holds</th><th>Allowed values / format</th><th>On the site</th></tr></thead>
+    <tbody>
+      <tr><td><code>slug</code><span class="req">★</span></td><td>text</td><td>lowercase letters, numbers, dashes; unique across all litters. <code>bella</code>, <code>mr-pickles</code>, <code>bella-2</code></td><td>Photo folder name; the puppy's link (<code>/bella</code>) if site-design PLUS-1 is taken</td></tr>
+      <tr><td><code>name</code><span class="req">★</span></td><td>text</td><td>as visitors should read it</td><td>Everywhere</td></tr>
+      <tr><td><code>sex</code><span class="req">★</span></td><td>one of</td><td><div class="vals"><code>female</code><code>male</code></div></td><td>Pink or blue accent and paw; “Female”/“Male”</td></tr>
+      <tr><td><code>status</code><span class="req">★</span></td><td>one of</td><td><div class="vals"><code>available</code><code>reserved</code><code>adopted</code></div></td><td>Badge, and which button the page offers</td></tr>
+      <tr><td><code>color</code></td><td>list of 1–3</td><td><div class="vals"><code>white</code><code>cream</code><code>apricot</code><code>gold</code><code>red</code><code>brown</code><code>black</code><code>silver</code></div><span style="font-size:12px">Main color first: <code>["white", "black"]</code></span></td><td>“White &amp; black”</td></tr>
+      <tr><td><code>pattern</code></td><td>one of</td><td><div class="vals"><code>solid</code><code>parti</code><code>tuxedo</code><code>phantom</code><code>abstract</code><code>sable</code><code>brindle</code><code>merle</code></div></td><td>Joins the color: “White &amp; black parti”</td></tr>
+      <tr><td><code>markings</code></td><td>text</td><td>a short phrase, starting with a capital</td><td>“Markings”</td></tr>
+      <tr><td><code>personality</code></td><td>text</td><td>one to three words, starting with a capital</td><td>“Personality”</td></tr>
+      <tr><td><code>weights</code></td><td>list</td><td>entries of <code>date</code>★ (YYYY-MM-DD) · <code>oz</code>★ (a number: <code>27.8</code>, not <code>"27.8 oz"</code>)</td><td>Latest: “27.8 oz at 3 weeks”</td></tr>
+      <tr><td><code>cover</code></td><td>file name</td><td>a file in the puppy's folder — optional</td><td>First photo, and its card; leave it out and the first file by name leads, as today</td></tr>
+    </tbody>
+  </table>
+
+  <h3 class="catalog-h">What each value means</h3>
+  <div class="enum-grid">
+    <div class="enum">
+      <div class="enum__hd">status <span>you type one; the site may show a fourth</span></div>
+      <div class="enum__row"><code>available</code><span>Shows <b>Inquire</b>. Before the litter's <code>readyDate</code> the badge reads “Ready Jul 28”.</span></div>
+      <div class="enum__row"><code>reserved</code><span>Deposit paid. Amber badge; the page points to littermates still available.</span></div>
+      <div class="enum__row"><code>adopted</code><span>Gone home. The page points to littermates still available, or to the waitlist.</span></div>
+      <div class="enum__row" style="background:var(--card-deep)"><span style="font-size:11.5px">Not a value</span><span style="font-size:12px">If you ever keep a puppy, add <code>staying</code> here — it needs its own badge and no button, so it's a small code change too.</span></div>
+    </div>
+    <div class="enum">
+      <div class="enum__hd">sex</div>
+      <div class="enum__row"><code>female</code><span>Pink accent <span style="color:var(--a-girl)">●</span> #e91e8c · shows “Female”.</span></div>
+      <div class="enum__row"><code>male</code><span>Blue accent <span style="color:var(--a-boy)">●</span> #4a90d9 · shows “Male”. Replaces <code>icon</code>: the paw color is worked out from this.</span></div>
+    </div>
+    <div class="enum">
+      <div class="enum__hd">pattern <span>today's five, as I read the photos</span></div>
+      <div class="enum__row"><code>solid</code><span>One color all over.</span></div>
+      <div class="enum__row"><code>parti</code><span>Mostly white with patches of a second color — Bella, Olive, Pepper.</span></div>
+      <div class="enum__row"><code>tuxedo</code><span>Solid, with a white chest, belly and feet.</span></div>
+      <div class="enum__row"><code>phantom</code><span>Two colors, with tan or cream points on face, chest and legs.</span></div>
+      <div class="enum__row"><code>abstract</code><span>Solid, with small white marks — Brownie, Jasper.</span></div>
+      <div class="enum__row"><code>sable</code><span>Darker tips on lighter hair; often lightens with age.</span></div>
+      <div class="enum__row"><code>brindle</code><span>Striped, like a tiger.</span></div>
+      <div class="enum__row"><code>merle</code><span>Marbled patches of a diluted color.</span></div>
+    </div>
+    <div class="enum">
+      <div class="enum__hd">color</div>
+      <div class="enum__row"><code>white</code><span>White.</span></div>
+      <div class="enum__row"><code>cream</code><span>Pale, off-white.</span></div>
+      <div class="enum__row"><code>apricot</code><span>Light orange-gold.</span></div>
+      <div class="enum__row"><code>gold</code><span>Deeper yellow-gold.</span></div>
+      <div class="enum__row"><code>red</code><span>Deep red-orange.</span></div>
+      <div class="enum__row"><code>brown</code><span>Brown — breed clubs call it chocolate. Today's word on the site.</span></div>
+      <div class="enum__row"><code>black</code><span>Black.</span></div>
+      <div class="enum__row"><code>silver</code><span>Born dark, clears to grey-silver.</span></div>
+    </div>
+    <div class="enum">
+      <div class="enum__hd">care · type</div>
+      <div class="enum__row"><code>vet-check</code><span>“Vet checked”.</span></div>
+      <div class="enum__row"><code>dewormed</code><span>“Dewormed”, with the date.</span></div>
+      <div class="enum__row"><code>vaccinated</code><span>“Vaccinated”, with the date and <code>note</code> (e.g. “First DHPP”).</span></div>
+      <div class="enum__row"><code>microchipped</code><span>“Microchipped”.</span></div>
+      <div class="enum__row" style="background:var(--card-deep)"><span style="font-size:11.5px">Replaces</span><span style="font-size:12px"><code>vaccinations: ""</code>, <code>dewormingDate</code> and <code>vetChecked</code> — three ad-hoc fields become one dated list that's hidden while empty.</span></div>
+    </div>
+  </div>
+
+  <h3 class="catalog-h">Paste-ready</h3>
+  <p class="subtitle">These are the build's starting files under SRC-2 + LIT-2 + DATA-3/4. Both parse as JSON, and the converted file passes the schema.</p>
+
+  <details class="deliver">
+    <summary>litters.schema.json <span class="s">— every rule above, with VS Code's suggestions, hover text and New litter / New puppy templates</span></summary>
+    <div class="codebox">
+      <div class="codebox__hd"><span>src/data/litters.schema.json</span><button class="copy" data-copy="schema-json">Copy</button></div>
+<pre class="src json src--tall" id="schema-json">{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Doro Family Puppies — litters",
+  "description": "Every litter and puppy on the site. Edit litters.json; this file lists what each field may hold.",
+  "type": "object",
+  "required": ["litters"],
+  "additionalProperties": false,
+  "properties": {
+    "$schema": { "type": "string" },
+    "litters": {
+      "description": "Newest first. The site shows every litter whose listed is true.",
+      "type": "array",
+      "items": { "$ref": "#/definitions/litter" }
+    }
+  },
+  "definitions": {
+    "date": {
+      "type": "string",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$",
+      "patternErrorMessage": "Write dates as YYYY-MM-DD, e.g. 2026-07-04."
+    },
+    "slug": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+      "patternErrorMessage": "Lowercase letters, numbers and dashes only, e.g. bella or mr-pickles."
+    },
+    "text": { "type": "string", "minLength": 1 },
+    "parent": {
+      "type": "object",
+      "required": ["name", "breed"],
+      "additionalProperties": false,
+      "properties": {
+        "name": { "$ref": "#/definitions/text", "description": "The parent's name, e.g. Coco." },
+        "breed": { "$ref": "#/definitions/text", "description": "e.g. Havapoo." },
+        "photo": { "type": "string", "description": "A file in src/images/parents/, shown only as a small round icon on the litter card." }
+      }
+    },
+    "sex": {
+      "description": "Sets the pink or blue accent and paw.",
+      "enum": ["female", "male"],
+      "enumDescriptions": ["Pink accent. Shows Female.", "Blue accent. Shows Male."]
+    },
+    "status": {
+      "description": "What a visitor can do. The Ready (date) badge is never typed: it comes from the litter's readyDate.",
+      "enum": ["available", "reserved", "adopted"],
+      "enumDescriptions": [
+        "Shows the Inquire button. Before the litter's readyDate the badge reads Ready and the date, e.g. Ready Jul 28.",
+        "Deposit paid. Amber badge; the page points to littermates still available.",
+        "Gone home. The page points to littermates still available, or the waitlist."
+      ]
+    },
+    "color": {
+      "enum": ["white", "cream", "apricot", "gold", "red", "brown", "black", "silver"],
+      "enumDescriptions": [
+        "White.",
+        "Pale, off-white.",
+        "Light orange-gold.",
+        "Deeper yellow-gold.",
+        "Deep red-orange.",
+        "Brown. Breed clubs call it chocolate.",
+        "Black.",
+        "Born dark, clears to grey-silver."
+      ]
+    },
+    "pattern": {
+      "description": "Joins the color on the page: White and black parti.",
+      "enum": ["solid", "parti", "tuxedo", "phantom", "abstract", "sable", "brindle", "merle"],
+      "enumDescriptions": [
+        "One color all over.",
+        "Mostly white with patches of a second color.",
+        "Solid, with a white chest, belly and feet.",
+        "Two colors, with tan or cream points on face, chest and legs.",
+        "Solid, with small white marks.",
+        "Darker tips on lighter hair; often lightens with age.",
+        "Striped, like a tiger.",
+        "Marbled patches of a diluted color."
+      ]
+    },
+    "careType": {
+      "enum": ["vet-check", "dewormed", "vaccinated", "microchipped"],
+      "enumDescriptions": ["Shows Vet checked.", "Shows Dewormed and the date.", "Shows Vaccinated, the date and the note.", "Shows Microchipped."]
+    },
+    "careEvent": {
+      "type": "object",
+      "required": ["type"],
+      "additionalProperties": false,
+      "properties": {
+        "type": { "$ref": "#/definitions/careType" },
+        "date": { "$ref": "#/definitions/date" },
+        "note": { "type": "string", "description": "e.g. First DHPP." }
+      }
+    },
+    "weight": {
+      "type": "object",
+      "required": ["date", "oz"],
+      "additionalProperties": false,
+      "properties": {
+        "date": { "$ref": "#/definitions/date" },
+        "oz": { "type": "number", "exclusiveMinimum": 0, "description": "Ounces as a number: 27.8, not \"27.8 oz\"." }
+      }
+    },
+    "puppy": {
+      "type": "object",
+      "required": ["slug", "name", "sex", "status"],
+      "additionalProperties": false,
+      "properties": {
+        "slug": { "$ref": "#/definitions/slug", "description": "Unique across all litters. Also the photo folder: src/images/(litter id)/(slug)/." },
+        "name": { "$ref": "#/definitions/text" },
+        "sex": { "$ref": "#/definitions/sex" },
+        "status": { "$ref": "#/definitions/status" },
+        "color": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 3,
+          "uniqueItems": true,
+          "items": { "$ref": "#/definitions/color" },
+          "description": "Main color first, e.g. [\"white\", \"black\"]."
+        },
+        "pattern": { "$ref": "#/definitions/pattern" },
+        "markings": { "$ref": "#/definitions/text", "description": "A short phrase starting with a capital, e.g. Black spot on left eye." },
+        "personality": { "$ref": "#/definitions/text", "description": "One to three words, e.g. Chill cuddler." },
+        "weights": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/weight" },
+          "description": "Append one entry per weigh-in. The page shows the latest with the puppy's age."
+        },
+        "cover": { "type": "string", "description": "A file in this puppy's folder to show first. Default: the first file alphabetically." }
+      },
+      "defaultSnippets": [
+        {
+          "label": "New puppy",
+          "description": "Then make the folder src/images/(litter id)/(slug)/",
+          "body": {
+            "slug": "${1:name}",
+            "name": "${2:Name}",
+            "sex": "${3|female,male|}",
+            "status": "available",
+            "color": ["${4|white,cream,apricot,gold,red,brown,black,silver|}"],
+            "markings": "$5",
+            "personality": "$6",
+            "weights": []
+          }
+        }
+      ]
+    },
+    "litter": {
+      "type": "object",
+      "required": ["id", "listed", "breed", "mom", "dad", "puppies"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "$ref": "#/definitions/slug", "description": "Year-month-mom-dad, e.g. 2026-06-coco-leo. Never rename once photos exist: it is the folder name." },
+        "listed": { "type": "boolean", "description": "false hides this litter from the site without deleting anything." },
+        "breed": { "$ref": "#/definitions/text" },
+        "mom": { "$ref": "#/definitions/parent" },
+        "dad": { "$ref": "#/definitions/parent" },
+        "due": { "$ref": "#/definitions/date", "description": "While expecting. The site shows Due (date) until born is set." },
+        "born": { "$ref": "#/definitions/date" },
+        "readyDate": { "$ref": "#/definitions/date", "description": "Ready to go home. Until then, available puppies' badges read Ready and this date." },
+        "litterSize": { "type": "integer", "minimum": 1, "description": "Only if not every puppy is listed. Otherwise the puppies are counted." },
+        "care": { "type": "array", "items": { "$ref": "#/definitions/careEvent" } },
+        "description": { "$ref": "#/definitions/text" },
+        "facts": { "type": "array", "items": { "$ref": "#/definitions/text" }, "description": "Key breed facts, one short sentence each." },
+        "cover": { "type": "string", "description": "A file in src/images/(litter id)/ to lead Home's gallery. Default: the first file alphabetically." },
+        "puppies": { "type": "array", "items": { "$ref": "#/definitions/puppy" } }
+      },
+      "defaultSnippets": [
+        {
+          "label": "New litter",
+          "description": "An expecting litter. Add born, readyDate and puppies when they arrive.",
+          "body": {
+            "id": "${1:2027-01-coco-leo}",
+            "listed": true,
+            "breed": "${2:Havapoo}",
+            "mom": { "name": "${3:Coco}", "breed": "${2:Havapoo}", "photo": "${4:coco.jpg}" },
+            "dad": { "name": "${5:Leo}", "breed": "${2:Havapoo}", "photo": "${6:leo.jpg}" },
+            "due": "${7:2027-01-12}",
+            "puppies": []
+          }
+        }
+      ]
+    }
+  }
+}</pre>
+    </div>
+  </details>
+
+  <details class="deliver">
+    <summary>litters.json <span class="s">— the June litter exactly as the live site has it: three available, two reserved, so the first build can be checked page by page against today's site. Casing normalized; patterns are my reading of the photos — confirm them. When the next litter goes in, these five become <code>"adopted"</code>.</span></summary>
+    <div class="codebox">
+      <div class="codebox__hd"><span>src/data/litters.json</span><button class="copy" data-copy="litters-json">Copy</button></div>
+<pre class="src json src--tall" id="litters-json">{
+  "$schema": "./litters.schema.json",
+  "litters": [
+    {
+      "id": "2026-06-coco-leo",
+      "listed": true,
+      "breed": "Havapoo",
+      "mom": { "name": "Coco", "breed": "Havapoo", "photo": "coco.jpg" },
+      "dad": { "name": "Leo", "breed": "Havapoo", "photo": "leo.jpg" },
+      "born": "2026-06-02",
+      "readyDate": "2026-07-28",
+      "care": [
+        { "type": "dewormed", "date": "2026-06-29" },
+        { "type": "vet-check" }
+      ],
+      "description": "Raised in a loving home with children and other pets, making them well-socialized and ready to settle into family life from day one.",
+      "facts": [
+        "Typically range from 7 to 20 lbs",
+        "Hypoallergenic, making them a good match for those with mild pet allergies",
+        "Highly trainable and eager to please"
+      ],
+      "puppies": [
+        {
+          "slug": "bella", "name": "Bella", "sex": "female", "status": "available",
+          "color": ["white", "black"], "pattern": "parti",
+          "markings": "Black face mask and side spot", "personality": "Curiously energetic",
+          "weights": [{ "date": "2026-06-28", "oz": 27.8 }]
+        },
+        {
+          "slug": "brownie", "name": "Brownie", "sex": "male", "status": "reserved",
+          "color": ["brown"], "pattern": "abstract",
+          "markings": "White toes", "personality": "Cautious explorer",
+          "weights": [{ "date": "2026-06-28", "oz": 29.6 }],
+          "cover": "IMG_1876.jpeg"
+        },
+        {
+          "slug": "jasper", "name": "Jasper", "sex": "male", "status": "reserved",
+          "color": ["brown"], "pattern": "abstract",
+          "markings": "White back paws and tip of tail", "personality": "Chill explorer",
+          "weights": [{ "date": "2026-06-28", "oz": 26.5 }],
+          "cover": "IMG_1892.jpeg"
+        },
+        {
+          "slug": "olive", "name": "Olive", "sex": "female", "status": "available",
+          "color": ["white", "black"], "pattern": "parti",
+          "markings": "Black spot on left eye", "personality": "Chill cuddler",
+          "weights": [{ "date": "2026-06-28", "oz": 28.5 }]
+        },
+        {
+          "slug": "pepper", "name": "Pepper", "sex": "male", "status": "available",
+          "color": ["white", "brown"], "pattern": "parti",
+          "markings": "Brown face mask and rear spot", "personality": "Outgoingly brave",
+          "weights": [{ "date": "2026-06-28", "oz": 29.7 }]
+        }
+      ]
+    }
+  ]
+}</pre>
+    </div>
+  </details>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════════════ -->
+<section class="doc-sec">
+  <p class="doc-sec__num">08 · Cleanups</p>
+  <h2 class="doc-sec__title">Worth doing under any option</h2>
+  <p class="subtitle">Small and independent — take all, some, or none. Name them by code.</p>
+  <ol class="findings findings--fix">
+    <li><b>Stop documenting the value that breaks the page.</b> <code>SPEC.md</code> and the README's Supabase plan both say <code>available</code> is a boolean; <code>true</code> renders “Adopted” with no inquiry button. Delete SPEC.md and correct the README, even if DATA-5 isn't taken.</li>
+    <li><b>Accept .webp and .avif photos, and warn about .heic.</b> The glob takes only jpg/jpeg/png/gif, so anything else is dropped without a word. Browsers can't show HEIC, so that one gets a warning rather than support.</li>
+    <li class="done"><b>Resolved Nov 24 —</b> <s>move <code>systemX-logo.png</code> out of <code>src/images/home/</code></s>. It was a stray file from another project and has been deleted, so nothing in that folder will play as a slide by mistake.</li>
+    <li><b>Count the puppies instead of storing <code>litterSize</code>.</b> Keep the field only for litters where not every puppy is listed, and warn when it's smaller than the list.</li>
+  </ol>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════════════ -->
+<section class="doc-sec">
+  <p class="doc-sec__num">09 · The set</p>
+  <h2 class="doc-sec__title">SRC-2 + LIT-2 + IMG-1, DATA-1–5, DFIX-1–4</h2>
+
+  <table class="census delta" style="max-width:900px">
+    <thead><tr><th></th><th>Today</th><th>With the set</th></tr></thead>
+    <tbody>
+      <tr><td>Fields to fill for a new puppy</td><td class="num">10, three of them bookkeeping (<code>id</code>, <code>icon</code>, <code>folder</code>)</td><td class="after">4 required, inserted by “New puppy”</td></tr>
+      <tr><td>Values that must agree, unchecked</td><td class="num">3 pairs</td><td class="after">0 — merged, or checked by the build</td></tr>
+      <tr><td>Where the allowed values are written</td><td>A comment listing values for 2 fields (<code>icon</code>, <code>available</code>)</td><td class="after">The schema: every field, shown as you type</td></tr>
+      <tr><td>A typo reaches the live site</td><td>Always, silently</td><td class="after">Never — the build stops and says why</td></tr>
+      <tr><td>Two litters on the site at once</td><td>Impossible</td><td class="after">Yes</td></tr>
+      <tr><td>Retiring a litter</td><td>Delete records and folders</td><td class="after"><code>"listed": false</code></td></tr>
+      <tr><td>Bella's page on a phone</td><td class="num">7.9 MB</td><td class="after num">≈ 0.27 MB</td></tr>
+      <tr><td>Instructions for adding a litter</td><td>A comment block, plus an outdated SPEC</td><td class="after">README, kept current with the schema</td></tr>
+    </tbody>
+  </table>
+
+  <h3 class="catalog-h">Build order</h3>
+  <ol class="order">
+    <li><b>DATA-1 with the §07 files, before the site reads them.</b> The schema, the converted <code>litters.json</code> and the checker land together, wired into build, dev and test, while the pages still read <code>puppies.jsx</code>. The checker's first job is the conversion itself, and the live site doesn't change. (It can't go first against today's file: what it checks is the new format.)</li>
+    <li><b>SRC-2 + LIT-2: the site switches over.</b> A <code>git mv</code> per photo folder, the query functions in <code>puppies.jsx</code> rewritten to read litters, the old array deleted. The query functions still hand today's pages what they expect, so every page looks as it does now apart from the casing fixes — the proof that the conversion is right. DFIX-4 comes with it: the converted file already drops <code>litterSize</code>.</li>
+    <li><b>IMG-1, with DFIX-2.</b> Alone, so a visual regression is easy to bisect. The glob changes here anyway, so .webp and .avif join it.</li>
+    <li><b>DATA-2, -3, -4.</b> Facts list, weight log, cover — the display side of the new fields.</li>
+    <li><b>DATA-5 and DFIX-1 last.</b> The manual describes what was actually built.</li>
+    <li><b>The tutorial, once everything is built.</b> A plain-language guide to managing litters, with a small working editor to practise in — written last, so it teaches the real thing.</li>
+  </ol>
+  <p class="subtitle" style="margin-top:14px">The design doc's steps read this data, so they start after step 2. <a href="site-design-options.html">site-design-options.html</a> §07 has both docs' steps as one sequence.</p>
+
+  <div class="callout callout--plain">
+    <b>Before you start — three ways this ships broken.</b>
+    The Mac ignores the case of file names and Cloudflare's Linux build doesn't, so the checker compares <code>cover</code>, parent photos and folder names with each folder's real listing, never a does-this-file-exist call — otherwise a cover written <code>IMG_1876.jpeg</code> for a file saved as <code>IMG_1876.JPEG</code> passes on the Mac and fails the deploy.
+    · Every photo folder holds a <code>.DS_Store</code>, and <code>src/images/parents/</code> sits beside the litter folders: the checker and the loader skip dotfiles and never read <code>parents/</code> as a litter.
+    · The 16 tests mock today's data shape. Step 2 keeps them passing through the query functions; each later step that replaces a component replaces its tests.
+  </div>
+
+  <div class="callout callout--plain">
+    <b>The one thing I'd flag:</b> SRC-2's help is VS Code's. Edit <code>litters.json</code> in GitHub's web editor or on a phone and you get no suggestions and no underlines — only the checker's verdict when the build runs. If anyone besides you will be updating puppies, that's the real argument for SRC-3, and it reverses independently: the schema and checker carry over to a sheet unchanged.
+  </div>
+  <div class="callout callout--plain">
+    <b>Needed before building, not before deciding:</b> confirmation of the patterns I read from the June litter's photos · whether <code>?parents=true</code> stays — step 2 moves the photos it shows (design doc §07).<br>
+    <b>Needed only when the next litter goes in:</b> its parents and due or birth date. No build step waits on them; fixture files stand in for every season.<br>
+    <b>Settled Nov 24:</b> the June litter converts exactly as the live site has it — three available, two reserved — because those are the statuses a build most needs to get right; the five become <code>"adopted"</code> when the next litter goes in, and whether the litter then leaves the site is open in the design doc · a lead photo needs no field — the first file by name leads, as today, and <code>cover</code> is only for when you want a different one · <code>systemX-logo.png</code> is deleted.
+  </div>
+</section>
+
+<p class="foot">
+  Method: <a href="../../METHOD_MOCKS_AND_MEASUREMENT.md">METHOD_MOCKS_AND_MEASUREMENT.md</a> · measured with <code>scripts/measure/measure.mjs</code> (blocks the live visit counter) · photos in <code>docs/img/</code> are small copies for this doc only.
+  Companion: <a href="site-design-options.html">site-design-options.html</a> — what visitors see.
+</p>
+
+</main>
+
+<script>
+// JSON blocks: colour keys, strings, numbers, literals.
+for (const pre of document.querySelectorAll('pre.json')) {
+  const esc = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  pre.innerHTML = esc(pre.textContent).replace(
+    /("(?:[^"\\]|\\.)*")(\s*:)?|\b(true|false|null)\b|(-?\b\d+(?:\.\d+)?\b)/g,
+    (m, str, colon, lit, num) => {
+      if (str) return colon ? `<span class="j-key">${str}</span>${colon}` : `<span class="j-str">${str}</span>`;
+      if (lit) return `<span class="j-lit">${lit}</span>`;
+      return `<span class="j-num">${num}</span>`;
+    }
+  );
+}
+
+// Copy buttons copy the text of the block they name.
+for (const btn of document.querySelectorAll('[data-copy]')) {
+  btn.addEventListener('click', async (e) => {
+    e.preventDefault();
+    const text = document.getElementById(btn.dataset.copy)?.textContent ?? '';
+    try {
+      await navigator.clipboard.writeText(text);
+      btn.textContent = 'Copied';
+    } catch {
+      const r = document.createRange();
+      r.selectNodeContents(document.getElementById(btn.dataset.copy));
+      const sel = getSelection(); sel.removeAllRanges(); sel.addRange(r);
+      btn.textContent = 'Selected — ⌘C';
+    }
+    setTimeout(() => { btn.textContent = 'Copy'; }, 1800);
+  });
+}
+</script>
+</body>
+</html>

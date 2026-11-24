@@ -1,0 +1,1735 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Site design — options</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<style>
+/* ── Doc chrome (paper) — every text/background pair ≥ 5:1 ───────────────── */
+:root {
+  --serif: "Instrument Serif", Georgia, "Times New Roman", serif;
+  --sans:  -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --mono:  ui-monospace, SFMono-Regular, Menlo, monospace;
+  --paper: #fbfaf7; --card: #ffffff; --card-deep: #f3f1ec;
+  --ink: #1d2733; --ink-2: #3d4b5a; --ink-3: #5a6878; --ink-4: #98a3ae;
+  --hair: rgba(29, 39, 51, 0.10); --hair-2: rgba(29, 39, 51, 0.18);
+  --pick: #a4500f; --pick-soft: rgba(224, 123, 26, 0.10); --pick-border: rgba(164, 80, 15, 0.32);
+  --stack: #1d7446; --stack-soft: rgba(30, 132, 73, 0.09); --stack-border: rgba(29, 116, 70, 0.30);
+  --bad: #b3261e; --bad-soft: rgba(179, 38, 30, 0.07);
+  --shadow: 0 10px 30px rgba(29, 39, 51, 0.10), 0 2px 6px rgba(29, 39, 51, 0.06);
+}
+* { box-sizing: border-box; }
+body { margin: 0; padding: 48px 32px 120px; background: var(--paper); color: var(--ink); font-family: var(--sans); -webkit-font-smoothing: antialiased; }
+main { max-width: 1320px; }
+h1 { font-family: var(--serif); font-size: 38px; font-weight: 400; margin: 0 0 10px; letter-spacing: -0.2px; line-height: 1.15; }
+h1 em { font-style: italic; color: var(--pick); }
+.subtitle { color: var(--ink-3); font-size: 14px; max-width: 820px; line-height: 1.65; margin: 0 0 8px; }
+.subtitle b { color: var(--ink-2); font-weight: 600; }
+a { color: var(--pick); }
+code { font-family: var(--mono); font-size: 12.5px; color: var(--ink-2); background: var(--card-deep); padding: 1px 5px; border-radius: 4px; }
+.doc-sec { margin: 84px 0 0; padding-top: 26px; border-top: 2px solid var(--hair-2); }
+.doc-sec__num { font-size: 11px; text-transform: uppercase; letter-spacing: 1.8px; color: var(--pick); margin: 0 0 10px; font-weight: 600; }
+.doc-sec__title { font-family: var(--serif); font-size: 30px; font-weight: 400; margin: 0 0 12px; }
+.sub-h { font-family: var(--serif); font-size: 22px; font-weight: 400; margin: 36px 0 0; }
+
+.census { border-collapse: collapse; margin: 20px 0 8px; font-size: 13px; width: 100%; max-width: 900px; }
+.census th { text-align: left; font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.8px; color: var(--ink-3); font-weight: 600; padding: 0 14px 9px 0; border-bottom: 1px solid var(--hair-2); }
+.census td { padding: 8px 14px 8px 0; border-bottom: 1px solid var(--hair); color: var(--ink-2); vertical-align: top; line-height: 1.5; }
+.census td:first-child { color: var(--ink); }
+.census tr.hot td, .census tr.hot td:first-child { color: var(--bad); font-weight: 600; }
+.census tfoot td { border-bottom: 0; color: var(--ink-3); font-weight: 600; }
+.census .num { font-variant-numeric: tabular-nums; white-space: nowrap; }
+.census td.after { color: var(--stack); font-weight: 600; }
+.tables { display: flex; gap: 40px; flex-wrap: wrap; align-items: flex-start; }
+.tables > div { flex: 1 1 520px; max-width: 640px; }
+.tables .census { margin-top: 10px; }
+.t-cap { font-size: 12.5px; color: var(--ink-3); margin: 16px 0 0; }
+.t-cap b { color: var(--ink); }
+
+.findings { max-width: 860px; margin: 26px 0 0; padding: 0; list-style: none; counter-reset: f; }
+.findings li { position: relative; padding: 0 0 0 32px; margin-bottom: 15px; font-size: 14px; line-height: 1.65; color: var(--ink-3); }
+.findings li::before { content: counter(f); counter-increment: f; position: absolute; left: 0; top: 2px; width: 21px; height: 21px; border-radius: 50%; background: var(--card); border: 1px solid var(--hair-2); font-size: 10.5px; font-weight: 600; color: var(--ink-3); display: flex; align-items: center; justify-content: center; }
+.findings b { color: var(--ink); font-weight: 600; }
+.findings--fix li { padding-left: 70px; }
+.findings--fix li::before { content: "FIX-" counter(f); width: 54px; height: 21px; border-radius: 6px; font-family: var(--mono); font-size: 10px; letter-spacing: 0.4px; color: var(--ink-2); }
+
+.key { max-width: 980px; margin: 30px 0 0; background: var(--card); border: 1px solid var(--hair-2); border-radius: 16px; overflow: hidden; box-shadow: var(--shadow); }
+.key__hd { font-size: 11px; text-transform: uppercase; letter-spacing: 1.8px; color: var(--ink-3); font-weight: 600; padding: 15px 20px 12px; border-bottom: 1px solid var(--hair); margin: 0; }
+.key__grp { display: flex; gap: 18px; padding: 14px 20px; border-bottom: 1px solid var(--hair); align-items: flex-start; flex-wrap: wrap; }
+.key__rule { flex: 0 0 160px; font-size: 12px; color: var(--ink-3); line-height: 1.5; padding-top: 3px; margin: 0; }
+.key__rule b { display: block; color: var(--ink); font-size: 13px; font-weight: 600; margin-bottom: 2px; }
+.key__items { flex: 1 1 480px; display: flex; flex-direction: column; gap: 9px; }
+.key__item { display: flex; gap: 11px; align-items: baseline; font-size: 13px; color: var(--ink-3); line-height: 1.5; margin: 0; }
+.key__item .code { flex-shrink: 0; min-width: 62px; text-align: center; }
+.key__item b { color: var(--ink); font-weight: 600; }
+.key__star { color: var(--pick); }
+.key__eg { padding: 15px 20px; background: var(--card-deep); font-size: 13px; color: var(--ink-3); line-height: 1.7; margin: 0; }
+.key__eg b { color: var(--ink-2); }
+.code { display: inline-block; font-family: var(--mono); font-size: 11px; font-weight: 600; letter-spacing: 0.5px; padding: 3px 8px; border-radius: 6px; background: var(--card-deep); border: 1px solid var(--hair-2); color: var(--ink-2); }
+.code--pick { color: var(--pick); border-color: var(--pick-border); background: var(--pick-soft); }
+.code--stack { color: var(--stack); border-color: var(--stack-border); background: var(--stack-soft); }
+
+.options { display: flex; flex-wrap: wrap; gap: 44px 40px; align-items: flex-start; margin-top: 36px; }
+.option-block { flex: 0 1 400px; max-width: 420px; padding-top: 22px; border-top: 1px solid var(--hair-2); }
+.option-block--wide { flex: 1 1 100%; max-width: 1240px; }
+.option-block--mid { flex: 1 1 520px; max-width: 840px; }
+.band { flex: 1 0 100%; margin: 14px 0 -14px; display: flex; align-items: center; gap: 14px; }
+.band__t { font-size: 11px; text-transform: uppercase; letter-spacing: 1.8px; color: var(--stack); font-weight: 700; white-space: nowrap; }
+.band__t--pick { color: var(--pick); }
+.band__line { flex: 1; height: 1px; background: var(--hair-2); }
+.band__sub { font-size: 12px; color: var(--ink-3); white-space: nowrap; }
+.option-label { font-size: 11px; text-transform: uppercase; letter-spacing: 1.8px; color: var(--ink-3); margin: 0 0 8px; }
+.option-name { font-family: var(--serif); font-size: 25px; margin: 0 0 6px; font-weight: 400; }
+.option-pos { font-size: 12.5px; color: var(--ink-3); font-style: italic; margin: 0 0 10px; }
+.tag { font-family: var(--sans); font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; border-radius: 999px; padding: 3px 8px; vertical-align: 5px; margin-left: 8px; color: var(--pick); border: 1px solid var(--pick); }
+.tag--no { color: var(--ink-4); border-color: var(--ink-4); }
+.tag--ok { color: var(--stack); border-color: var(--stack); }
+.option-note { font-size: 13.5px; color: var(--ink-3); line-height: 1.65; margin: 0 0 16px; }
+.option-note b { color: var(--ink-2); }
+.tradeoff { font-size: 13px; line-height: 1.65; margin: 16px 0 0; padding: 12px 14px; border-radius: 10px; background: var(--card); border: 1px solid var(--hair); color: var(--ink-3); }
+.tradeoff b { color: var(--ink-2); }
+.tradeoff .plus { color: var(--stack); font-weight: 700; }
+.tradeoff .minus { color: var(--bad); font-weight: 700; }
+.caption { font-size: 11px; color: var(--ink-3); margin: 10px 0 0; text-transform: uppercase; letter-spacing: 0.8px; line-height: 1.55; }
+.caption b { color: var(--ink); }
+.callout { max-width: 900px; margin: 26px 0 0; padding: 16px 18px; border-radius: 12px; background: var(--card); border: 1px solid var(--hair-2); font-size: 14px; line-height: 1.65; color: var(--ink-2); }
+.callout b { color: var(--ink); }
+.callout--pick { background: var(--pick-soft); border-color: var(--pick-border); }
+.pair { display: flex; gap: 28px; flex-wrap: wrap; align-items: flex-start; }
+.mini-label { font-size: 11px; text-transform: uppercase; letter-spacing: 1.2px; color: var(--ink-3); font-weight: 600; margin: 0 0 8px; }
+
+/* ── App tokens (redeclared from src/App.css) ──────────────────────────────
+   --acc / --acc-strong are set per drawing: the light accent stays for bars
+   and paws; the strong one (FIX-1) is for text and button fills. */
+.phone, .pm, .desk { --a-bg: #f4f4f4; --a-ink: #2c3e50; --text-2: #5d718a; --acc: #8a9bb0; --acc-strong: #5d718a; }
+.girl { --acc: #e91e8c; --acc-strong: #df1683; }
+.boy  { --acc: #4a90d9; --acc-strong: #2a78c8; }
+
+/* Phone frame, fold, shade */
+.phone { position: relative; width: 390px; flex: 0 0 390px; background: var(--a-bg); border: 1px solid var(--hair-2); border-radius: 28px; overflow: hidden; box-shadow: var(--shadow); font-family: var(--sans); color: var(--a-ink); }
+.phone--clip { height: 1000px; }
+.phone--clip::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 80px; background: linear-gradient(rgba(244,244,244,0), #f4f4f4 85%); z-index: 8; pointer-events: none; }
+.fold { position: absolute; left: 0; right: 0; height: 0; border-top: 1.5px dashed var(--pick); z-index: 9; pointer-events: none; }
+.fold::after { content: attr(data-label); position: absolute; right: 10px; top: 5px; font: 700 9.5px/1 var(--sans); letter-spacing: .8px; text-transform: uppercase; color: #fff; background: var(--pick); padding: 3px 7px; border-radius: 4px; }
+.shade { position: absolute; left: 0; right: 0; bottom: 0; background: rgba(29, 39, 51, 0.05); z-index: 7; pointer-events: none; }
+.ic { width: 1em; height: 1em; fill: currentColor; flex-shrink: 0; }
+.ic--line { fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+
+/* ── Today's components (pm-) ── */
+.pm-head { height: 71px; display: flex; align-items: center; gap: 10px; padding: 0 16px; background: linear-gradient(135deg, #1a2a3a 0%, #2c3e50 60%, #34495e 100%); border-bottom: 3px solid #4a90d9; }
+.pm-head__emoji { font-size: 24px; line-height: 1; }
+.pm-head__t { margin: 0; color: #fff; font-size: 19.2px; font-weight: 700; letter-spacing: .03em; line-height: 1.1; }
+.pm-head__s { margin: 2px 0 0; color: rgba(255,255,255,.55); font-size: 11.2px; letter-spacing: .08em; text-transform: uppercase; }
+.pm-trig { height: 57px; display: flex; align-items: center; justify-content: space-between; padding: 0 18px; background: #2c3e50; border-bottom: 1px solid rgba(255,255,255,.12); color: #fff; font-size: 15px; font-weight: 600; }
+.pm-trig__r { display: flex; align-items: center; gap: 7px; font-size: 11.5px; font-weight: 700; letter-spacing: .09em; color: rgba(255,255,255,.45); }
+.pm-trig__r .ic { font-size: 21px; color: #fff; }
+.pm-main { padding: 26px 26px 0; }
+.pm-title { margin: 0 0 16px; height: 27px; font-size: 22.4px; font-weight: 700; line-height: 27px; color: var(--acc); white-space: nowrap; }
+.pm-title__pre { color: #8a9bb0; font-weight: 400; }
+.pm-dep { height: 77px; margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 0 16px; border-radius: 10px; color: #fff; background: linear-gradient(90deg, #e07b1a, #f0a030); }
+.pm-dep__l { display: flex; align-items: center; gap: 10px; font-size: 14px; font-weight: 600; line-height: 1.3; }
+.pm-dep__l .ic { font-size: 40px; color: rgba(255,255,255,.75); }
+.pm-dep__amt { font-size: 1.15em; font-weight: 800; }
+.pm-dep__btn { flex-shrink: 0; padding: 6px 12px; border-radius: 6px; border: 1px solid rgba(255,255,255,.45); background: rgba(255,255,255,.2); font-size: 13.6px; font-weight: 700; white-space: nowrap; }
+.pm-card0 { background: #fff; border-radius: 0 0 12px 12px; overflow: hidden; box-shadow: 0 1px 6px rgba(0,0,0,.07); }
+.pm-bar4 { height: 4px; background: var(--acc); }
+.pm-cells { display: grid; grid-template-columns: 1fr 1fr; }
+.pm-cell { padding: 11px 14px; border-right: 1px solid #f0f4f8; border-bottom: 1px solid #f0f4f8; display: flex; flex-direction: column; gap: 4px; overflow: hidden; }
+.pm-cell:nth-child(2n) { border-right: 0; }
+.pm-lab { font-size: 10.9px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; color: #9bafc4; }
+.pm-val { font-size: 14.7px; font-weight: 600; color: #2c3e50; line-height: 1.35; }
+.pm-pill { align-self: flex-start; padding: 6px 12px; border-radius: 999px; background: var(--acc); color: #fff; font-size: 13px; font-weight: 700; }
+.pm-badge { display: inline-block; margin: 10px 14px 0; padding: 3px 14px; border-radius: 999px; font-size: 12.8px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; color: #1e8449; background: #e8f8f0; border: 1.5px solid #a9dfbf; }
+.pm-litinfo { padding: 14px 22px 0; border-top: 1px solid #f0f4f8; overflow: hidden; }
+.pm-litinfo h4 { margin: 0 0 6px; font-size: 12px; font-weight: 700; letter-spacing: .09em; text-transform: uppercase; color: #7a8fa6; }
+.pm-litinfo ul { margin: 0; padding-left: 18px; }
+.pm-litinfo li, .pm-litinfo p { color: #8a9bb0; font-size: 14.7px; line-height: 1.7; }
+.pm-litinfo p { margin: 10px 0 0; }
+.pm-photo { position: relative; height: 280px; background: #1e2a35; border-radius: 14px 14px 0 0; overflow: hidden; display: flex; justify-content: center; }
+.pm-photo__bg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; filter: blur(14px) brightness(.55) saturate(1.2); transform: scale(1.1); }
+.pm-photo__img { position: relative; height: 280px; width: 280px; object-fit: cover; }
+.pm-expand { position: absolute; top: 10px; right: 10px; width: 40px; height: 40px; border-radius: 8px; background: rgba(0,0,0,.45); color: rgba(255,255,255,.9); display: flex; align-items: center; justify-content: center; z-index: 2; font-size: 16px; }
+.pm-pfoot { height: 60px; display: flex; align-items: center; gap: 8px; padding: 0 16px; background: #1a2530; border-radius: 0 0 14px 14px; color: rgba(255,255,255,.85); font-size: 13px; }
+.pm-pfoot__b { width: 36px; height: 36px; border-radius: 6px; background: rgba(255,255,255,.12); display: flex; align-items: center; justify-content: center; font-size: 22px; line-height: 1; color: rgba(255,255,255,.9); }
+.pm-pfoot__n { margin-left: auto; letter-spacing: .04em; }
+.pm-progress { position: absolute; left: 0; right: 0; bottom: 0; height: 3px; background: rgba(255,255,255,.15); z-index: 2; }
+.pm-progress span { display: block; width: 38%; height: 100%; background: rgba(255,255,255,.75); }
+.pm-thumbs { margin-top: 16px; padding-top: 16px; border-top: 1px solid #e2e8f0; display: grid; grid-template-columns: repeat(4, 1fr); gap: 7px; }
+.pm-thumb { aspect-ratio: 1; border-radius: 8px; overflow: hidden; border: 3px solid transparent; box-shadow: 0 2px 4px rgba(0,0,0,.1); }
+.pm-thumb--on { border-color: #8a9bb0; }
+.pm-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.pm-divider { margin-top: 20px; border-top: 1px solid #e2e8f0; }
+.pm-cta { margin-top: 20px; height: 144px; }
+.pm-cta__body { padding: 14px 16px; display: flex; flex-direction: column; gap: 12px; align-items: flex-start; }
+.pm-cta__text { display: flex; gap: 14px; align-items: center; height: 60px; }
+.pm-cta__text .ic { font-size: 36px; color: var(--acc); opacity: .55; }
+.pm-cta__h { margin: 0 0 3px; font-size: 19.2px; font-weight: 700; color: #2c3e50; }
+.pm-cta__s { margin: 0; font-size: 13.6px; color: #7a9bbf; line-height: 1.35; }
+.pm-cta__btn { padding: 11px 26px; border-radius: 10px; background: var(--acc); color: #fff; font-size: 15.2px; font-weight: 700; letter-spacing: .03em; box-shadow: 0 4px 16px rgba(0,0,0,.12); }
+.pm-copy { margin: 20px 0 0; height: 13px; text-align: center; font-size: 11.5px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: #9bafc4; }
+
+/* ── Proposed components ── */
+.pm-bar { height: 56px; display: flex; align-items: center; justify-content: space-between; padding: 0 6px 0 16px; background: linear-gradient(135deg, #1a2a3a 0%, #2c3e50 70%); border-bottom: 3px solid #4a90d9; color: #fff; }
+.pm-bar__brand { display: flex; align-items: center; gap: 8px; font-size: 17px; font-weight: 700; letter-spacing: .02em; }
+.pm-bar__brand .ic { font-size: 20px; color: rgba(255,255,255,.8); }
+.pm-bar__menu { width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; font-size: 22px; }
+.pm-lh { height: 118px; padding: 16px 16px 0; }
+.pm-lh__over { margin: 0; font-size: 10.5px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--text-2); }
+.pm-lh__h { margin: 4px 0 3px; font-size: 23px; font-weight: 700; color: #2c3e50; line-height: 1.25; }
+.pm-lh__meta { margin: 0; font-size: 13.5px; color: var(--text-2); }
+.pm-lh__avail { margin: 6px 0 0; font-size: 13.5px; font-weight: 600; color: #1d8047; display: flex; align-items: center; gap: 7px; }
+.pm-lh__avail::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: #2fa866; }
+.pm-lh__avail--off { color: var(--text-2); }
+.pm-lh__avail--off::before { background: #a7b3c0; }
+.pm-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 8px 16px 0; }
+.pm-pcard { background: #fff; border-radius: 12px; overflow: hidden; box-shadow: 0 1px 6px rgba(0,0,0,.08); }
+.pm-pcard img { display: block; width: 100%; aspect-ratio: 1; object-fit: cover; }
+.pm-pcard__ph { aspect-ratio: 1; background: #f4f8fd; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; color: var(--acc); }
+.pm-pcard__ph .ic { font-size: 54px; opacity: .45; }
+.pm-pcard__ph span { font-size: 10.5px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--text-2); }
+.pm-pcard__row { height: 46px; display: flex; align-items: center; justify-content: space-between; gap: 6px; padding: 0 9px 0 11px; }
+.pm-pcard__name { display: flex; align-items: center; gap: 5px; font-size: 15px; font-weight: 700; color: #2c3e50; white-space: nowrap; }
+.pm-pcard__name .ic { font-size: 13px; color: var(--acc); }
+.chip { display: inline-block; font-family: var(--sans); font-size: 10px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; padding: 3px 7px; border-radius: 5px; white-space: nowrap; line-height: 1.3; }
+.chip--ok { color: #1d8047; background: #e8f8f0; border: 1.5px solid #a9dfbf; }
+.chip--res { color: #7a4f00; background: #fff8e1; border: 1.5px solid #ffd666; }
+.chip--gone { color: #c0392b; background: #fdf0f0; border: 1.5px solid #f5b7b1; }
+.chip--soon { color: #5a6a7a; background: #f0f2f5; border: 1.5px solid #c4cdd6; }
+.pm-dep2 { margin: 16px 16px 0; height: 56px; display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 0 14px; background: #fff4e6; border-left: 4px solid #e07b1a; border-radius: 10px; color: #9a4a0b; font-size: 13px; font-weight: 600; white-space: nowrap; }
+.pm-dep2 b { font-weight: 800; }
+.pm-dep2__go { font-size: 13px; font-weight: 700; white-space: nowrap; }
+.pm-sec { margin: 22px 16px 8px; font-size: 11px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--text-2); }
+.pm-strip { display: flex; gap: 8px; padding: 0 16px; overflow: hidden; }
+.pm-strip img { width: 150px; height: 120px; object-fit: cover; border-radius: 10px; flex-shrink: 0; }
+.pm-facts { margin: 0 16px; background: #fff; border-radius: 12px; box-shadow: 0 1px 6px rgba(0,0,0,.07); overflow: hidden; }
+.pm-fact { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; padding: 11px 14px; border-bottom: 1px solid #f0f4f8; min-height: 41px; }
+.pm-fact:last-child { border-bottom: 0; }
+.pm-fact__l { font-size: 11px; font-weight: 700; letter-spacing: .07em; text-transform: uppercase; color: var(--text-2); flex-shrink: 0; }
+.pm-fact__v { font-size: 14.5px; font-weight: 600; color: #2c3e50; text-align: right; }
+.pm-fold { display: flex; align-items: center; justify-content: space-between; padding: 11px 14px; font-size: 13.5px; font-weight: 700; color: #2c3e50; background: #fafbfc; }
+.pm-back { height: 36px; display: flex; align-items: center; justify-content: space-between; padding: 0 16px; font-size: 13.5px; font-weight: 600; color: var(--text-2); }
+.pm-car { position: relative; height: 390px; background: #1e2a35; }
+.pm-car__track { display: flex; height: 100%; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; }
+.pm-car__track::-webkit-scrollbar { display: none; }
+.pm-car__track img { flex: 0 0 100%; width: 100%; height: 100%; object-fit: cover; scroll-snap-align: start; }
+.pm-car__ph { flex: 0 0 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; background: #f4f8fd; color: var(--acc); }
+.pm-car__ph .ic { font-size: 110px; opacity: .4; }
+.pm-car__ph span { font-size: 13px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--text-2); }
+.pm-dots { position: absolute; left: 0; right: 0; bottom: 12px; display: flex; justify-content: center; align-items: center; gap: 6px; z-index: 2; pointer-events: none; }
+.pm-dots i { width: 7px; height: 7px; border-radius: 4px; background: rgba(255,255,255,.55); box-shadow: 0 0 3px rgba(0,0,0,.35); transition: width .2s; }
+.pm-dots i.on { background: #fff; width: 18px; }
+.pm-id { height: 70px; padding: 14px 16px 0; }
+.pm-id__row { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.pm-id__t { margin: 0; font-size: 24px; font-weight: 700; color: var(--acc); line-height: 30px; white-space: nowrap; }
+.pm-id__t span { color: #7c8fa7; font-weight: 400; }
+.pm-id__sub { margin: 6px 0 0; font-size: 13.5px; color: var(--text-2); white-space: nowrap; }
+.pm-id__sub b { color: var(--acc-strong); font-weight: 700; }
+.pm-btn { margin: 12px 16px 0; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; gap: 8px; background: var(--acc-strong); color: #fff; font-size: 16px; font-weight: 700; box-shadow: 0 4px 14px rgba(0,0,0,.12); }
+.pm-btn .ic { font-size: 17px; opacity: .85; }
+.pm-btn--navy { background: #2c3e50; }
+.pm-note { margin: 8px 16px 0; height: 18px; text-align: center; font-size: 12.5px; color: var(--text-2); }
+.pm-mates { padding: 20px 0 0; }
+.pm-mates .pm-sec { margin-top: 0; }
+.pm-mates__row { display: flex; gap: 10px; padding: 0 16px; overflow: hidden; }
+.pm-mate { flex: 0 0 104px; }
+.pm-mate img { width: 104px; height: 104px; border-radius: 10px; object-fit: cover; display: block; }
+.pm-mate__n { margin: 6px 0 3px; font-size: 13.5px; font-weight: 700; color: #2c3e50; display: flex; align-items: center; gap: 4px; }
+.pm-mate__n .ic { font-size: 11px; color: var(--acc); }
+.pm-pin { position: absolute; left: 0; right: 0; height: 64px; background: rgba(255,255,255,.97); box-shadow: 0 -4px 16px rgba(0,0,0,.10); display: flex; align-items: center; padding: 0 16px; z-index: 6; }
+.pm-pin .pm-btn { margin: 0; flex: 1; height: 44px; }
+.pm-chips { display: flex; flex-wrap: wrap; gap: 6px; padding: 10px 16px 0; }
+.pm-tchip { font-size: 12.5px; padding: 5px 10px; border-radius: 6px; background: #fff; border: 1px solid #e2e8f0; color: #2c3e50; font-weight: 600; }
+.pm-tchip span { color: var(--text-2); margin-right: 5px; font-size: 10.5px; text-transform: uppercase; letter-spacing: .05em; }
+.pm-full { width: 390px; height: 390px; object-fit: cover; display: block; }
+.pm-hero { position: relative; height: 390px; }
+.pm-hero img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.pm-hero__txt { position: absolute; left: 0; right: 0; bottom: 0; padding: 60px 16px 16px; background: linear-gradient(rgba(0,0,0,0), rgba(0,0,0,.72)); color: #fff; }
+.pm-hero__txt .pm-lh__over { color: rgba(255,255,255,.8); }
+.pm-hero__txt .pm-lh__h { color: #fff; }
+.pm-hero__txt .pm-lh__meta { color: rgba(255,255,255,.85); }
+.pm-hero__txt .pm-lh__avail { color: #b6f0cb; }
+
+/* ── Round 2: gallery hero, litter card, mosaic, facts, tabs, peek ── */
+.pm-gal { position: relative; height: 288px; background: #1e2a35; overflow: hidden; }
+.pm-gal .pm-car__track img { object-fit: cover; }
+.pm-gal__count { position: absolute; top: 10px; left: 12px; z-index: 3; padding: 3px 9px; border-radius: 6px; background: rgba(0,0,0,.5); color: #fff; font-size: 12px; font-weight: 600; letter-spacing: .02em; pointer-events: none; }
+.pm-gal__shade { position: absolute; left: 0; right: 0; bottom: 0; height: 130px; z-index: 2; background: linear-gradient(rgba(0,0,0,0), rgba(0,0,0,.72)); pointer-events: none; }
+.pm-gal__txt { position: absolute; left: 16px; right: 16px; bottom: 16px; z-index: 3; pointer-events: none; }
+.pm-gal__h { margin: 0; color: #fff; font-size: 23px; font-weight: 700; line-height: 1.2; text-shadow: 0 1px 6px rgba(0,0,0,.35); }
+.pm-gal__s { margin: 4px 0 0; display: flex; align-items: center; gap: 7px; color: #c9f5da; font-size: 13.5px; font-weight: 600; }
+.pm-gal__s::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: #2fa866; }
+.pm-gal__s--off { color: rgba(255,255,255,.88); }
+.pm-gal__s--off::before { background: #a7b3c0; }
+.pm-gal .pm-progress { z-index: 4; }
+.pm-glance { margin: 12px 16px 0; background: #fff; border-radius: 12px; box-shadow: 0 1px 6px rgba(0,0,0,.08); overflow: hidden; }
+.pm-glance__bar { height: 4px; background: linear-gradient(to right, #4a90d9 0 50%, #e91e8c 50% 100%); }
+.pm-glance__par { display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-bottom: 1px solid #f0f4f8; }
+.pm-avas { display: flex; flex-shrink: 0; }
+.pm-ava { width: 42px; height: 42px; border-radius: 50%; overflow: hidden; border: 2px solid #fff; box-shadow: 0 1px 4px rgba(0,0,0,.18); background: #e6eaef; flex-shrink: 0; }
+.pm-ava + .pm-ava { margin-left: -10px; }
+.pm-ava img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.pm-glance__t { margin: 0; font-size: 15px; font-weight: 700; color: #2c3e50; }
+.pm-glance__s { margin: 1px 0 0; font-size: 12.5px; color: #5d718a; }
+.pm-glance__more { margin-left: auto; font-size: 12.5px; font-weight: 700; color: #2a78c8; white-space: nowrap; }
+.pm-glance__facts { display: grid; grid-template-columns: repeat(3, 1fr); border-bottom: 1px solid #f0f4f8; }
+.pm-glance__facts > div { padding: 8px 14px 9px; border-right: 1px solid #f0f4f8; }
+.pm-glance__facts > div:last-child { border-right: 0; }
+.pm-glance__facts b { display: block; margin-top: 2px; font-size: 15px; color: #2c3e50; }
+.pm-glance__care { display: flex; flex-wrap: wrap; gap: 6px; padding: 9px 14px; border-bottom: 1px solid #f0f4f8; }
+.pm-check { display: inline-flex; align-items: center; gap: 5px; padding: 4px 10px 4px 8px; border-radius: 6px; background: #e8f8f0; color: #1d6b3e; font-size: 12.5px; font-weight: 700; }
+.pm-check .ic { font-size: 13px; }
+.pm-glance__desc { margin: 0; padding: 9px 14px 11px; font-size: 13.5px; line-height: 1.5; color: #4a5d70; }
+.pm-glance__desc span { color: #2a78c8; font-weight: 700; white-space: nowrap; }
+.pm-sechead { display: flex; align-items: baseline; justify-content: space-between; margin: 16px 16px 8px; }
+.pm-sechead b { font-size: 16px; color: #2c3e50; }
+.pm-sechead span { font-size: 12.5px; font-weight: 700; color: #1d8047; }
+.pm-grid--tight { padding-top: 0; }
+.pm-mosaic { display: grid; grid-template-columns: 2fr 1fr; grid-template-rows: 1fr 1fr; gap: 4px; height: 236px; margin: 0 16px; border-radius: 12px; overflow: hidden; }
+.pm-mosaic img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.pm-mosaic > :first-child { grid-row: span 2; }
+.pm-mosaic__more { position: relative; }
+.pm-mosaic__more span { position: absolute; inset: 0; background: rgba(20, 30, 40, .55); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: 700; }
+.pm-f4s { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 12px 16px 0; }
+.pm-f4 { display: flex; align-items: center; gap: 9px; padding: 8px 10px; background: #fff; border-radius: 10px; box-shadow: 0 1px 4px rgba(0,0,0,.07); }
+.pm-f4__i { width: 32px; height: 32px; border-radius: 8px; background: #eef3f8; color: #2c3e50; display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
+.pm-f4__i--ok { background: #e8f8f0; color: #1d8047; }
+.pm-f4 small { display: block; font-size: 10.5px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: #5d718a; }
+.pm-f4 b { display: block; font-size: 14px; color: #2c3e50; }
+.pm-tabs { display: flex; margin: 12px 16px 0; padding: 3px; background: #e3e8ee; border-radius: 10px; }
+.pm-tab { flex: 1; text-align: center; padding: 8px 4px; border-radius: 8px; font-size: 13.5px; font-weight: 600; color: #4a5d70; }
+.pm-tab--on { background: #fff; color: #2c3e50; box-shadow: 0 1px 3px rgba(0,0,0,.12); }
+.pm-peek { display: flex; gap: 8px; padding: 0 16px; overflow-x: auto; scroll-snap-type: x mandatory; scroll-padding: 0 16px; scrollbar-width: none; }
+.pm-peek::-webkit-scrollbar { display: none; }
+.pm-peek img { flex: 0 0 290px; height: 196px; border-radius: 12px; object-fit: cover; scroll-snap-align: start; }
+.pm-litstrip { margin: 16px 16px 0; padding: 10px 12px; background: #fff; border-radius: 12px; box-shadow: 0 1px 6px rgba(0,0,0,.07); display: flex; gap: 10px; align-items: center; }
+.pm-litstrip .pm-ava { width: 34px; height: 34px; }
+.pm-litstrip p { margin: 0; font-size: 12.5px; color: #4a5d70; line-height: 1.5; }
+.pm-litstrip b { color: #2c3e50; }
+.pm-litstrip .ok { color: #1d6b3e; font-weight: 700; }
+.pm-litstrip .go { color: #2a78c8; font-weight: 700; white-space: nowrap; }
+.pm-more { width: 390px; background: #fff; border-radius: 12px; box-shadow: var(--shadow); padding: 4px 0 8px; }
+.pm-more .pm-sec { margin: 12px 14px 4px; }
+.pm-more ul { margin: 0; padding: 0 14px 0 32px; font-size: 13.5px; line-height: 1.65; color: #4a5d70; }
+.d-hero { display: flex; gap: 24px; }
+.d-gal { position: relative; flex: 0 0 560px; height: 360px; border-radius: 14px; overflow: hidden; }
+.d-gal img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.d-right { flex: 1; min-width: 0; }
+.d-right .pm-glance, .d-right .pm-dep2 { margin-left: 0; margin-right: 0; }
+.d-right .pm-glance { margin-top: 0; }
+.rb--trust { background: rgba(42, 120, 200, .42); }
+/* Round 3 */
+.pm-story { padding: 11px 14px 12px; }
+.pm-story__hd { display: flex; align-items: center; gap: 10px; }
+.pm-story__hd .pm-ava { width: 36px; height: 36px; }
+.pm-story__hd p { margin: 0; font-size: 13px; color: #5d718a; line-height: 1.35; }
+.pm-story__hd b { font-size: 15px; color: #2c3e50; }
+.pm-story__p { margin: 8px 0 0; font-size: 13.5px; line-height: 1.5; color: #4a5d70; }
+.pm-story__p span { color: #2a78c8; font-weight: 700; white-space: nowrap; }
+.pm-story + .pm-glance__facts { border-top: 1px solid #f0f4f8; }
+.pm-glance > :last-child { border-bottom: 0; }
+.pm-f4--span { grid-column: 1 / -1; }
+.d-right .pm-f4s { margin-left: 0; margin-right: 0; }
+.pm-gal--empty { background: radial-gradient(120% 90% at 85% 10%, #3d556c 0%, #2c3e50 55%, #1f3040 100%); }
+.pm-gal__paw { position: absolute; right: -26px; top: -22px; font-size: 230px; color: rgba(255,255,255,.07); transform: rotate(18deg); }
+.pm-gap { margin-left: auto; align-self: stretch; width: 118px; border: 1.5px dashed var(--pick); border-radius: 8px; color: var(--pick); font: 700 9.5px/1.3 var(--sans); letter-spacing: .06em; text-transform: uppercase; display: flex; align-items: center; justify-content: center; text-align: center; padding: 0 6px; }
+.tilestate { margin-bottom: 14px; }
+.tilestate__t { margin: 0 0 6px; font-size: 12.5px; font-weight: 700; color: var(--ink-2); }
+.tilestate__t span { font-weight: 400; color: var(--ink-3); margin-left: 6px; }
+.tilestate .pm { width: 390px; background: #f4f4f4; border-radius: 14px; padding: 0 0 12px; border: 1px solid var(--hair-2); }
+#pup-1 .pm-pill, #pup-1 .pm-badge { border-radius: 6px; }
+
+/* Menu sheet, parents, form (PLUS drawings and states) */
+.pm-menu { background: #2c3e50; padding: 8px 10px 12px; }
+.pm-mrow { display: flex; align-items: center; gap: 12px; padding: 10px 14px; color: rgba(255,255,255,.82); font-size: 14px; border-radius: 8px; }
+.pm-mrow--active { background: rgba(138,155,176,.5); color: #fff; }
+.pm-mrow--bold { font-weight: 700; color: #fff; }
+.pm-mrow .ic { font-size: 18px; }
+.pm-mrow .chip { margin-left: auto; }
+.pm-msec { display: flex; align-items: center; gap: 8px; padding: 10px 14px 4px; font-size: 10.5px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: rgba(255,255,255,.4); }
+.pm-msec::after { content: ""; flex: 1; height: 1px; background: rgba(255,255,255,.15); }
+.pm-parents { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 4px 16px 0; }
+.pm-parent { position: relative; border-radius: 12px; overflow: hidden; height: 200px; }
+.pm-parent img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.pm-parent__o { position: absolute; left: 0; right: 0; bottom: 0; padding: 30px 10px 10px; background: linear-gradient(rgba(0,0,0,0), rgba(0,0,0,.7)); display: flex; align-items: center; gap: 7px; color: #fff; font-weight: 700; font-size: 15px; }
+.pm-role { font-size: 10px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; padding: 3px 7px; border-radius: 5px; }
+.pm-role--mom { background: #df1683; } .pm-role--dad { background: #2a78c8; }
+.pm-formcard { margin: 0 16px; background: #fff; border-radius: 0 0 12px 12px; box-shadow: 0 1px 6px rgba(0,0,0,.07); padding-bottom: 16px; }
+.pm-about { display: flex; align-items: center; gap: 10px; margin: 14px 14px 0; padding: 8px 10px; border-radius: 10px; background: #fdf0f6; border: 1px solid #f6c6dd; }
+.pm-about img { width: 38px; height: 38px; border-radius: 8px; object-fit: cover; }
+.pm-about__t { font-size: 13.5px; color: #2c3e50; line-height: 1.35; }
+.pm-about__t small { display: block; font-size: 11.5px; color: var(--text-2); }
+.pm-about__x { margin-left: auto; color: var(--text-2); font-size: 18px; }
+.pm-field { padding: 12px 14px 0; }
+.pm-field__l { font-size: 10.9px; font-weight: 700; letter-spacing: .07em; text-transform: uppercase; color: var(--text-2); margin-bottom: 5px; }
+.pm-field__l i { font-style: normal; font-weight: 600; letter-spacing: 0; text-transform: none; }
+.pm-input { height: 40px; border: 1px solid #e2e8f0; border-radius: 8px; background: #f4f8fd; padding: 0 12px; display: flex; align-items: center; font-size: 14px; color: #8a9bb0; }
+.pm-input--tall { height: 74px; align-items: flex-start; padding-top: 10px; color: #2c3e50; line-height: 1.4; font-size: 13.5px; }
+.pm-mail { margin-top: 14px; border: 1px solid var(--hair-2); border-radius: 10px; background: #fff; font-size: 12.5px; color: var(--ink-3); overflow: hidden; max-width: 390px; }
+.pm-mail div { padding: 7px 12px; border-bottom: 1px solid var(--hair); }
+.pm-mail div:last-child { border-bottom: 0; }
+.pm-mail b { color: var(--ink); display: inline-block; width: 62px; font-weight: 600; }
+.pm-addr { display: flex; align-items: center; gap: 8px; height: 40px; margin: 0; padding: 0 12px; background: #f1f1f3; border-radius: 10px; font-size: 13.5px; color: #3c3c43; max-width: 390px; }
+.pm-bubble { margin-top: 14px; max-width: 290px; margin-left: auto; padding: 9px 13px; border-radius: 18px 18px 4px 18px; background: #0a84ff; color: #fff; font-size: 14px; line-height: 1.4; }
+.pm-bubble u { color: #fff; }
+.chrome-cmp { display: flex; flex-direction: column; gap: 6px; width: 390px; }
+.chrome-cmp__row { position: relative; border-radius: 16px; overflow: hidden; border: 1px solid var(--hair-2); box-shadow: var(--shadow); }
+.dim { position: absolute; right: -58px; top: 0; bottom: 0; width: 46px; border-left: 1.5px solid var(--pick); font: 700 11px var(--sans); color: var(--pick); display: flex; align-items: center; padding-left: 6px; }
+.cmp-wrap { position: relative; padding-right: 62px; }
+
+/* State blocks (§06) */
+.states { display: flex; flex-wrap: wrap; gap: 26px; margin-top: 26px; }
+.state { width: 390px; }
+.state__t { font-family: var(--serif); font-size: 20px; margin: 0 0 2px; }
+.state__w { font-size: 12.5px; color: var(--ink-3); margin: 0 0 10px; line-height: 1.5; min-height: 38px; }
+.state__w b { color: var(--ink-2); }
+.state__here { display: inline-block; vertical-align: 3px; margin-left: 6px; font: 700 10px/1.4 var(--sans); letter-spacing: .06em; text-transform: uppercase; color: var(--stack); background: var(--stack-soft); border: 1px solid var(--stack-border); border-radius: 5px; padding: 2px 7px; }
+.state__card { width: 390px; background: #f4f4f4; border: 1px solid var(--hair-2); border-radius: 20px; overflow: hidden; box-shadow: var(--shadow); font-family: var(--sans); color: #2c3e50; padding-bottom: 16px; }
+.state__slice { height: 96px; overflow: hidden; position: relative; }
+.state__slice img { width: 100%; height: 96px; object-fit: cover; object-position: center 34%; display: block; }
+.state__today { margin: 10px 0 0; font-size: 12.5px; line-height: 1.55; color: var(--ink-3); border-left: 2px solid var(--hair-2); padding-left: 10px; }
+.state__today--bad { border-left-color: var(--bad); }
+.state__today--ok { border-left-color: var(--stack); }
+.state__today b { color: var(--ink); }
+
+/* Contrast table (§05) */
+.contrast { border-collapse: collapse; width: 100%; max-width: 1040px; font-size: 13px; margin-top: 18px; }
+.contrast th { text-align: left; font-size: 10.5px; text-transform: uppercase; letter-spacing: .8px; color: var(--ink-3); font-weight: 600; padding: 0 10px 9px 0; border-bottom: 1px solid var(--hair-2); }
+.contrast td { padding: 8px 10px 8px 0; border-bottom: 1px solid var(--hair); vertical-align: middle; color: var(--ink-2); }
+.swatch { display: inline-flex; align-items: center; justify-content: center; min-width: 118px; height: 32px; padding: 0 10px; border-radius: 7px; font-size: 13.5px; font-weight: 600; border: 1px solid var(--hair); white-space: nowrap; }
+.ratio { font-variant-numeric: tabular-nums; font-weight: 700; }
+.ratio.fail { color: var(--bad); }
+.ratio.pass { color: var(--stack); }
+.hex { font-family: var(--mono); font-size: 11.5px; color: var(--ink-3); }
+
+/* Ribbons and minis (§07) */
+.ribbons { display: flex; gap: 34px; flex-wrap: wrap; align-items: flex-start; margin-top: 18px; }
+.ribbon { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+.ribbon__strip { position: relative; width: 72px; border: 1px solid var(--hair-2); background: #fff; }
+.rb { width: 100%; }
+.rb--answer { background: rgba(224, 123, 26, .62); }
+.rb--status { background: rgba(29, 128, 71, .55); }
+.rb--action { background: rgba(223, 22, 131, .55); }
+.rb--facts  { background: rgba(29, 39, 51, .17); }
+.rb--chrome { background: rgba(29, 39, 51, .07); }
+.rb--dead   { background: repeating-linear-gradient(45deg, transparent 0 3px, rgba(29, 39, 51, .10) 3px 6px); }
+.ribbon__fold { position: absolute; left: -7px; right: -7px; border-top: 1.5px dashed var(--pick); }
+.ribbon__cap { font-size: 11.5px; color: var(--ink-3); text-align: center; max-width: 120px; line-height: 1.4; }
+.ribbon__cap b { color: var(--ink); display: block; }
+.legend { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 16px; font-size: 12px; color: var(--ink-3); }
+.legend span { display: inline-flex; align-items: center; gap: 6px; }
+.legend i { display: inline-block; width: 16px; height: 12px; border: 1px solid var(--hair-2); }
+.minis { display: flex; gap: 22px; flex-wrap: wrap; margin-top: 18px; align-items: flex-start; }
+.mini { position: relative; overflow: hidden; border-radius: 18px; border: 1px solid var(--hair-2); box-shadow: var(--shadow); background: #f4f4f4; }
+.mini > .phone { position: absolute; top: 0; left: 0; transform-origin: top left; border: 0; border-radius: 0; box-shadow: none; }
+.mini-cap { font-size: 11px; text-transform: uppercase; letter-spacing: .8px; color: var(--ink-3); margin: 8px 0 0; max-width: 250px; line-height: 1.5; }
+.mini-cap b { color: var(--ink); }
+
+/* Desktop (drawn at 1280 × 800, shown at 50%) */
+.deskwrap { position: relative; width: 640px; height: 400px; overflow: hidden; border-radius: 12px; border: 1px solid var(--hair-2); box-shadow: var(--shadow); background: #f4f4f4; flex-shrink: 0; }
+.desk { position: absolute; top: 0; left: 0; width: 1280px; height: 800px; transform: scale(.5); transform-origin: top left; font-family: var(--sans); color: #2c3e50; background: #f4f4f4; }
+.d-head { height: 84px; display: flex; align-items: center; gap: 14px; padding: 0 32px; background: linear-gradient(135deg, #1a2a3a 0%, #2c3e50 60%, #34495e 100%); border-bottom: 3px solid #4a90d9; color: #fff; }
+.d-head b { font-size: 25.6px; } .d-head span { display: block; font-size: 12.5px; letter-spacing: .08em; text-transform: uppercase; color: rgba(255,255,255,.55); }
+.d-body { display: flex; height: 716px; }
+.d-side { width: 240px; background: #2c3e50; padding: 16px 12px; flex-shrink: 0; }
+.d-side .pm-mrow { font-size: 15px; padding: 12px 14px; }
+.d-main { flex: 1; padding: 34px 48px; overflow: hidden; }
+.d-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-top: 18px; }
+.d-grid .pm-pcard__row { height: 50px; }
+.d-cols { display: flex; gap: 36px; margin-top: 12px; }
+.d-photo { width: 540px; height: 540px; border-radius: 14px; overflow: hidden; position: relative; flex-shrink: 0; }
+.d-photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.d-info { flex: 1; min-width: 0; padding-top: 4px; }
+.d-info .pm-id__t { font-size: 34px; line-height: 40px; }
+.d-info .pm-id__sub { font-size: 15px; margin-top: 8px; }
+.d-info .pm-btn { margin: 22px 0 0; height: 52px; font-size: 17px; }
+.d-info .pm-note { margin: 10px 0 0; font-size: 13.5px; }
+.d-info .pm-facts { margin: 22px 0 0; }
+.d-thumbs { display: flex; gap: 8px; margin-top: 10px; }
+.d-thumbs img { width: 62px; height: 62px; border-radius: 8px; object-fit: cover; }
+.d-fold { position: absolute; left: 0; right: 0; bottom: 0; height: 0; }
+
+.foot { margin-top: 90px; padding-top: 18px; border-top: 1px solid var(--hair-2); font-size: 12.5px; color: var(--ink-3); line-height: 1.7; max-width: 900px; }
+.order { counter-reset: o; list-style: none; padding: 0; margin: 18px 0 0; max-width: 900px; }
+.order li { counter-increment: o; position: relative; padding: 10px 0 10px 40px; border-bottom: 1px solid var(--hair); font-size: 13.5px; line-height: 1.6; color: var(--ink-3); }
+.order li::before { content: counter(o); position: absolute; left: 0; top: 10px; width: 26px; height: 26px; border-radius: 8px; background: var(--card-deep); border: 1px solid var(--hair-2); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; color: var(--ink-2); }
+.order b { color: var(--ink); }
+
+@media (max-width: 720px) {
+  body { padding: 28px 12px 80px; }
+  h1 { font-size: 30px; }
+  .key__rule { flex-basis: 100%; }
+}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="paw" viewBox="0 0 24 24"><ellipse cx="12" cy="19" rx="5" ry="4"/><ellipse cx="6" cy="11" rx="2.5" ry="3"/><ellipse cx="18" cy="11" rx="2.5" ry="3"/><ellipse cx="9" cy="6" rx="2" ry="2.5"/><ellipse cx="15" cy="6" rx="2" ry="2.5"/></symbol>
+  <symbol id="burger" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></g></symbol>
+  <symbol id="expand" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></g></symbol>
+  <symbol id="cal" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><line x1="16" y1="3" x2="16" y2="7"/><line x1="8" y1="3" x2="8" y2="7"/><line x1="3" y1="11" x2="21" y2="11"/></g></symbol>
+  <symbol id="check" viewBox="0 0 24 24"><polyline points="5 12.5 10 17.5 19 7" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="house" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9.5z"/><polyline points="9 21 9 12 15 12 15 21"/></g></symbol>
+</svg>
+<main>
+
+<h1>Site design — ready for the next litter<em>.</em></h1>
+<p class="subtitle">
+  What a visitor sees first, and whether the site stays pleasant as a litter goes from expecting to sold out.
+  Measured on the production build at <b>390 × 844</b> and <b>1280 × 800</b> on Nov 24, 2026 with <code>scripts/measure/measure.mjs</code>.
+  Drawings are 390&nbsp;px phones in the site's own colors with real photos; today's pages are drawn at their measured heights.
+  The data half — litters, allowed values, the checker — is <a href="puppy-data-options.html">puppy-data-options.html</a>.
+  The <b>“Name |”</b> prefix stays on every puppy title in every option, as settled on Apr 30.
+</p>
+
+<div class="key">
+  <p class="key__hd">The names — say these back to me</p>
+  <div class="key__grp">
+    <p class="key__rule"><b>Pick one</b>What Home leads with</p>
+    <div class="key__items">
+      <p class="key__item"><span class="code code--pick">HOME-1</span><span><b>Photos first.</b> Today's page with the slideshow moved to the top and the litter facts folded.</span></p>
+      <p class="key__item"><span class="code code--pick">HOME-2</span><span><b>Puppy grid.</b> The litter in two lines, then every puppy as a photo card with its status. The alternative if you'd rather lead with the puppies.</span></p>
+      <p class="key__item"><span class="code code--pick">HOME-3</span><span><b>Hero + grid.</b> A full-width litter photo with the headline over it, then the grid. Superseded by HOME-4.</span></p>
+      <p class="key__item"><span class="code code--pick">HOME-4</span><span><b>Gallery hero.</b> Round 2: HOME-3 with a swipeable gallery of the litter's photos as the hero, the litter card under it, then the puppies. Refined as HOME-8.</span></p>
+      <p class="key__item"><span class="code code--pick">HOME-5</span><span><b>Photo mosaic.</b> Three photos at once and four key facts, then the puppies.</span></p>
+      <p class="key__item"><span class="code code--pick">HOME-6</span><span><b>Gallery + tabs.</b> A gallery, then Puppies · The litter · Parents as tabs.</span></p>
+      <p class="key__item"><span class="code code--pick">HOME-7</span><span><b>Litter first.</b> The litter card leads, then a photo strip, then the puppies.</span></p>
+      <p class="key__item"><span class="code code--pick">HOME-8</span><span><b>Gallery + detail tiles.</b> <span class="key__star">★</span> Round 3, your combination: HOME-4's gallery and card — parents as small icons, the family line — with HOME-5's tiles for born, goes home and each care step once it's done, and the $100 Reserve banner right under them.</span></p>
+    </div>
+  </div>
+  <div class="key__grp">
+    <p class="key__rule"><b>Pick one</b>What a puppy page leads with</p>
+    <div class="key__items">
+      <p class="key__item"><span class="code code--pick">PUP-1</span><span><b>Reordered.</b> Today's blocks: photo first, the inquiry card moved above the facts.</span></p>
+      <p class="key__item"><span class="code code--pick">PUP-2</span><span><b>Photo profile.</b> <span class="key__star">★</span> A full-width photo you swipe; name, status and Inquire right under it; littermates at the end.</span></p>
+      <p class="key__item"><span class="code code--pick">PUP-3</span><span><b>Photo stack.</b> Every photo full width, one after another, with a pinned Inquire bar.</span></p>
+    </div>
+  </div>
+  <div class="key__grp">
+    <p class="key__rule"><b>Stack any</b>Independent of the picks above</p>
+    <div class="key__items">
+      <p class="key__item"><span class="code code--stack">PLUS-1</span><span><b>Puppy links.</b> <span class="key__star">★</span> Every puppy gets its own address (<code>/bella</code>): shareable, survives a refresh, Back works.</span></p>
+      <p class="key__item"><span class="code code--stack">PLUS-2</span><span><b>Status on every name.</b> <span class="key__star">★</span> Wherever a puppy's name appears — menu, cards, littermates — its status is next to it.</span></p>
+      <p class="key__item"><span class="code code--stack">PLUS-3</span><span><b>Littermates.</b> <span class="key__star">★</span> The random “Meet Another Pup” becomes the actual list of who's still available.</span></p>
+      <p class="key__item"><span class="code code--stack">PLUS-4</span><span><b>One bar.</b> <span class="key__star">★</span> Phones get one 56&nbsp;px bar instead of 128&nbsp;px of pinned header and menu, and the page scrolls normally.</span></p>
+      <p class="key__item"><span class="code code--stack">PLUS-5</span><span><b>Every season.</b> <span class="key__star">★</span> Home has something true to say before birth (expecting, waitlist) and after the last pup goes; the deposit banner shows only while one is available.</span></p>
+      <p class="key__item"><span class="code code--stack">PLUS-6</span><span><b>The inquiry knows the puppy.</b> <span class="key__star">★</span> The form shows which puppy, sends it as a field and puts it in the email subject; phone number optional.</span></p>
+      <p class="key__item"><span class="code code--stack">PLUS-7</span><span><b>Pinned Inquire bar.</b> A bottom bar on available puppies. Needed by PUP-3; redundant with PUP-2.</span></p>
+      <p class="key__item"><span class="code code--stack">PLUS-8</span><span><b>Litter at a glance.</b> <span class="key__star">★</span> The litter details redesigned for buyers: a short card for who (parents as small icons, the family line) and tiles for what and when (born, goes home, each care step once it's done). A one-line version sits on every puppy page.</span></p>
+    </div>
+  </div>
+  <div class="key__grp">
+    <p class="key__rule"><b>Cleanups</b>Small, unrelated to any option</p>
+    <div class="key__items">
+      <p class="key__item"><span class="code">FIX-1 … FIX-7</span><span>Seven independent fixes in §05 — contrast is the big one. Take all, some, or none.</span></p>
+    </div>
+  </div>
+  <p class="key__eg">
+    <b>To move forward, say something like:</b> “Build <span class="code code--pick">HOME-8</span> + <span class="code code--pick">PUP-2</span> with
+    <span class="code code--stack">PLUS-1</span> through <span class="code code--stack">PLUS-6</span>, <span class="code code--stack">PLUS-8</span>, and FIX-1 through FIX-7.”
+    &nbsp;<span class="key__star">★</span> marks what I'd recommend — that exact combination. §07 shows it next to today, first screen against first screen.
+  </p>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════════ -->
+<section class="doc-sec">
+  <p class="doc-sec__num">01 · Diagnosis</p>
+  <h2 class="doc-sec__title">What a visitor gets first</h2>
+  <p class="subtitle">
+    The resting state on a 390&nbsp;×&nbsp;844 phone, clock pinned to Nov 24. The fixture is <b>Bella</b> — available, with ten photos, which is the case that pushes the most below the fold. That's the data as recorded on Jul 5; in fact the whole June litter has gone home, and the drawings keep the recorded mix because it exercises every status.
+    The screen ends at 844; there's no bottom bar.
+  </p>
+
+  <div class="tables">
+    <div>
+      <p class="mini-label">Home, phone</p>
+      <table class="census">
+        <thead><tr><th>Block</th><th>Top</th><th>Height</th><th>Answers</th><th>1st screen</th></tr></thead>
+        <tbody>
+          <tr><td>Site header + menu bar</td><td class="num">0</td><td class="num">128</td><td>Whose puppies? Where am I?</td><td>pinned</td></tr>
+          <tr><td>Title “Home”</td><td class="num">154</td><td class="num">27</td><td>Where am I? (again)</td><td>yes</td></tr>
+          <tr><td>Deposit banner</td><td class="num">197</td><td class="num">77</td><td>How do I pay?</td><td>yes</td></tr>
+          <tr><td>Litter facts, 9 cells</td><td class="num">294</td><td class="num">316</td><td>Parents, dates, vet</td><td>yes</td></tr>
+          <tr><td>Breed facts + description</td><td class="num">610</td><td class="num">272</td><td>Is the breed right for me?</td><td>partly</td></tr>
+          <tr class="hot"><td>First photo</td><td class="num">906</td><td class="num">280</td><td>What do they look like?</td><td>no</td></tr>
+        </tbody>
+        <tfoot><tr><td colspan="5">Page 1305 · 128 px pinned · 0 puppies on the first screen</td></tr></tfoot>
+      </table>
+    </div>
+    <div>
+      <p class="mini-label">Bella, phone</p>
+      <table class="census">
+        <thead><tr><th>Block</th><th>Top</th><th>Height</th><th>Answers</th><th>1st screen</th></tr></thead>
+        <tbody>
+          <tr><td>Site header + menu bar</td><td class="num">0</td><td class="num">128</td><td></td><td>pinned</td></tr>
+          <tr><td>“Name | Bella”</td><td class="num">154</td><td class="num">27</td><td>Who is this?</td><td>yes</td></tr>
+          <tr><td>Facts card, 5 cells</td><td class="num">197</td><td class="num">284</td><td>Sex, color, weight, looks</td><td>yes</td></tr>
+          <tr><td>Status badge (in the card)</td><td class="num">442</td><td class="num">27</td><td>Can I still get her?</td><td>yes</td></tr>
+          <tr><td>Photo</td><td class="num">505</td><td class="num">280</td><td>What does she look like?</td><td>yes</td></tr>
+          <tr><td>Ten thumbnails</td><td class="num">861</td><td class="num">269</td><td>More photos</td><td>no</td></tr>
+          <tr class="hot"><td>Inquire button</td><td class="num">1260</td><td class="num">41</td><td>How do I get her?</td><td>no</td></tr>
+        </tbody>
+        <tfoot><tr><td colspan="5">Page 1374 · 7.9 MB of photos · Inquire 416 px below the screen</td></tr></tfoot>
+      </table>
+    </div>
+  </div>
+  <p class="t-cap"><b>Desktop, 1280 × 800:</b> Home's first photo starts at y 701, so 99 px of it shows. Bella's Inquire button is at y 1148.</p>
+
+  <h3 class="sub-h">What a buyer needs, and where it is today</h3>
+  <table class="census" style="max-width:900px">
+    <thead><tr><th>What the visitor needs</th><th>How often</th><th>Where it is today</th></tr></thead>
+    <tbody>
+      <tr><td>To see the puppies</td><td>Every visit</td><td>Home y 906 · a puppy page y 505</td></tr>
+      <tr class="hot"><td>To trust the litter — parents, dates, health</td><td>Every buyer, before they reach out</td><td>Home's first screen, but as nine equal cells — one reads “——”, and the parents are text in a cell</td></tr>
+      <tr class="hot"><td>Which are still available</td><td>Every visit — it changes weekly</td><td>Nowhere until you open each puppy</td></tr>
+      <tr><td>Boy or girl, color, markings</td><td>First visits</td><td>Puppy page; sex is said four times</td></tr>
+      <tr class="hot"><td>How to reserve</td><td>Once — the moment that matters</td><td>Puppy page: after all the thumbnails</td></tr>
+    </tbody>
+  </table>
+  <p class="t-cap"><b>Revised after your review.</b> The first version of this table ranked parents and health as a one-time read. They're the trust step every buyer takes before reaching out, so the litter details belong on the first screen — today the problem is their <i>shape</i>, not their place.</p>
+
+  <ol class="findings">
+    <li><b>Home has the right facts in the wrong shape.</b> On a phone the first screen is the site name, “Home” twice, a $100 banner and nine equal cells — the birth date weighs the same as “Vaccinations ——” — and the first puppy photo is at y 906, below the screen. The parents are text in a cell: “Coco / Havapoo”. On desktop the first photo starts at y 701 of 800.</li>
+    <li><b>No page shows the puppies together.</b> Comparing five means five trips through the menu — two taps each on a phone, with the menu covering the page while it's open.</li>
+    <li><b>Availability is invisible until you've clicked in.</b> The menu shows names and sex. Two of five are reserved, and a visitor finds that out on arrival. As a litter sells, more taps end at “Reserved”.</li>
+    <li><b>Sex is said four times; status once.</b> The title color, the card's top bar, a pink pill in the first cell and the menu paw all say <i>girl</i>. The thing that changes week to week — status — is a small badge at the bottom of the card.</li>
+    <li><b>The inquiry is the last thing on the page.</b> “Inquire About Bella” is at y 1260 on a phone, after ten thumbnails, and at y 1148 on desktop. The only other way to inquire is Home's banner, which comes before any puppy.</li>
+    <li><b>Photos are small and don't swipe.</b> 280&nbsp;px tall on a phone — shorter than the facts card above it — with two 36&nbsp;px buttons below the frame and no swipe. Square photos get blurred bars down each side.</li>
+    <li><b>The phone page is heavy, and pinned.</b> 7.9&nbsp;MB of photos for Bella. And the page is locked to the screen height with only the content pane scrolling, so 128&nbsp;px of header never scroll away, Safari's toolbars never collapse, and tapping the status bar doesn't scroll to the top.</li>
+    <li><b>Nothing can be shared.</b> Every puppy lives at the same address: you can't text a link to Olive, a refresh goes back to Home, and Back leaves the site.</li>
+    <li><b>Grey text fails contrast.</b> The grey used for descriptions, facts and sub-copy measures 2.84:1 on white, labels 2.25:1, white on the blue button 3.34:1 and the orange banner 2.15–2.99:1. WCAG AA asks for 4.5:1. §05 computes every pair.</li>
+    <li><b>When a litter sells out, the site keeps selling.</b> Once every puppy is reserved or adopted, puppy pages show no button at all, and Home still says “Reserve today — $100 holds your pup”.</li>
+  </ol>
+
+  <div class="options">
+    <div>
+      <p class="option-label">As shipped</p>
+      <h3 class="option-name">Home <span class="tag tag--no">Before</span></h3>
+      <div class="phone" id="home-today">
+        <div class="pm-head"><span class="pm-head__emoji">🐾</span><div><p class="pm-head__t">Doro Family Puppies</p><p class="pm-head__s">Lovingly raised, family bred</p></div></div>
+        <div class="pm-trig"><span>Home</span><span class="pm-trig__r">MENU <svg class="ic"><use href="#burger"/></svg></span></div>
+        <div class="pm-main">
+          <p class="pm-title">Home</p>
+          <div class="pm-dep"><span class="pm-dep__l"><svg class="ic"><use href="#paw"/></svg><span>Reserve today<br><span class="pm-dep__amt">$100</span> holds<br>your pup</span></span><span class="pm-dep__btn">Inquire now →</span></div>
+          <div class="pm-card0" style="height:588px; margin-bottom:24px">
+            <div class="pm-bar4"></div>
+            <div class="pm-cells">
+              <div class="pm-cell" style="height:61px"><span class="pm-lab">Breed</span><span class="pm-val">Havapoo</span></div>
+              <div class="pm-cell" style="height:61px"><span class="pm-lab">Mom</span><span class="pm-val">Coco / Havapoo</span></div>
+              <div class="pm-cell" style="height:61px"><span class="pm-lab">Dad</span><span class="pm-val">Leo / Havapoo</span></div>
+              <div class="pm-cell" style="height:61px"><span class="pm-lab">Birth Date</span><span class="pm-val">Jun 2, 2026</span></div>
+              <div class="pm-cell" style="height:73px"><span class="pm-lab">Litter Size</span><span class="pm-val">5</span></div>
+              <div class="pm-cell" style="height:73px"><span class="pm-lab">Ready To Adopt Date</span><span class="pm-val">Jul 28, 2026</span></div>
+              <div class="pm-cell" style="height:61px"><span class="pm-lab">Vaccinations</span><span class="pm-val">——</span></div>
+              <div class="pm-cell" style="height:61px"><span class="pm-lab">Deworming Date</span><span class="pm-val">Jun 29, 2026</span></div>
+              <div class="pm-cell" style="height:56px; border-bottom:0"><span class="pm-lab">Vet Checked</span><span class="pm-val">Yes</span></div>
+            </div>
+            <div class="pm-litinfo" style="height:272px">
+              <h4>Key Breed Facts</h4>
+              <ul><li>Typically range from 7 to 20 lbs</li><li>Hypoallergenic, making them a good match for those with mild pet allergies</li><li>Highly trainable and eager to please</li></ul>
+              <p>Raised in a loving home with children and other pets, making them well-socialized…</p>
+            </div>
+          </div>
+          <div class="pm-photo"><img class="pm-photo__bg" src="img/litter-1.webp" alt=""><img class="pm-photo__img" src="img/litter-1.webp" alt="Two puppies on grass"><span class="pm-expand"><svg class="ic"><use href="#expand"/></svg></span><span class="pm-progress"><span></span></span></div>
+          <div class="pm-pfoot"><span class="pm-pfoot__b">‹</span><span class="pm-pfoot__b">›</span><span class="pm-pfoot__n">1 / 28</span></div>
+          <p class="pm-copy">© 2026 All rights reserved.</p>
+          <div style="height:26px"></div>
+        </div>
+        <div class="shade" style="top:844px"></div>
+        <div class="fold" style="top:844px" data-label="Screen ends · 844"></div>
+      </div>
+      <p class="caption">First photo at <b>y 906</b> · 0 puppies on the first screen · page 1305</p>
+    </div>
+
+    <div>
+      <p class="option-label">As shipped</p>
+      <h3 class="option-name">Bella <span class="tag tag--no">Before</span></h3>
+      <div class="phone girl" id="bella-today">
+        <div class="pm-head"><span class="pm-head__emoji">🐾</span><div><p class="pm-head__t">Doro Family Puppies</p><p class="pm-head__s">Lovingly raised, family bred</p></div></div>
+        <div class="pm-trig"><span>Bella</span><span class="pm-trig__r">MENU <svg class="ic"><use href="#burger"/></svg></span></div>
+        <div class="pm-main">
+          <p class="pm-title"><span class="pm-title__pre">Name | </span>Bella</p>
+          <div class="pm-card0" style="height:284px; margin-bottom:24px">
+            <div class="pm-bar4"></div>
+            <div class="pm-cells" style="border-bottom:1px solid #f0f4f8">
+              <div class="pm-cell" style="height:76px"><span class="pm-lab">Sex</span><span class="pm-pill">Female</span></div>
+              <div class="pm-cell" style="height:76px"><span class="pm-lab">Color</span><span class="pm-val">White/Black</span></div>
+              <div class="pm-cell" style="height:77px"><span class="pm-lab">Weight As Of</span><span class="pm-val">27.8 oz · Jun 28, 2026</span></div>
+              <div class="pm-cell" style="height:77px"><span class="pm-lab">Markings</span><span class="pm-val">Black face mask and side spot</span></div>
+              <div class="pm-cell" style="height:76px; border-bottom:0"><span class="pm-lab">Personality</span><span class="pm-val">Curiously energetic</span></div>
+              <div class="pm-cell" style="height:76px; border-bottom:0"></div>
+            </div>
+            <span class="pm-badge">Available</span>
+          </div>
+          <div class="pm-photo"><img class="pm-photo__bg" src="img/bella-1.webp" alt=""><img class="pm-photo__img" src="img/bella-1.webp" alt="Bella"><span class="pm-expand"><svg class="ic"><use href="#expand"/></svg></span></div>
+          <div class="pm-pfoot"><span class="pm-pfoot__b">‹</span><span class="pm-pfoot__b">›</span><span class="pm-pfoot__n">1 / 10</span></div>
+          <div class="pm-thumbs">
+            <div class="pm-thumb pm-thumb--on"><img src="img/bella-1.webp" alt=""></div><div class="pm-thumb"><img src="img/bella-2.webp" alt=""></div><div class="pm-thumb"><img src="img/bella-3.webp" alt=""></div><div class="pm-thumb"><img src="img/bella-4.webp" alt=""></div>
+            <div class="pm-thumb"><img src="img/bella-5.webp" alt=""></div><div class="pm-thumb"><img src="img/bella-2.webp" alt=""></div><div class="pm-thumb"><img src="img/bella-3.webp" alt=""></div><div class="pm-thumb"><img src="img/bella-4.webp" alt=""></div>
+            <div class="pm-thumb"><img src="img/bella-5.webp" alt=""></div><div class="pm-thumb"><img src="img/bella-1.webp" alt=""></div>
+          </div>
+          <div class="pm-divider"></div>
+          <div class="pm-card0 pm-cta"><div class="pm-bar4"></div><div class="pm-cta__body"><div class="pm-cta__text"><svg class="ic"><use href="#paw"/></svg><div><p class="pm-cta__h">Like to bring me home?</p><p class="pm-cta__s">Reach out and we'll guide you through the next steps.</p></div></div><span class="pm-cta__btn">Inquire About Bella</span></div></div>
+          <p class="pm-copy">© 2026 All rights reserved.</p>
+          <div style="height:26px"></div>
+        </div>
+        <div class="shade" style="top:844px"></div>
+        <div class="fold" style="top:844px" data-label="Screen ends · 844"></div>
+      </div>
+      <p class="caption">Inquire at <b>y 1260</b> · status at y 442, inside the facts card · page 1374</p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════════════ -->
+<section class="doc-sec">
+  <p class="doc-sec__num">02 · Home</p>
+  <h2 class="doc-sec__title">What do I see first?</h2>
+  <p class="subtitle">
+    Same litter, same day. Round 1 (HOME-1–3) came first; round 2 (HOME-4–7, below) came from your review and treats the litter details as first-class.
+    Every drawing uses the one-bar header from PLUS-4 so they differ only in what they lead with — without it, add 72&nbsp;px to every number. FIX-3's wording applies throughout: no title says “Home”.
+  </p>
+
+  <div class="options">
+    <div class="band"><span class="band__t band__t--pick">Pick one</span><span class="band__line"></span><span class="band__sub">Round 1 · HOME-1 · HOME-2 · HOME-3</span></div>
+
+    <div class="option-block">
+      <p class="option-label"><span class="code code--pick">HOME-1</span></p>
+      <h3 class="option-name">Photos first</h3>
+      <p class="option-pos">Least change.</p>
+      <div class="phone phone--clip" id="home-1">
+        <div class="pm-bar"><span class="pm-bar__brand"><svg class="ic"><use href="#paw"/></svg>Doro Family Puppies</span><span class="pm-bar__menu"><svg class="ic"><use href="#burger"/></svg></span></div>
+        <div class="pm-main">
+          <p class="pm-title" style="color:#2c3e50; margin-bottom:4px">Coco &amp; Leo's litter</p>
+          <p class="pm-lh__meta" style="margin-bottom:16px">Havapoos · born Jun 2 · ready to go home now</p>
+          <div class="pm-photo"><img class="pm-photo__bg" src="img/litter-1.webp" alt=""><img class="pm-photo__img" src="img/litter-1.webp" alt="Two puppies on grass"><span class="pm-expand"><svg class="ic"><use href="#expand"/></svg></span><span class="pm-progress"><span></span></span></div>
+          <div class="pm-pfoot"><span class="pm-pfoot__b">‹</span><span class="pm-pfoot__b">›</span><span class="pm-pfoot__n">1 / 28</span></div>
+          <div class="pm-dep" style="margin-top:16px"><span class="pm-dep__l"><svg class="ic"><use href="#paw"/></svg><span>Reserve today<br><span class="pm-dep__amt">$100</span> holds<br>your pup</span></span><span class="pm-dep__btn">Inquire now →</span></div>
+          <div class="pm-card0">
+            <div class="pm-bar4"></div>
+            <div class="pm-fact"><span class="pm-fact__l">Parents</span><span class="pm-fact__v">Coco × Leo</span></div>
+            <div class="pm-fact"><span class="pm-fact__l">Born</span><span class="pm-fact__v">Jun 2, 2026</span></div>
+            <div class="pm-fact"><span class="pm-fact__l">Ready to go home</span><span class="pm-fact__v">Jul 28, 2026</span></div>
+            <div class="pm-fold">More about the litter <span>▾</span></div>
+          </div>
+          <div class="pm-card0" style="margin-top:20px">
+            <div class="pm-litinfo" style="border-top:0; padding-bottom:16px">
+              <h4 style="color:#5d718a">Key Breed Facts</h4>
+              <ul><li style="color:#5d718a">Typically range from 7 to 20 lbs</li><li style="color:#5d718a">Hypoallergenic, making them a good match for those with mild pet allergies</li></ul>
+            </div>
+          </div>
+        </div>
+        <div class="shade" style="top:844px"></div>
+        <div class="fold" style="top:844px" data-label="Screen ends · 844"></div>
+      </div>
+      <p class="caption">Litter photo at <b>y 145</b> · puppies named on the first screen: <b>0</b> · status: still behind the menu</p>
+      <div class="tradeoff">
+        <span class="plus">+</span> Cheapest: reorder the JSX and fold one card. No new components.<br>
+        <span class="minus">−</span> Still no way to see the puppies side by side, and status still costs a tap per puppy.<br>
+        <span class="minus">−</span> The slideshow is group shots, so “which one is that?” has no answer on this page.
+      </div>
+    </div>
+
+    <div class="option-block">
+      <p class="option-label"><span class="code code--pick">HOME-2</span></p>
+      <h3 class="option-name">Puppy grid <span class="tag tag--no">Alternative</span></h3>
+      <p class="option-pos">Puppies first. Still the pick if you'd rather lead with them — add PLUS-8's litter card right under the grid.</p>
+      <div class="phone phone--clip" id="home-2">
+        <div class="pm-bar"><span class="pm-bar__brand"><svg class="ic"><use href="#paw"/></svg>Doro Family Puppies</span><span class="pm-bar__menu"><svg class="ic"><use href="#burger"/></svg></span></div>
+        <div class="pm-lh">
+          <p class="pm-lh__over">Lovingly raised, family bred</p>
+          <p class="pm-lh__h">Coco &amp; Leo's litter</p>
+          <p class="pm-lh__meta">Havapoos · born Jun 2 · ready to go home now</p>
+          <p class="pm-lh__avail">3 of 5 still looking for a home</p>
+        </div>
+        <div class="pm-grid">
+          <div class="pm-pcard girl"><img src="img/cover-bella.webp" alt="Bella"><div class="pm-pcard__row"><span class="pm-pcard__name"><svg class="ic"><use href="#paw"/></svg>Bella</span><span class="chip chip--ok">Available</span></div></div>
+          <div class="pm-pcard boy"><img src="img/cover-brownie.webp" alt="Brownie"><div class="pm-pcard__row"><span class="pm-pcard__name"><svg class="ic"><use href="#paw"/></svg>Brownie</span><span class="chip chip--res">Reserved</span></div></div>
+          <div class="pm-pcard boy"><img src="img/cover-jasper.webp" alt="Jasper"><div class="pm-pcard__row"><span class="pm-pcard__name"><svg class="ic"><use href="#paw"/></svg>Jasper</span><span class="chip chip--res">Reserved</span></div></div>
+          <div class="pm-pcard girl"><img src="img/cover-olive.webp" alt="Olive"><div class="pm-pcard__row"><span class="pm-pcard__name"><svg class="ic"><use href="#paw"/></svg>Olive</span><span class="chip chip--ok">Available</span></div></div>
+          <div class="pm-pcard boy"><img src="img/cover-pepper.webp" alt="Pepper"><div class="pm-pcard__row"><span class="pm-pcard__name"><svg class="ic"><use href="#paw"/></svg>Pepper</span><span class="chip chip--ok">Available</span></div></div>
+        </div>
+        <div class="pm-dep2"><span>Reserve today — <b>$100</b> holds your pup</span><span class="pm-dep2__go">Inquire →</span></div>
+        <p class="pm-sec">From the litter</p>
+        <div class="pm-strip"><img src="img/litter-1.webp" alt=""><img src="img/litter-3.webp" alt=""><img src="img/litter-2.webp" alt=""></div>
+        <div class="shade" style="top:844px"></div>
+        <div class="fold" style="top:844px" data-label="Screen ends · 844"></div>
+      </div>
+      <p class="caption">All five puppies with their status on the first screen (the fifth to its photo) · first photo at <b>y 182</b></p>
+      <div class="tradeoff">
+        <span class="plus">+</span> Answers the two every-visit questions — what do they look like, which are still available — before any scrolling.<br>
+        <span class="plus">+</span> The grid is the menu: one tap to any puppy, no overlay. A litter of eight is four rows.<br>
+        <span class="minus">−</span> The group photos become a strip below the grid; parents, care and breed facts move down a screen (the headline keeps the dates).<br>
+        <span class="minus">−</span> New <code>PuppyCard</code> and <code>LitterHeader</code>; Home and puppy pages stop sharing <code>ImageGallery</code>.
+      </div>
+    </div>
+
+    <div class="option-block">
+      <p class="option-label"><span class="code code--pick">HOME-3</span></p>
+      <h3 class="option-name">Hero + grid <span class="tag tag--no">Superseded by HOME-4</span></h3>
+      <p class="option-pos">Most mood, least information.</p>
+      <div class="phone phone--clip" id="home-3">
+        <div class="pm-bar"><span class="pm-bar__brand"><svg class="ic"><use href="#paw"/></svg>Doro Family Puppies</span><span class="pm-bar__menu"><svg class="ic"><use href="#burger"/></svg></span></div>
+        <div class="pm-hero"><img src="img/litter-2.webp" alt="A puppy close up on grass">
+          <div class="pm-hero__txt"><p class="pm-lh__over">Lovingly raised, family bred</p><p class="pm-lh__h">Coco &amp; Leo's litter</p><p class="pm-lh__meta">Havapoos · born Jun 2 · ready now</p><p class="pm-lh__avail">3 of 5 still looking for a home</p></div>
+        </div>
+        <div class="pm-grid" style="padding-top:12px">
+          <div class="pm-pcard girl"><img src="img/cover-bella.webp" alt="Bella"><div class="pm-pcard__row"><span class="pm-pcard__name"><svg class="ic"><use href="#paw"/></svg>Bella</span><span class="chip chip--ok">Available</span></div></div>
+          <div class="pm-pcard boy"><img src="img/cover-brownie.webp" alt="Brownie"><div class="pm-pcard__row"><span class="pm-pcard__name"><svg class="ic"><use href="#paw"/></svg>Brownie</span><span class="chip chip--res">Reserved</span></div></div>
+          <div class="pm-pcard boy"><img src="img/cover-jasper.webp" alt="Jasper"><div class="pm-pcard__row"><span class="pm-pcard__name"><svg class="ic"><use href="#paw"/></svg>Jasper</span><span class="chip chip--res">Reserved</span></div></div>
+          <div class="pm-pcard girl"><img src="img/cover-olive.webp" alt="Olive"><div class="pm-pcard__row"><span class="pm-pcard__name"><svg class="ic"><use href="#paw"/></svg>Olive</span><span class="chip chip--ok">Available</span></div></div>
+        </div>
+        <div class="shade" style="top:844px"></div>
+        <div class="fold" style="top:844px" data-label="Screen ends · 844"></div>
+      </div>
+      <p class="caption">One litter photo, two puppies and the tops of two more · grid starts at <b>y 458</b></p>
+      <div class="tradeoff">
+        <span class="plus">+</span> The warmest first impression.<br>
+        <span class="minus">−</span> Half the first screen goes to a photo that isn't any one puppy; three of five start below it.<br>
+        <span class="minus">−</span> Text over a photo is only as legible as the photo underneath it.
+      </div>
+    </div>
+  </div>
+
+  <h3 class="sub-h" style="margin-top:64px">Round 2 — the litter details first-class</h3>
+  <div class="callout callout--pick">
+    <b>Your note:</b> buyers weigh the litter details — parents, dates, health — before they reach out, and one large photo doesn't do the litter justice.
+    That corrects §01: those details are the trust step, and what's wrong today is their shape (nine equal cells, one empty, parents as text), not their place.
+    So every option below puts the same redesigned litter card — <b>PLUS-8</b>, drawn in §04 — on or near the first screen, and treats the photos as a gallery.
+  </div>
+
+  <div class="options">
+    <div class="band"><span class="band__t band__t--pick">Pick one</span><span class="band__line"></span><span class="band__sub">Round 2 · HOME-4 · HOME-5 · HOME-6 · HOME-7 — one pick across both rounds</span></div>
+
+    <div class="option-block">
+      <p class="option-label"><span class="code code--pick">HOME-4</span></p>
+      <h3 class="option-name">Gallery hero <span class="tag tag--no">Refined as HOME-8</span></h3>
+      <p class="option-pos">HOME-3, revised to your note: the hero <i>is</i> the gallery. <b>It swipes — try it.</b></p>
+      <div class="phone phone--clip" id="home-4">
+        <div class="pm-bar"><span class="pm-bar__brand"><svg class="ic"><use href="#paw"/></svg>Doro Family Puppies</span><span class="pm-bar__menu"><svg class="ic"><use href="#burger"/></svg></span></div>
+        <div class="pm-gal"><div class="pm-car__track" data-carousel data-count="28"><img src="img/litter-1.webp" alt="Two puppies on the grass"><img src="img/litter-5.webp" alt="Littermates together"><img src="img/litter-4.webp" alt="The two brown puppies"><img src="img/litter-6.webp" alt="Two white puppies"><img src="img/litter-2.webp" alt="A puppy close up"><img src="img/litter-7.webp" alt="A brown puppy close up"><img src="img/litter-8.webp" alt="Two puppies playing"><img src="img/litter-3.webp" alt="Two puppies on the grass"></div><span class="pm-gal__count" data-counter>1 / 28</span><span class="pm-expand"><svg class="ic"><use href="#expand"/></svg></span><div class="pm-gal__shade"></div><div class="pm-gal__txt"><p class="pm-gal__h">Coco &amp; Leo's litter</p><p class="pm-gal__s">3 of 5 still looking for a home</p></div><span class="pm-progress"><span></span></span></div>
+        <div class="pm-glance"><div class="pm-glance__bar"></div><div class="pm-story"><div class="pm-story__hd"><span class="pm-avas"><span class="pm-ava"><img src="img/mom-coco.webp" alt="Coco"></span><span class="pm-ava"><img src="img/dad-leo.webp" alt="Leo"></span></span><p><b>Coco × Leo</b> · Mom &amp; dad · Havapoos</p></div><p class="pm-story__p">Raised in a loving home with children and other pets. <span>More about the litter ›</span></p></div><div class="pm-glance__facts"><div><span class="pm-fact__l">Born</span><b>Jun 2</b></div><div><span class="pm-fact__l">Ready</span><b>Now</b></div><div><span class="pm-fact__l">Litter</span><b>5 puppies</b></div></div><div class="pm-glance__care"><span class="pm-check"><svg class="ic"><use href="#check"/></svg>Vet checked</span><span class="pm-check"><svg class="ic"><use href="#check"/></svg>Dewormed Jun 29</span></div></div>
+        <div class="pm-sechead"><b>Meet the puppies</b><span>3 available</span></div>
+        <div class="pm-grid pm-grid--tight">
+          <div class="pm-pcard girl"><img src="img/cover-bella.webp" alt="Bella"><div class="pm-pcard__row"><span class="pm-pcard__name"><svg class="ic"><use href="#paw"/></svg>Bella</span><span class="chip chip--ok">Available</span></div></div>
+          <div class="pm-pcard boy"><img src="img/cover-brownie.webp" alt="Brownie"><div class="pm-pcard__row"><span class="pm-pcard__name"><svg class="ic"><use href="#paw"/></svg>Brownie</span><span class="chip chip--res">Reserved</span></div></div>
+          <div class="pm-pcard boy"><img src="img/cover-jasper.webp" alt="Jasper"><div class="pm-pcard__row"><span class="pm-pcard__name"><svg class="ic"><use href="#paw"/></svg>Jasper</span><span class="chip chip--res">Reserved</span></div></div>
+          <div class="pm-pcard girl"><img src="img/cover-olive.webp" alt="Olive"><div class="pm-pcard__row"><span class="pm-pcard__name"><svg class="ic"><use href="#paw"/></svg>Olive</span><span class="chip chip--ok">Available</span></div></div>
+          <div class="pm-pcard boy"><img src="img/cover-pepper.webp" alt="Pepper"><div class="pm-pcard__row"><span class="pm-pcard__name"><svg class="ic"><use href="#paw"/></svg>Pepper</span><span class="chip chip--ok">Available</span></div></div>
+        </div>
+        <div class="pm-dep2"><span>Reserve today — <b>$100</b> holds your pup</span><span class="pm-dep2__go">Inquire →</span></div>
+        <div class="shade" style="top:844px"></div>
+        <div class="fold" style="top:844px" data-label="Screen ends · 844"></div>
+      </div>
+      <p class="caption" data-cap="home-4">Gallery at <b>y 56</b> · litter card at y 356 · the first two puppies and their status by <b>y 813</b></p>
+      <div class="tradeoff">
+        <span class="plus">+</span> The litter's 28 photos get the biggest stage on the page and are the first thing anyone sees — swiped, or autoplaying as today's slideshow does.<br>
+        <span class="plus">+</span> Parents, dates and health sit on the first screen, right above the puppies — the order a buyer decides in: <i>do I love them, do I trust you, which one</i>.<br>
+        <span class="minus">−</span> One photo at a time; the other 27 are a swipe or an autoplay away.<br>
+        <span class="minus">−</span> Only the first two puppies make the first screen; the rest are one short scroll down.
+      </div>
+    </div>
+
+    <div class="option-block">
+      <p class="option-label"><span class="code code--pick">HOME-5</span></p>
+      <h3 class="option-name">Photo mosaic</h3>
+      <p class="option-pos">Most on one screen: three photos, four facts, two puppies.</p>
+      <div class="phone phone--clip" id="home-5">
+        <div class="pm-bar"><span class="pm-bar__brand"><svg class="ic"><use href="#paw"/></svg>Doro Family Puppies</span><span class="pm-bar__menu"><svg class="ic"><use href="#burger"/></svg></span></div>
+        <div class="pm-lh"><p class="pm-lh__over">Lovingly raised, family bred</p><p class="pm-lh__h">Coco &amp; Leo's litter</p><p class="pm-lh__meta">Havapoos · born Jun 2 · ready to go home now</p><p class="pm-lh__avail">3 of 5 still looking for a home</p></div>
+        <div class="pm-mosaic"><img src="img/litter-1.webp" alt="Two puppies on the grass"><img src="img/litter-5.webp" alt="Littermates together"><div class="pm-mosaic__more"><img src="img/litter-4.webp" alt="The two brown puppies"><span>+25 photos</span></div></div>
+        <div class="pm-f4s">
+          <div class="pm-f4"><span class="pm-f4__i"><svg class="ic"><use href="#paw"/></svg></span><div><small>Parents</small><b>Coco × Leo</b></div></div>
+          <div class="pm-f4"><span class="pm-f4__i"><svg class="ic"><use href="#cal"/></svg></span><div><small>Born</small><b>Jun 2</b></div></div>
+          <div class="pm-f4"><span class="pm-f4__i"><svg class="ic"><use href="#house"/></svg></span><div><small>Ready</small><b>Now</b></div></div>
+          <div class="pm-f4"><span class="pm-f4__i pm-f4__i--ok"><svg class="ic"><use href="#check"/></svg></span><div><small>Health</small><b>Vet checked</b></div></div>
+        </div>
+        <div class="pm-sechead"><b>Meet the puppies</b><span>3 available</span></div>
+        <div class="pm-grid pm-grid--tight">
+          <div class="pm-pcard girl"><img src="img/cover-bella.webp" alt="Bella"><div class="pm-pcard__row"><span class="pm-pcard__name"><svg class="ic"><use href="#paw"/></svg>Bella</span><span class="chip chip--ok">Available</span></div></div>
+          <div class="pm-pcard boy"><img src="img/cover-brownie.webp" alt="Brownie"><div class="pm-pcard__row"><span class="pm-pcard__name"><svg class="ic"><use href="#paw"/></svg>Brownie</span><span class="chip chip--res">Reserved</span></div></div>
+          <div class="pm-pcard boy"><img src="img/cover-jasper.webp" alt="Jasper"><div class="pm-pcard__row"><span class="pm-pcard__name"><svg class="ic"><use href="#paw"/></svg>Jasper</span><span class="chip chip--res">Reserved</span></div></div>
+          <div class="pm-pcard girl"><img src="img/cover-olive.webp" alt="Olive"><div class="pm-pcard__row"><span class="pm-pcard__name"><svg class="ic"><use href="#paw"/></svg>Olive</span><span class="chip chip--ok">Available</span></div></div>
+          <div class="pm-pcard boy"><img src="img/cover-pepper.webp" alt="Pepper"><div class="pm-pcard__row"><span class="pm-pcard__name"><svg class="ic"><use href="#paw"/></svg>Pepper</span><span class="chip chip--ok">Available</span></div></div>
+        </div>
+        <div class="shade" style="top:844px"></div>
+        <div class="fold" style="top:844px" data-label="Screen ends · 844"></div>
+      </div>
+      <p class="caption" data-cap="home-5">Three photos · four facts at y 422 · two puppies with status by <b>y 774</b>, two more from 798</p>
+      <div class="tradeoff">
+        <span class="plus">+</span> Several photos at once with nothing to learn; any tile opens the full gallery.<br>
+        <span class="plus">+</span> Photos, facts and puppies all on the first screen.<br>
+        <span class="minus">−</span> Tiles are small on a phone (the side ones are about 116&nbsp;px), so group shots lose detail until tapped.<br>
+        <span class="minus">−</span> Four facts is the ceiling: deworming, the family-raised line and breed facts wait below the grid.
+      </div>
+    </div>
+
+    <div class="option-block">
+      <p class="option-label"><span class="code code--pick">HOME-6</span></p>
+      <h3 class="option-name">Gallery + tabs</h3>
+      <p class="option-pos">Shortest page; everything one tap away.</p>
+      <div class="phone phone--clip" id="home-6">
+        <div class="pm-bar"><span class="pm-bar__brand"><svg class="ic"><use href="#paw"/></svg>Doro Family Puppies</span><span class="pm-bar__menu"><svg class="ic"><use href="#burger"/></svg></span></div>
+        <div class="pm-gal"><div class="pm-car__track" data-carousel data-count="28"><img src="img/litter-1.webp" alt="Two puppies on the grass"><img src="img/litter-5.webp" alt="Littermates together"><img src="img/litter-4.webp" alt="The two brown puppies"><img src="img/litter-6.webp" alt="Two white puppies"><img src="img/litter-2.webp" alt="A puppy close up"><img src="img/litter-7.webp" alt="A brown puppy close up"><img src="img/litter-8.webp" alt="Two puppies playing"><img src="img/litter-3.webp" alt="Two puppies on the grass"></div><span class="pm-gal__count" data-counter>1 / 28</span><span class="pm-expand"><svg class="ic"><use href="#expand"/></svg></span><span class="pm-progress"><span></span></span></div>
+        <div class="pm-lh" style="height:auto; padding-bottom:0"><p class="pm-lh__h" style="margin-top:0">Coco &amp; Leo's litter</p><p class="pm-lh__meta">Havapoos · born Jun 2 · ready to go home now</p></div>
+        <div class="pm-tabs"><span class="pm-tab pm-tab--on">Puppies</span><span class="pm-tab">The litter</span><span class="pm-tab">Parents</span></div>
+        <p class="pm-lh__avail" style="margin:12px 16px 8px">3 of 5 still looking for a home</p>
+        <div class="pm-grid pm-grid--tight">
+          <div class="pm-pcard girl"><img src="img/cover-bella.webp" alt="Bella"><div class="pm-pcard__row"><span class="pm-pcard__name"><svg class="ic"><use href="#paw"/></svg>Bella</span><span class="chip chip--ok">Available</span></div></div>
+          <div class="pm-pcard boy"><img src="img/cover-brownie.webp" alt="Brownie"><div class="pm-pcard__row"><span class="pm-pcard__name"><svg class="ic"><use href="#paw"/></svg>Brownie</span><span class="chip chip--res">Reserved</span></div></div>
+          <div class="pm-pcard boy"><img src="img/cover-jasper.webp" alt="Jasper"><div class="pm-pcard__row"><span class="pm-pcard__name"><svg class="ic"><use href="#paw"/></svg>Jasper</span><span class="chip chip--res">Reserved</span></div></div>
+          <div class="pm-pcard girl"><img src="img/cover-olive.webp" alt="Olive"><div class="pm-pcard__row"><span class="pm-pcard__name"><svg class="ic"><use href="#paw"/></svg>Olive</span><span class="chip chip--ok">Available</span></div></div>
+          <div class="pm-pcard boy"><img src="img/cover-pepper.webp" alt="Pepper"><div class="pm-pcard__row"><span class="pm-pcard__name"><svg class="ic"><use href="#paw"/></svg>Pepper</span><span class="chip chip--ok">Available</span></div></div>
+        </div>
+        <div class="shade" style="top:844px"></div>
+        <div class="fold" style="top:844px" data-label="Screen ends · 844"></div>
+      </div>
+      <p class="caption" data-cap="home-6">Gallery at y 56 · tabs at y 420 · two puppies with status by <b>y 699</b> · litter details one tap away</p>
+      <p class="mini-label" style="margin-top:16px">Tap “The litter”</p>
+      <div class="pm" style="width:390px; background:#f4f4f4; border-radius:18px; padding:12px 0 16px; border:1px solid var(--hair-2); box-shadow:var(--shadow)">
+        <div class="pm-tabs" style="margin-top:0"><span class="pm-tab">Puppies</span><span class="pm-tab pm-tab--on">The litter</span><span class="pm-tab">Parents</span></div>
+        <div class="pm-glance"><div class="pm-glance__bar"></div><div class="pm-glance__facts"><div><span class="pm-fact__l">Born</span><b>Jun 2</b></div><div><span class="pm-fact__l">Ready</span><b>Now</b></div><div><span class="pm-fact__l">Litter</span><b>5 puppies</b></div></div><div class="pm-glance__care"><span class="pm-check"><svg class="ic"><use href="#check"/></svg>Vet checked</span><span class="pm-check"><svg class="ic"><use href="#check"/></svg>Dewormed Jun 29</span></div><p class="pm-glance__desc">Raised in a loving home with children and other pets, making them well-socialized and ready to settle into family life from day one.</p></div>
+        <p class="pm-sec">Key breed facts</p>
+        <ul style="margin:0; padding:0 16px 0 34px; font-size:13.5px; line-height:1.65; color:#4a5d70"><li>Typically range from 7 to 20 lbs</li><li>Hypoallergenic — a good match for mild pet allergies</li><li>Highly trainable and eager to please</li></ul>
+      </div>
+      <div class="tradeoff">
+        <span class="plus">+</span> The shortest Home; each tab gets the full width, and the litter tab has room for everything — care log, the whole description, breed facts.<br>
+        <span class="minus">−</span> Anything behind a tab is easy to miss: a buyer who never taps “The litter” never sees the health checks.<br>
+        <span class="minus">−</span> Tabs need their own address (<code>/?tab=litter</code>) or Back and shared links lose the place.<br>
+        <span class="minus">−</span> With the parents shown only as icons, the Parents tab has almost nothing to hold.
+      </div>
+    </div>
+
+    <div class="option-block">
+      <p class="option-label"><span class="code code--pick">HOME-7</span></p>
+      <h3 class="option-name">Litter first</h3>
+      <p class="option-pos">Trust before mood. <b>The photo strip scrolls sideways.</b></p>
+      <div class="phone phone--clip" id="home-7">
+        <div class="pm-bar"><span class="pm-bar__brand"><svg class="ic"><use href="#paw"/></svg>Doro Family Puppies</span><span class="pm-bar__menu"><svg class="ic"><use href="#burger"/></svg></span></div>
+        <div class="pm-lh"><p class="pm-lh__over">Lovingly raised, family bred</p><p class="pm-lh__h">Coco &amp; Leo's litter</p><p class="pm-lh__meta">Havapoos · born Jun 2 · ready to go home now</p><p class="pm-lh__avail">3 of 5 still looking for a home</p></div>
+        <div class="pm-glance" style="margin-top:2px"><div class="pm-glance__bar"></div><div class="pm-story"><div class="pm-story__hd"><span class="pm-avas"><span class="pm-ava"><img src="img/mom-coco.webp" alt="Coco"></span><span class="pm-ava"><img src="img/dad-leo.webp" alt="Leo"></span></span><p><b>Coco × Leo</b> · Mom &amp; dad · Havapoos</p></div><p class="pm-story__p">Raised in a loving home with children and other pets. <span>More about the litter ›</span></p></div><div class="pm-glance__facts"><div><span class="pm-fact__l">Born</span><b>Jun 2</b></div><div><span class="pm-fact__l">Ready</span><b>Now</b></div><div><span class="pm-fact__l">Litter</span><b>5 puppies</b></div></div><div class="pm-glance__care"><span class="pm-check"><svg class="ic"><use href="#check"/></svg>Vet checked</span><span class="pm-check"><svg class="ic"><use href="#check"/></svg>Dewormed Jun 29</span></div></div>
+        <div class="pm-sechead"><b>From the litter</b><span style="color:#5d718a">28 photos ›</span></div>
+        <div class="pm-peek"><img src="img/litter-1.webp" alt="Two puppies on the grass"><img src="img/litter-5.webp" alt="Littermates together"><img src="img/litter-4.webp" alt="The two brown puppies"><img src="img/litter-6.webp" alt="Two white puppies"><img src="img/litter-2.webp" alt="A puppy close up"></div>
+        <div class="pm-sechead"><b>Meet the puppies</b><span>3 available</span></div>
+        <div class="pm-grid pm-grid--tight">
+          <div class="pm-pcard girl"><img src="img/cover-bella.webp" alt="Bella"><div class="pm-pcard__row"><span class="pm-pcard__name"><svg class="ic"><use href="#paw"/></svg>Bella</span><span class="chip chip--ok">Available</span></div></div>
+          <div class="pm-pcard boy"><img src="img/cover-brownie.webp" alt="Brownie"><div class="pm-pcard__row"><span class="pm-pcard__name"><svg class="ic"><use href="#paw"/></svg>Brownie</span><span class="chip chip--res">Reserved</span></div></div>
+          <div class="pm-pcard boy"><img src="img/cover-jasper.webp" alt="Jasper"><div class="pm-pcard__row"><span class="pm-pcard__name"><svg class="ic"><use href="#paw"/></svg>Jasper</span><span class="chip chip--res">Reserved</span></div></div>
+          <div class="pm-pcard girl"><img src="img/cover-olive.webp" alt="Olive"><div class="pm-pcard__row"><span class="pm-pcard__name"><svg class="ic"><use href="#paw"/></svg>Olive</span><span class="chip chip--ok">Available</span></div></div>
+          <div class="pm-pcard boy"><img src="img/cover-pepper.webp" alt="Pepper"><div class="pm-pcard__row"><span class="pm-pcard__name"><svg class="ic"><use href="#paw"/></svg>Pepper</span><span class="chip chip--ok">Available</span></div></div>
+        </div>
+        <div class="shade" style="top:844px"></div>
+        <div class="fold" style="top:844px" data-label="Screen ends · 844"></div>
+      </div>
+      <p class="caption" data-cap="home-7">Litter card at <b>y 176</b> · photo strip at y 428 · puppies from y 666, their status just below the screen</p>
+      <div class="tradeoff">
+        <span class="plus">+</span> Opens like a breeder's introduction: who the parents are, when the puppies were born and can come home, what care they've had.<br>
+        <span class="plus">+</span> The strip peeks past the edge, so it reads as a gallery without taking over.<br>
+        <span class="minus">−</span> The smallest photos in round 2, and the puppies start below the first screen.<br>
+        <span class="minus">−</span> The card is the first thing anyone sees, so a stale date is front and centre.
+      </div>
+    </div>
+  </div>
+
+  <h3 class="sub-h" style="margin-top:64px">Round 3 — HOME-4, refined</h3>
+  <div class="callout callout--pick">
+    <b>Your notes:</b> HOME-4 is clean. Drop “Meet them” — the parents stay small icons, because the only photos of them are real but AI-cleaned and were never meant to show large.
+    Keep the card's parents and family line, break the major details out as HOME-5's tiles, and give deworming its own tile once it's done. And corners instead of pills.
+    The merged parents block now runs through HOME-4 and HOME-7 above as well, so the rounds still compare like for like.
+  </div>
+
+  <div class="options">
+    <div class="band"><span class="band__t band__t--pick">Pick one</span><span class="band__line"></span><span class="band__sub">Round 3 · HOME-8 — still one pick across all rounds</span></div>
+
+    <div class="option-block">
+      <p class="option-label"><span class="code code--pick">HOME-8</span></p>
+      <h3 class="option-name">Gallery + detail tiles <span class="tag">★ Recommended</span></h3>
+      <p class="option-pos">Your combination: HOME-4's gallery and card, HOME-5's tiles. <b>It swipes.</b></p>
+      <div class="phone phone--clip" id="home-8">
+        <div class="pm-bar"><span class="pm-bar__brand"><svg class="ic"><use href="#paw"/></svg>Doro Family Puppies</span><span class="pm-bar__menu"><svg class="ic"><use href="#burger"/></svg></span></div>
+        <div class="pm-gal"><div class="pm-car__track" data-carousel data-count="28"><img src="img/litter-1.webp" alt="Two puppies on the grass"><img src="img/litter-5.webp" alt="Littermates together"><img src="img/litter-4.webp" alt="The two brown puppies"><img src="img/litter-6.webp" alt="Two white puppies"><img src="img/litter-2.webp" alt="A puppy close up"><img src="img/litter-7.webp" alt="A brown puppy close up"><img src="img/litter-8.webp" alt="Two puppies playing"><img src="img/litter-3.webp" alt="Two puppies on the grass"></div><span class="pm-gal__count" data-counter>1 / 28</span><span class="pm-expand"><svg class="ic"><use href="#expand"/></svg></span><div class="pm-gal__shade"></div><div class="pm-gal__txt"><p class="pm-gal__h">Coco &amp; Leo's litter</p><p class="pm-gal__s">3 of 5 still looking for a home</p></div><span class="pm-progress"><span></span></span></div>
+        <div class="pm-glance"><div class="pm-glance__bar"></div><div class="pm-story"><div class="pm-story__hd"><span class="pm-avas"><span class="pm-ava"><img src="img/mom-coco.webp" alt="Coco"></span><span class="pm-ava"><img src="img/dad-leo.webp" alt="Leo"></span></span><p><b>Coco × Leo</b> · Mom &amp; dad · Havapoos</p></div><p class="pm-story__p">Raised in a loving home with children and other pets. <span>More about the litter ›</span></p></div></div>
+        <div class="pm-f4s"><div class="pm-f4"><span class="pm-f4__i"><svg class="ic"><use href="#cal"/></svg></span><div><small>Born</small><b>Jun 2</b></div></div><div class="pm-f4"><span class="pm-f4__i"><svg class="ic"><use href="#house"/></svg></span><div><small>Goes home</small><b>Now</b></div></div><div class="pm-f4"><span class="pm-f4__i pm-f4__i--ok"><svg class="ic"><use href="#check"/></svg></span><div><small>Vet checked</small><b>Yes</b></div></div><div class="pm-f4"><span class="pm-f4__i pm-f4__i--ok"><svg class="ic"><use href="#check"/></svg></span><div><small>Dewormed</small><b>Jun 29</b></div></div></div>
+        <div class="pm-dep2"><span>Reserve today — <b>$100</b> holds your pup</span><span class="pm-dep2__go">Inquire →</span></div>
+        <div class="pm-sechead"><b>Meet the puppies</b><span>3 available</span></div>
+        <div class="pm-grid pm-grid--tight">
+          <div class="pm-pcard girl"><img src="img/cover-bella.webp" alt="Bella"><div class="pm-pcard__row"><span class="pm-pcard__name"><svg class="ic"><use href="#paw"/></svg>Bella</span><span class="chip chip--ok">Available</span></div></div>
+          <div class="pm-pcard boy"><img src="img/cover-brownie.webp" alt="Brownie"><div class="pm-pcard__row"><span class="pm-pcard__name"><svg class="ic"><use href="#paw"/></svg>Brownie</span><span class="chip chip--res">Reserved</span></div></div>
+          <div class="pm-pcard boy"><img src="img/cover-jasper.webp" alt="Jasper"><div class="pm-pcard__row"><span class="pm-pcard__name"><svg class="ic"><use href="#paw"/></svg>Jasper</span><span class="chip chip--res">Reserved</span></div></div>
+          <div class="pm-pcard girl"><img src="img/cover-olive.webp" alt="Olive"><div class="pm-pcard__row"><span class="pm-pcard__name"><svg class="ic"><use href="#paw"/></svg>Olive</span><span class="chip chip--ok">Available</span></div></div>
+          <div class="pm-pcard boy"><img src="img/cover-pepper.webp" alt="Pepper"><div class="pm-pcard__row"><span class="pm-pcard__name"><svg class="ic"><use href="#paw"/></svg>Pepper</span><span class="chip chip--ok">Available</span></div></div>
+        </div>
+        <div class="shade" style="top:844px"></div>
+        <div class="fold" style="top:844px" data-label="Screen ends · 844"></div>
+      </div>
+      <p class="caption">Gallery at <b>y 56</b> · card at y 356 · tiles at y 480 · <b>Reserve banner at y 600</b> · “Meet the puppies” at y 672 · the first two puppies from y 698, their names and status just below the screen</p>
+      <div class="tradeoff">
+        <span class="plus">+</span> Every major detail is its own tile — same size, same place, read in one look. A new care step adds a tile instead of crowding a row.<br>
+        <span class="plus">+</span> The card stays short and personal: who the parents are and how the puppies are raised.<br>
+        <span class="plus">+</span> Reserving is on the first screen, in the slot that always says what you can do next: the $100 banner while a puppy is available, the waitlist button before birth and after the last one goes (§06).<br>
+        <span class="minus">−</span> Litter size leaves the details; the gallery's “3 of 5” carries it.<br>
+        <span class="minus">−</span> The banner costs 72&nbsp;px. The first two puppies' photos now run past the screen's edge (146 of their 172&nbsp;px show), and their names and status sit 38&nbsp;px below it. The gallery's “3 of 5 still looking for a home” keeps availability above the line.
+      </div>
+      <p class="option-note" style="margin-top:14px"><b>Revised Nov 24, at your request:</b> the Reserve banner moved up from the end of the page to right under the tiles, and the “Meet the puppies” heading stays below it. Dropping the heading would save 30&nbsp;px: the first two puppies' photos would end inside the first screen, with their names and status 8&nbsp;px below it instead of 38. The other places the banner could go each cost more: on the photos it competes with the litter and with swiping, pinned to the bottom it covers 56&nbsp;px of every screen, and above the card it comes before the details buyers weigh first.</p>
+    </div>
+
+    <div class="option-block">
+      <p class="option-label">What changed from HOME-4</p>
+      <h3 class="option-name">The card, before and after</h3>
+      <p class="option-note">Removing “Meet them ›” alone leaves an empty corner on the parents row. Instead of padding it out, the parents line and the family line now share one block.</p>
+      <p class="mini-label">Round 2, with the link removed</p>
+      <div class="pm" style="width:390px; background:#f4f4f4; border-radius:18px; padding:4px 0 16px; border:1px solid var(--hair-2)"><div class="pm-glance"><div class="pm-glance__bar"></div><div class="pm-glance__par"><span class="pm-avas"><span class="pm-ava"><img src="img/mom-coco.webp" alt="Coco"></span><span class="pm-ava"><img src="img/dad-leo.webp" alt="Leo"></span></span><div><p class="pm-glance__t">Coco × Leo</p><p class="pm-glance__s">Mom &amp; dad · Havapoos</p></div><span class="pm-gap">the gap removing “Meet them” leaves</span></div><p class="pm-glance__desc">Raised in a loving home with children and other pets. <span>More about the litter ›</span></p></div></div>
+      <p class="mini-label" style="margin-top:16px">Round 3</p>
+      <div class="pm" style="width:390px; background:#f4f4f4; border-radius:18px; padding:4px 0 16px; border:1px solid var(--hair-2)"><div class="pm-glance"><div class="pm-glance__bar"></div><div class="pm-story"><div class="pm-story__hd"><span class="pm-avas"><span class="pm-ava"><img src="img/mom-coco.webp" alt="Coco"></span><span class="pm-ava"><img src="img/dad-leo.webp" alt="Leo"></span></span><p><b>Coco × Leo</b> · Mom &amp; dad · Havapoos</p></div><p class="pm-story__p">Raised in a loving home with children and other pets. <span>More about the litter ›</span></p></div></div></div>
+      <ol class="findings" style="margin-top:20px">
+        <li><b>“Meet them ›” is gone.</b> There's no parents page to send anyone to — the parents are icons by design.</li>
+        <li><b>Two rows become one block.</b> Icons and names on one line, the family line under it — 112&nbsp;px, with no empty corner.</li>
+        <li><b>The details move to tiles.</b> Born and goes home, then each care step as a green-check tile once it's done. Deworming lands with its date the day you enter it; PLUS-8 draws the eight weeks.</li>
+        <li><b>Corners, not pills,</b> on every chip and badge — FIX-7.</li>
+      </ol>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════════════ -->
+<section class="doc-sec">
+  <p class="doc-sec__num">03 · A puppy page</p>
+  <h2 class="doc-sec__title">Who, what she looks like, can I, how</h2>
+  <p class="subtitle">
+    Bella, available, ten photos. One-bar header in all three, with FIX-1's colors and FIX-3's labels. Each option answers the same four questions in a different order.
+  </p>
+
+  <div class="options">
+    <div class="band"><span class="band__t band__t--pick">Pick one</span><span class="band__line"></span><span class="band__sub">PUP-1 · PUP-2 · PUP-3</span></div>
+
+    <div class="option-block">
+      <p class="option-label"><span class="code code--pick">PUP-1</span></p>
+      <h3 class="option-name">Reordered</h3>
+      <p class="option-pos">Cheapest.</p>
+      <div class="phone phone--clip girl" id="pup-1">
+        <div class="pm-bar"><span class="pm-bar__brand"><svg class="ic"><use href="#paw"/></svg>Doro Family Puppies</span><span class="pm-bar__menu"><svg class="ic"><use href="#burger"/></svg></span></div>
+        <div class="pm-main">
+          <p class="pm-title"><span class="pm-title__pre" style="color:#7c8fa7">Name | </span>Bella</p>
+          <div class="pm-photo"><img class="pm-photo__bg" src="img/bella-1.webp" alt=""><img class="pm-photo__img" src="img/bella-1.webp" alt="Bella"><span class="pm-expand"><svg class="ic"><use href="#expand"/></svg></span></div>
+          <div class="pm-pfoot"><span class="pm-pfoot__b">‹</span><span class="pm-pfoot__b">›</span><span class="pm-pfoot__n">1 / 10</span></div>
+          <div class="pm-card0 pm-cta" style="margin-top:16px"><div class="pm-bar4"></div><div class="pm-cta__body"><div class="pm-cta__text"><svg class="ic"><use href="#paw"/></svg><div><p class="pm-cta__h">Like to bring me home?</p><p class="pm-cta__s" style="color:#5d718a">Reach out and we'll guide you through the next steps.</p></div></div><span class="pm-cta__btn" style="background:var(--acc-strong)">Inquire About Bella</span></div></div>
+          <div class="pm-card0" style="height:284px; margin-top:16px">
+            <div class="pm-bar4"></div>
+            <div class="pm-cells" style="border-bottom:1px solid #f0f4f8">
+              <div class="pm-cell" style="height:76px"><span class="pm-lab" style="color:#5d718a">Sex</span><span class="pm-pill" style="background:var(--acc-strong)">Female</span></div>
+              <div class="pm-cell" style="height:76px"><span class="pm-lab" style="color:#5d718a">Color</span><span class="pm-val">White &amp; black parti</span></div>
+              <div class="pm-cell" style="height:77px"><span class="pm-lab" style="color:#5d718a">Weight</span><span class="pm-val">27.8 oz at 3 weeks</span></div>
+              <div class="pm-cell" style="height:77px"><span class="pm-lab" style="color:#5d718a">Markings</span><span class="pm-val">Black face mask and side spot</span></div>
+              <div class="pm-cell" style="height:76px; border-bottom:0"><span class="pm-lab" style="color:#5d718a">Personality</span><span class="pm-val">Curiously energetic</span></div>
+              <div class="pm-cell" style="height:76px; border-bottom:0"></div>
+            </div>
+            <span class="pm-badge" style="color:#1d8047">Available</span>
+          </div>
+        </div>
+        <div class="shade" style="top:844px"></div>
+        <div class="fold" style="top:844px" data-label="Screen ends · 844"></div>
+      </div>
+      <p class="caption">Inquire at <b>y 571</b> (today 1260) · the status badge falls to <b>y 885</b>, below the screen</p>
+      <div class="tradeoff">
+        <span class="plus">+</span> Cheapest: two blocks change places; no new components.<br>
+        <span class="minus">−</span> The photo is still 280&nbsp;px, with buttons below it and no swipe.<br>
+        <span class="minus">−</span> The facts card — and the status badge inside it — lands below the screen. The inquiry heading has to carry the status.
+      </div>
+    </div>
+
+    <div class="option-block">
+      <p class="option-label"><span class="code code--pick">PUP-2</span></p>
+      <h3 class="option-name">Photo profile <span class="tag">★ Recommended</span></h3>
+      <p class="option-pos">Best first screen. <b>The photo swipes — try it.</b></p>
+      <div class="phone phone--clip girl" id="pup-2">
+        <div class="pm-bar"><span class="pm-bar__brand"><svg class="ic"><use href="#paw"/></svg>Doro Family Puppies</span><span class="pm-bar__menu"><svg class="ic"><use href="#burger"/></svg></span></div>
+        <div class="pm-back"><span>‹ All puppies</span><span data-counter>1 / 10</span></div>
+        <div class="pm-car">
+          <div class="pm-car__track" data-carousel>
+            <img src="img/bella-1.webp" alt="Bella, photo 1"><img src="img/bella-2.webp" alt="Bella, photo 2"><img src="img/bella-3.webp" alt="Bella, photo 3"><img src="img/bella-4.webp" alt="Bella, photo 4"><img src="img/bella-5.webp" alt="Bella, photo 5">
+            <img src="img/bella-2.webp" alt="Bella, photo 6"><img src="img/bella-3.webp" alt="Bella, photo 7"><img src="img/bella-4.webp" alt="Bella, photo 8"><img src="img/bella-5.webp" alt="Bella, photo 9"><img src="img/bella-1.webp" alt="Bella, photo 10">
+          </div>
+          <span class="pm-expand"><svg class="ic"><use href="#expand"/></svg></span>
+          <div class="pm-dots"><i class="on"></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+        </div>
+        <div class="pm-id">
+          <div class="pm-id__row"><p class="pm-id__t"><span>Name | </span>Bella</p><span class="chip chip--ok">Available</span></div>
+          <p class="pm-id__sub"><b>Female</b> · ready to go home now</p>
+        </div>
+        <div class="pm-btn"><svg class="ic"><use href="#paw"/></svg>Inquire about Bella</div>
+        <p class="pm-note">Reserve today — $100 holds her</p>
+        <p class="pm-sec">About Bella</p>
+        <div class="pm-facts">
+          <div class="pm-fact"><span class="pm-fact__l">Color</span><span class="pm-fact__v">White &amp; black parti</span></div>
+          <div class="pm-fact"><span class="pm-fact__l">Markings</span><span class="pm-fact__v">Black face mask and side spot</span></div>
+          <div class="pm-fact"><span class="pm-fact__l">Weight</span><span class="pm-fact__v">27.8 oz at 3 weeks</span></div>
+          <div class="pm-fact"><span class="pm-fact__l">Personality</span><span class="pm-fact__v">Curiously energetic</span></div>
+        </div>
+        <div class="pm-litstrip"><span class="pm-avas"><span class="pm-ava"><img src="img/mom-coco.webp" alt="Coco"></span><span class="pm-ava"><img src="img/dad-leo.webp" alt="Leo"></span></span><p><b>From Coco × Leo's litter</b> · born Jun 2<br><span class="ok">✓ Vet checked</span> · <span class="ok">✓ Dewormed</span> · <span class="go">About the litter ›</span></p></div>
+        <div class="pm-mates">
+          <p class="pm-sec">Her littermates</p>
+          <div class="pm-mates__row">
+            <div class="pm-mate girl"><img src="img/cover-olive.webp" alt=""><p class="pm-mate__n"><svg class="ic"><use href="#paw"/></svg>Olive</p><span class="chip chip--ok">Available</span></div>
+            <div class="pm-mate boy"><img src="img/cover-pepper.webp" alt=""><p class="pm-mate__n"><svg class="ic"><use href="#paw"/></svg>Pepper</p><span class="chip chip--ok">Available</span></div>
+            <div class="pm-mate boy"><img src="img/cover-brownie.webp" alt=""><p class="pm-mate__n"><svg class="ic"><use href="#paw"/></svg>Brownie</p><span class="chip chip--res">Reserved</span></div>
+            <div class="pm-mate boy"><img src="img/cover-jasper.webp" alt=""><p class="pm-mate__n"><svg class="ic"><use href="#paw"/></svg>Jasper</p><span class="chip chip--res">Reserved</span></div>
+          </div>
+        </div>
+        <div class="shade" style="top:844px"></div>
+        <div class="fold" style="top:844px" data-label="Screen ends · 844"></div>
+      </div>
+      <p class="caption">Photo 390 × 390 at y 92 · status at <b>y 501</b> · Inquire at <b>y 564</b></p>
+      <div class="tradeoff">
+        <span class="plus">+</span> The first screen answers who, what she looks like, can I, and how — in that order — plus most of her facts.<br>
+        <span class="plus">+</span> Swipe is native CSS scroll-snap: no gesture library. Fullscreen (the lightbox) is kept; desktop keeps thumbnails.<br>
+        <span class="minus">−</span> The thumbnail grid goes on phones; seeing all ten at once costs nine swipes.<br>
+        <span class="minus">−</span> A new <code>PhotoCarousel</code>, and the puppy page leaves <code>ImageGallery</code>.
+      </div>
+    </div>
+
+    <div class="option-block">
+      <p class="option-label"><span class="code code--pick">PUP-3</span></p>
+      <h3 class="option-name">Photo stack</h3>
+      <p class="option-pos">Most photo, least structure.</p>
+      <div class="phone phone--clip girl" id="pup-3">
+        <div class="pm-bar"><span class="pm-bar__brand"><svg class="ic"><use href="#paw"/></svg>Doro Family Puppies</span><span class="pm-bar__menu"><svg class="ic"><use href="#burger"/></svg></span></div>
+        <img class="pm-full" src="img/bella-1.webp" alt="Bella, photo 1">
+        <div class="pm-id" style="height:66px">
+          <div class="pm-id__row"><p class="pm-id__t"><span>Name | </span>Bella</p><span class="chip chip--ok">Available</span></div>
+          <p class="pm-id__sub"><b>Female</b> · ready to go home now</p>
+        </div>
+        <div class="pm-chips"><span class="pm-tchip"><span>Color</span>White &amp; black parti</span><span class="pm-tchip"><span>Weight</span>27.8 oz at 3 wks</span><span class="pm-tchip"><span>Markings</span>Black face mask</span></div>
+        <img class="pm-full" style="margin-top:14px" src="img/bella-2.webp" alt="Bella, photo 2">
+        <img class="pm-full" style="margin-top:6px" src="img/bella-3.webp" alt="Bella, photo 3">
+        <div class="pm-pin" style="top:780px"><div class="pm-btn"><svg class="ic"><use href="#paw"/></svg>Inquire about Bella</div></div>
+        <div class="shade" style="top:780px"></div>
+        <div class="fold" style="top:780px" data-label="Covered from 780"></div>
+      </div>
+      <p class="caption">Every photo at full width · Inquire pinned, covering y 780–844 · page ≈ 4,300 for ten photos</p>
+      <div class="tradeoff">
+        <span class="plus">+</span> Nothing to learn: scrolling is browsing, and every photo is big.<br>
+        <span class="minus">−</span> Ten photos make a 4,300&nbsp;px page; littermates are a long way down.<br>
+        <span class="minus">−</span> Needs the pinned bar (PLUS-7), which covers 64&nbsp;px of every screen.<br>
+        <span class="minus">−</span> Desktop needs its own layout.
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════════════ -->
+<section class="doc-sec">
+  <p class="doc-sec__num">04 · Stack any</p>
+  <h2 class="doc-sec__title">Worth having under every pick</h2>
+  <p class="subtitle">Eight additions that don't depend on §02 or §03. Take all, some, or none.</p>
+
+  <div class="options">
+    <div class="band"><span class="band__t">Stack any</span><span class="band__line"></span><span class="band__sub">PLUS-1 … PLUS-8</span></div>
+
+    <div class="option-block">
+      <p class="option-label"><span class="code code--stack">PLUS-1</span></p>
+      <h3 class="option-name">Puppy links <span class="tag tag--ok">★</span></h3>
+      <p class="option-note">Each page gets an address. React Router is already installed (used today only to read <code>?parents</code> and <code>?count</code>), and Cloudflare already serves the app for any path — <code>wrangler.toml</code> sets <code>not_found_handling = "single-page-application"</code> — so nothing changes on the server.</p>
+      <p class="pm-addr"><span style="color:#8e8e93">🔒</span> …/bella</p>
+      <div class="pm-bubble">Look at this one — she's still available! <u>…/bella</u></div>
+      <table class="census" style="margin-top:16px">
+        <thead><tr><th>Address</th><th>Page</th></tr></thead>
+        <tbody>
+          <tr><td><code>/</code></td><td>Home</td></tr>
+          <tr><td><code>/bella</code></td><td>Bella — the slug from the data</td></tr>
+          <tr><td><code>/contact?about=bella</code></td><td>The form, about Bella</td></tr>
+        </tbody>
+      </table>
+      <div class="tradeoff">
+        <span class="plus">+</span> Text a puppy to someone; refresh and Back behave; the browser tab says “Bella · Doro Family Puppies”.<br>
+        <span class="minus">−</span> Link previews in Messages (photo + name) need a static page per puppy at build time — priced separately, not included.<br>
+        <span class="minus">−</span> Needs lowercase slugs (the data doc's catalog has them).<br>
+        <span class="minus">−</span> Old and mistyped links need somewhere to land: a puppy from a retired litter gets “Bella has gone home” and the waitlist button; an address that never existed goes to Home. <code>contact</code> can't be a slug — the checker refuses it.
+      </div>
+    </div>
+
+    <div class="option-block">
+      <p class="option-label"><span class="code code--stack">PLUS-2</span></p>
+      <h3 class="option-name">Status on every name <span class="tag tag--ok">★</span></h3>
+      <p class="option-note">The menu as it opens on a phone, with each puppy's status beside its name. The same chips appear on cards and in the littermates row.</p>
+      <div class="pm" style="width:390px; border-radius:18px; overflow:hidden; box-shadow:var(--shadow)">
+        <div class="pm-menu">
+          <div class="pm-mrow pm-mrow--bold">Home</div>
+          <div class="pm-msec">Puppies</div>
+          <div class="pm-mrow pm-mrow--active girl"><svg class="ic" style="color:#fff"><use href="#paw"/></svg>Bella<span class="chip chip--ok">Available</span></div>
+          <div class="pm-mrow boy"><svg class="ic" style="color:#4a90d9"><use href="#paw"/></svg>Brownie<span class="chip chip--res">Reserved</span></div>
+          <div class="pm-mrow boy"><svg class="ic" style="color:#4a90d9"><use href="#paw"/></svg>Jasper<span class="chip chip--res">Reserved</span></div>
+          <div class="pm-mrow girl"><svg class="ic" style="color:#e91e8c"><use href="#paw"/></svg>Olive<span class="chip chip--ok">Available</span></div>
+          <div class="pm-mrow boy"><svg class="ic" style="color:#4a90d9"><use href="#paw"/></svg>Pepper<span class="chip chip--ok">Available</span></div>
+          <div class="pm-mrow" style="border-top:1px solid rgba(255,255,255,.1); border-radius:0; margin-top:6px">Contact us</div>
+        </div>
+      </div>
+      <div class="tradeoff">
+        <span class="plus">+</span> Nobody opens a reserved puppy expecting to inquire.<br>
+        <span class="minus">−</span> The menu gains a second column of text.
+      </div>
+    </div>
+
+    <div class="option-block">
+      <p class="option-label"><span class="code code--stack">PLUS-3</span></p>
+      <h3 class="option-name">Littermates <span class="tag tag--ok">★</span></h3>
+      <p class="option-note">On Brownie's page (reserved). Today: one grey button that jumps to a <i>random</i> available puppy. Instead: the puppies still available, by name.</p>
+      <p class="mini-label">Today</p>
+      <div class="pm" style="width:390px">
+        <div class="pm-card0" style="--acc:#8a9bb0"><div class="pm-bar4"></div><div class="pm-cta__body"><div class="pm-cta__text"><svg class="ic ic--line" style="font-size:36px;color:#8a9bb0;opacity:.55"><use href="#house"/></svg><div><p class="pm-cta__h">Brownie has been reserved!</p><p class="pm-cta__s">But we still have puppies looking for theirs.</p></div></div><span class="pm-cta__btn">Meet Another Pup</span></div></div>
+      </div>
+      <p class="mini-label" style="margin-top:18px">PLUS-3</p>
+      <div class="pm" style="width:390px; background:#f4f4f4; border-radius:14px; padding:14px 0; border:1px solid var(--hair-2)">
+        <p class="pm-sec" style="margin-top:0">Still looking for homes</p>
+        <div class="pm-mates__row">
+          <div class="pm-mate girl"><img src="img/cover-bella.webp" alt=""><p class="pm-mate__n"><svg class="ic"><use href="#paw"/></svg>Bella</p><span class="chip chip--ok">Available</span></div>
+          <div class="pm-mate girl"><img src="img/cover-olive.webp" alt=""><p class="pm-mate__n"><svg class="ic"><use href="#paw"/></svg>Olive</p><span class="chip chip--ok">Available</span></div>
+          <div class="pm-mate boy"><img src="img/cover-pepper.webp" alt=""><p class="pm-mate__n"><svg class="ic"><use href="#paw"/></svg>Pepper</p><span class="chip chip--ok">Available</span></div>
+        </div>
+      </div>
+      <div class="tradeoff">
+        <span class="plus">+</span> You see who's left and choose. The random jump can land on a puppy you've just looked at, and its grey button measures 2.84:1.<br>
+        <span class="minus">−</span> About 170&nbsp;px at the end of every puppy page.
+      </div>
+    </div>
+
+    <div class="option-block">
+      <p class="option-label"><span class="code code--stack">PLUS-4</span></p>
+      <h3 class="option-name">One bar <span class="tag tag--ok">★</span></h3>
+      <p class="option-note">The header and the menu bar become one sticky bar, and the page scrolls like a normal page. The tagline moves into Home's headline; the “current page” label goes, because the page title already says it.</p>
+      <div>
+        <div class="chrome-cmp">
+          <p class="mini-label" style="margin:0">Today · pinned · <b style="color:var(--bad)">128 px</b></p>
+          <div class="chrome-cmp__row pm"><div class="pm-head"><span class="pm-head__emoji">🐾</span><div><p class="pm-head__t">Doro Family Puppies</p><p class="pm-head__s">Lovingly raised, family bred</p></div></div><div class="pm-trig"><span>Bella</span><span class="pm-trig__r">MENU <svg class="ic"><use href="#burger"/></svg></span></div></div>
+          <p class="mini-label" style="margin:12px 0 0">PLUS-4 · sticky · <b style="color:var(--stack)">56 px</b></p>
+          <div class="chrome-cmp__row pm"><div class="pm-bar"><span class="pm-bar__brand"><svg class="ic"><use href="#paw"/></svg>Doro Family Puppies</span><span class="pm-bar__menu"><svg class="ic"><use href="#burger"/></svg></span></div></div>
+        </div>
+      </div>
+      <div class="tradeoff">
+        <span class="plus">+</span> 72&nbsp;px back on every screen; Safari can collapse its toolbars, and tapping the status bar scrolls to the top again.<br>
+        <span class="minus">−</span> The tagline leaves the top of every page.<br>
+        <span class="minus">−</span> Undoes the screen-height lock from <code>5339a8e</code> (“mobile scroll fix”): the lightbox and menu need a retest on an iPhone.
+      </div>
+    </div>
+
+    <div class="option-block">
+      <p class="option-label"><span class="code code--stack">PLUS-5</span></p>
+      <h3 class="option-name">Every season <span class="tag tag--ok">★</span></h3>
+      <p class="option-note">
+        Home always has something true to say. Before birth: the parents (as icons), the due date and a waitlist button. After the last puppy goes: “every puppy has a home” and the same button. The deposit banner shows only while a puppy is available, in the slot under the tiles that the waitlist button takes before and after.
+        <b>Drawn in §06</b>, all four seasons.
+      </p>
+      <div class="tradeoff">
+        <span class="plus">+</span> No season where the site says something false, or nothing at all.<br>
+        <span class="minus">−</span> “Expecting” needs a litter with a due date and no puppies — the data doc's LIT-2. Under LIT-1, only the sold-out half works.
+      </div>
+    </div>
+
+    <div class="option-block">
+      <p class="option-label"><span class="code code--stack">PLUS-6</span></p>
+      <h3 class="option-name">The inquiry knows the puppy <span class="tag tag--ok">★</span></h3>
+      <p class="option-note">Today the puppy's name lives only in the pre-filled message, which the visitor can edit away. Instead the form shows a puppy chip, sends <code>puppy</code> as its own field, and sets Formspree's <code>subject</code> field (its current name; available on every plan).</p>
+      <div class="pm girl" style="width:390px; background:#f4f4f4; border-radius:18px; padding:16px 0; border:1px solid var(--hair-2); box-shadow:var(--shadow)">
+        <p style="margin:0 16px 4px; font-size:13.5px; font-weight:600; color:#5d718a">← Back</p>
+        <p class="pm-title" style="margin:0 16px 10px; color:#5d718a"><span class="pm-title__pre" style="color:#7c8fa7">Get in Touch | </span>Contact Us</p>
+        <div class="pm-formcard">
+          <div class="pm-bar4"></div>
+          <div class="pm-about"><img src="img/cover-bella.webp" alt=""><div class="pm-about__t"><b>About Bella</b><small>Female · available</small></div><span class="pm-about__x">×</span></div>
+          <div class="pm-field"><div class="pm-field__l">Name</div><div class="pm-input">Your name</div></div>
+          <div class="pm-field"><div class="pm-field__l">Email</div><div class="pm-input">you@example.com</div></div>
+          <div class="pm-field"><div class="pm-field__l">Phone <i>— optional, if you'd rather text</i></div><div class="pm-input">(555) 555-0123</div></div>
+          <div class="pm-field"><div class="pm-field__l">Message</div><div class="pm-input pm-input--tall">Hi! I'm interested in Bella and would love to learn more…</div></div>
+        </div>
+      </div>
+      <div class="pm-mail"><div><b>Subject</b>Puppy inquiry — Bella</div><div><b>puppy</b>bella</div></div>
+      <div class="tradeoff">
+        <span class="plus">+</span> Your inbox sorts itself: the subject names the puppy even if the visitor rewrites the message.<br>
+        <span class="plus">+</span> A phone number for people who'd rather text.<br>
+        <span class="minus">−</span> One more (optional) field on the form.
+      </div>
+    </div>
+
+    <div class="option-block">
+      <p class="option-label"><span class="code code--stack">PLUS-7</span></p>
+      <h3 class="option-name">Pinned Inquire bar <span class="tag tag--no">Only with PUP-3</span></h3>
+      <p class="option-note">A bottom bar on available puppies. <b>Drawn in PUP-3.</b> With PUP-2 the button is already at y 564, inside the first screen.</p>
+      <div class="tradeoff">
+        <span class="plus">+</span> Always one tap away, however far down you are.<br>
+        <span class="minus">−</span> Covers 64&nbsp;px of every screen, on every scroll.
+      </div>
+    </div>
+
+    <div class="option-block option-block--wide">
+      <p class="option-label"><span class="code code--stack">PLUS-8</span></p>
+      <h3 class="option-name">Litter at a glance <span class="tag tag--ok">★ Round 3</span></h3>
+      <p class="option-note" style="max-width:900px">
+        Today's litter details are nine equal cells (316&nbsp;px) plus 272&nbsp;px of breed facts, all before the first photo. Round 3 splits them in two:
+        <b>a short card for who</b> — the parents as small icons (their photos are real but AI-cleaned, so they never show large) and the family-raised line —
+        and <b>HOME-5's tiles for what and when</b>: born, goes home, and each care step once it's done. Breed facts and the full care log open from “More about the litter”.
+        Puppy pages get a one-line version, because with puppy links (PLUS-1) many buyers land on a puppy first.
+      </p>
+      <div class="pair">
+        <div>
+          <p class="mini-label">On Home</p>
+          <div class="pm" style="width:390px; background:#f4f4f4; border-radius:18px; padding:4px 0 16px; border:1px solid var(--hair-2)"><div class="pm-glance"><div class="pm-glance__bar"></div><div class="pm-story"><div class="pm-story__hd"><span class="pm-avas"><span class="pm-ava"><img src="img/mom-coco.webp" alt="Coco"></span><span class="pm-ava"><img src="img/dad-leo.webp" alt="Leo"></span></span><p><b>Coco × Leo</b> · Mom &amp; dad · Havapoos</p></div><p class="pm-story__p">Raised in a loving home with children and other pets. <span>More about the litter ›</span></p></div></div><div class="pm-f4s"><div class="pm-f4"><span class="pm-f4__i"><svg class="ic"><use href="#cal"/></svg></span><div><small>Born</small><b>Jun 2</b></div></div><div class="pm-f4"><span class="pm-f4__i"><svg class="ic"><use href="#house"/></svg></span><div><small>Goes home</small><b>Now</b></div></div><div class="pm-f4"><span class="pm-f4__i pm-f4__i--ok"><svg class="ic"><use href="#check"/></svg></span><div><small>Vet checked</small><b>Yes</b></div></div><div class="pm-f4"><span class="pm-f4__i pm-f4__i--ok"><svg class="ic"><use href="#check"/></svg></span><div><small>Dewormed</small><b>Jun 29</b></div></div></div></div>
+          <p class="mini-label" style="margin-top:18px">On a puppy page, under her facts</p>
+          <div class="pm" style="width:390px; background:#f4f4f4; border-radius:18px; padding:0 0 16px; border:1px solid var(--hair-2)"><div class="pm-litstrip"><span class="pm-avas"><span class="pm-ava"><img src="img/mom-coco.webp" alt="Coco"></span><span class="pm-ava"><img src="img/dad-leo.webp" alt="Leo"></span></span><p><b>From Coco × Leo's litter</b> · born Jun 2<br><span class="ok">✓ Vet checked</span> · <span class="ok">✓ Dewormed</span> · <span class="go">About the litter ›</span></p></div></div>
+          <p class="mini-label" style="margin-top:18px">“More about the litter” opens</p>
+          <div class="pm pm-more">
+            <p class="pm-sec">Care so far</p>
+            <div class="pm-fact"><span class="pm-fact__l">Jun 29</span><span class="pm-fact__v">Dewormed</span></div>
+            <div class="pm-fact"><span class="pm-fact__l">✓ Done</span><span class="pm-fact__v">Vet checked</span></div>
+            <p class="pm-sec">Raised with us</p>
+            <p style="margin:0 14px; font-size:13.5px; line-height:1.6; color:#4a5d70">Raised in a loving home with children and other pets, making them well-socialized and ready to settle into family life from day one.</p>
+            <p class="pm-sec">About Havapoos</p>
+            <ul><li>Typically range from 7 to 20 lbs</li><li>Hypoallergenic — a good match for mild pet allergies</li><li>Highly trainable and eager to please</li></ul>
+          </div>
+        </div>
+        <div>
+          <p class="mini-label">How the tiles fill in — next litter, example dates</p>
+          <div class="tilestate"><p class="tilestate__t">Week 1<span>born Jan 10, goes home Mar 7</span></p><div class="pm"><div class="pm-f4s"><div class="pm-f4"><span class="pm-f4__i"><svg class="ic"><use href="#cal"/></svg></span><div><small>Born</small><b>Jan 10</b></div></div><div class="pm-f4"><span class="pm-f4__i"><svg class="ic"><use href="#house"/></svg></span><div><small>Goes home</small><b>Mar 7</b></div></div></div></div></div>
+          <div class="tilestate"><p class="tilestate__t">Week 4<span>first deworming entered</span></p><div class="pm"><div class="pm-f4s"><div class="pm-f4"><span class="pm-f4__i"><svg class="ic"><use href="#cal"/></svg></span><div><small>Born</small><b>Jan 10</b></div></div><div class="pm-f4"><span class="pm-f4__i"><svg class="ic"><use href="#house"/></svg></span><div><small>Goes home</small><b>Mar 7</b></div></div><div class="pm-f4 pm-f4--span"><span class="pm-f4__i pm-f4__i--ok"><svg class="ic"><use href="#check"/></svg></span><div><small>Dewormed</small><b>Feb 7</b></div></div></div></div></div>
+          <div class="tilestate"><p class="tilestate__t">Week 8<span>vet check and first shots; deworming repeated</span></p><div class="pm"><div class="pm-f4s"><div class="pm-f4"><span class="pm-f4__i"><svg class="ic"><use href="#cal"/></svg></span><div><small>Born</small><b>Jan 10</b></div></div><div class="pm-f4"><span class="pm-f4__i"><svg class="ic"><use href="#house"/></svg></span><div><small>Goes home</small><b>Mar 7</b></div></div><div class="pm-f4"><span class="pm-f4__i pm-f4__i--ok"><svg class="ic"><use href="#check"/></svg></span><div><small>Vet checked</small><b>Mar 2</b></div></div><div class="pm-f4"><span class="pm-f4__i pm-f4__i--ok"><svg class="ic"><use href="#check"/></svg></span><div><small>Dewormed</small><b>Mar 6</b></div></div><div class="pm-f4 pm-f4--span"><span class="pm-f4__i pm-f4__i--ok"><svg class="ic"><use href="#check"/></svg></span><div><small>Vaccinated</small><b>Mar 2 · first shots</b></div></div></div></div></div>
+          <p class="t-cap" style="max-width:390px">Each care tile is a line in the data doc's <code>care</code> list. A step that hasn't happened has no tile — never a blank or a “——” — and a repeat deworming moves the date forward.</p>
+        </div>
+      </div>
+      <div class="tradeoff" style="max-width:900px">
+        <span class="plus">+</span> Every fact a buyer weighs is on the first screen: who (the card), what and when (the tiles).<br>
+        <span class="plus">+</span> Health reads as accomplishments, and deworming shows the day it's done.<br>
+        <span class="plus">+</span> The parents get faces without leaning on photos that can't carry a large display.<br>
+        <span class="minus">−</span> An odd number of tiles leaves the last one full width (weeks 4 and 8).<br>
+        <span class="minus">−</span> Breed facts move behind “More about the litter”.
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════════════ -->
+<section class="doc-sec">
+  <p class="doc-sec__num">05 · Cleanups</p>
+  <h2 class="doc-sec__title">Worth doing under any option</h2>
+  <p class="subtitle">Small and independent — take all, some, or none. Name them by code.</p>
+  <ol class="findings findings--fix">
+    <li><b>Make text readable.</b> Keep the light accents (<code>#4a90d9</code>, <code>#e91e8c</code>, <code>#8a9bb0</code>) for bars, paws and borders, and add darker versions for text and button fills. The table below is computed in this page from the hex values — each ratio is live, not typed.</li>
+    <li><b>Hide empty facts.</b> “Vaccinations ——” reads as <i>none</i>. Skip a fact with no value instead of printing a dash. One test changes: it currently asserts the dash.</li>
+    <li><b>Say it in words.</b> Title “Home” → the litter's name. “Weight As Of” → “Weight”, “Ready To Adopt Date” → “Ready to go home”, “Deworming Date” → “Dewormed”, “Available Soon” → “Ready Jul 28”. These are the auto-generated labels from <code>formatKey</code>.</li>
+    <li><b>Small photos for small boxes.</b> 14&nbsp;KB thumbnails instead of ~790&nbsp;KB ones (the data doc's IMG-1). Listed here too because it's the biggest improvement a phone visitor will feel.</li>
+    <li><b>Lightbox keys and focus.</b> ← and → change photo in fullscreen; focus moves to the close button on open and back to the photo on close. Escape already works.</li>
+    <li><b>Delete the dead UI code.</b> The puppy-name labels on photos and thumbnails never render (<code>puppyName</code> is always <code>null</code>), and <code>.no-images</code>, <code>.cta-container</code> and <code>IconChevronDown</code> are unused.</li>
+    <li><b>Corners, not pills.</b> Status chips, care checks, counters and labels get 5–6&nbsp;px corners instead of fully round ends, so they line up with the cards and tiles around them. Applied to every proposed drawing in this doc; the “As shipped” drawings keep today's pills.</li>
+  </ol>
+
+  <table class="contrast" id="contrast">
+    <thead><tr><th>Where</th><th>Today</th><th>Ratio</th><th>Proposed</th><th>Ratio</th><th>Needs</th></tr></thead>
+    <tbody>
+      <tr data-need="4.5"><td>Descriptions, facts, sub-copy</td><td><span class="swatch" data-fg="#8a9bb0" data-bg="#ffffff">Raised in a loving…</span></td><td class="ratio"></td><td><span class="swatch" data-fg="#5d718a" data-bg="#ffffff">Raised in a loving…</span></td><td class="ratio"></td><td>4.5</td></tr>
+      <tr data-need="4.5"><td>Same grey on the page background</td><td><span class="swatch" data-fg="#8a9bb0" data-bg="#f4f4f4">Interested in one…</span></td><td class="ratio"></td><td><span class="swatch" data-fg="#5d718a" data-bg="#f4f4f4">Interested in one…</span></td><td class="ratio"></td><td>4.5</td></tr>
+      <tr data-need="4.5"><td>Field labels</td><td><span class="swatch" data-fg="#9bafc4" data-bg="#ffffff" style="font-size:11px;letter-spacing:.07em">WEIGHT AS OF</span></td><td class="ratio"></td><td><span class="swatch" data-fg="#5d718a" data-bg="#ffffff" style="font-size:11px;letter-spacing:.07em">WEIGHT</span></td><td class="ratio"></td><td>4.5</td></tr>
+      <tr data-need="4.5"><td>Inquiry card sub-line</td><td><span class="swatch" data-fg="#7a9bbf" data-bg="#ffffff">Reach out and…</span></td><td class="ratio"></td><td><span class="swatch" data-fg="#5d718a" data-bg="#ffffff">Reach out and…</span></td><td class="ratio"></td><td>4.5</td></tr>
+      <tr data-need="4.5"><td>Boy's button</td><td><span class="swatch" data-fg="#ffffff" data-bg="#4a90d9">Inquire about Pepper</span></td><td class="ratio"></td><td><span class="swatch" data-fg="#ffffff" data-bg="#2a78c8">Inquire about Pepper</span></td><td class="ratio"></td><td>4.5</td></tr>
+      <tr data-need="4.5"><td>Girl's button</td><td><span class="swatch" data-fg="#ffffff" data-bg="#e91e8c">Inquire about Bella</span></td><td class="ratio"></td><td><span class="swatch" data-fg="#ffffff" data-bg="#df1683">Inquire about Bella</span></td><td class="ratio"></td><td>4.5</td></tr>
+      <tr data-need="4.5"><td>Grey button (Meet Another Pup, Send)</td><td><span class="swatch" data-fg="#ffffff" data-bg="#8a9bb0">Send Message</span></td><td class="ratio"></td><td><span class="swatch" data-fg="#ffffff" data-bg="#5d718a">Send Message</span></td><td class="ratio"></td><td>4.5</td></tr>
+      <tr data-need="4.5"><td>“Available” badge</td><td><span class="swatch" data-fg="#1e8449" data-bg="#e8f8f0" style="font-size:11px">AVAILABLE</span></td><td class="ratio"></td><td><span class="swatch" data-fg="#1d8047" data-bg="#e8f8f0" style="font-size:11px">AVAILABLE</span></td><td class="ratio"></td><td>4.5</td></tr>
+      <tr data-need="4.5"><td>Deposit banner (its lighter end)</td><td><span class="swatch" data-fg="#ffffff" data-bg="#f0a030">$100 holds your pup</span></td><td class="ratio"></td><td><span class="swatch" data-fg="#9a4a0b" data-bg="#fff4e6">$100 holds your pup</span></td><td class="ratio"></td><td>4.5</td></tr>
+      <tr data-need="3"><td>“Name |” prefix — large text at 24&nbsp;px</td><td><span class="swatch" data-fg="#8a9bb0" data-bg="#f4f4f4" style="font-size:16px;font-weight:400">Name |</span></td><td class="ratio"></td><td><span class="swatch" data-fg="#7c8fa7" data-bg="#f4f4f4" style="font-size:16px;font-weight:400">Name |</span></td><td class="ratio"></td><td>3 (large)</td></tr>
+    </tbody>
+  </table>
+  <p class="t-cap">The prefix stays light on purpose: it only has to clear the large-text bar, so the title grows from 22.4&nbsp;px to 24&nbsp;px on phones. Today's 22.4&nbsp;px regular weight counts as normal text and would need 4.5.</p>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════════════ -->
+<section class="doc-sec">
+  <p class="doc-sec__num">06 · Every state</p>
+  <h2 class="doc-sec__title">The page in every season</h2>
+  <p class="subtitle">
+    The drawings above show the easy case: a puppy that's available today. Here is PUP-2's block under the photo for every status, then the top of HOME-8 for each season of a litter.
+    <b>Drawing these changed PUP-2:</b> an Inquire button on a reserved puppy is a dead end, so on reserved and adopted pages the button is replaced by the littermates still available — or, once there are none, by the waitlist.
+  </p>
+
+  <h3 class="sub-h">A puppy page — PUP-2</h3>
+  <div class="states">
+    <div class="state">
+      <p class="state__t">Available</p>
+      <p class="state__w">The button is the page's job.</p>
+      <div class="state__card girl">
+        <div class="state__slice"><img src="img/bella-1.webp" alt=""></div>
+        <div class="pm-id"><div class="pm-id__row"><p class="pm-id__t"><span>Name | </span>Bella</p><span class="chip chip--ok">Available</span></div><p class="pm-id__sub"><b>Female</b> · ready to go home now</p></div>
+        <div class="pm-btn"><svg class="ic"><use href="#paw"/></svg>Inquire about Bella</div>
+        <p class="pm-note">Reserve today — $100 holds her</p>
+      </div>
+      <p class="state__today state__today--ok"><b>Today:</b> works, but the button is at y 1260.</p>
+    </div>
+
+    <div class="state">
+      <p class="state__t">Before the ready date</p>
+      <p class="state__w">Clock pinned to Jul 10. The badge says <b>when</b>, not just “soon”.</p>
+      <div class="state__card girl">
+        <div class="state__slice"><img src="img/bella-2.webp" alt=""></div>
+        <div class="pm-id"><div class="pm-id__row"><p class="pm-id__t"><span>Name | </span>Bella</p><span class="chip chip--soon">Ready Jul 28</span></div><p class="pm-id__sub"><b>Female</b> · 5 weeks old</p></div>
+        <div class="pm-btn"><svg class="ic"><use href="#paw"/></svg>Get in line for Bella</div>
+        <p class="pm-note">Reserve today — $100 holds her</p>
+      </div>
+      <p class="state__today state__today--ok"><b>Today:</b> “Available Soon” and “Express Interest” — works, without the date.</p>
+    </div>
+
+    <div class="state">
+      <p class="state__t">Reserved</p>
+      <p class="state__w">No button to nowhere — the next-best puppies instead.</p>
+      <div class="state__card boy">
+        <div class="state__slice"><img src="img/cover-brownie.webp" alt=""></div>
+        <div class="pm-id"><div class="pm-id__row"><p class="pm-id__t"><span>Name | </span>Brownie</p><span class="chip chip--res">Reserved</span></div><p class="pm-id__sub"><b>Male</b> · has a family waiting</p></div>
+        <p class="pm-sec" style="margin-top:14px">Still looking for homes</p>
+        <div class="pm-mates__row" style="height:142px">
+          <div class="pm-mate girl"><img src="img/cover-bella.webp" alt="" style="width:96px;height:96px"><p class="pm-mate__n"><svg class="ic"><use href="#paw"/></svg>Bella</p></div>
+          <div class="pm-mate girl"><img src="img/cover-olive.webp" alt="" style="width:96px;height:96px"><p class="pm-mate__n"><svg class="ic"><use href="#paw"/></svg>Olive</p></div>
+          <div class="pm-mate boy"><img src="img/cover-pepper.webp" alt="" style="width:96px;height:96px"><p class="pm-mate__n"><svg class="ic"><use href="#paw"/></svg>Pepper</p></div>
+        </div>
+      </div>
+      <p class="state__today state__today--bad"><b>Today:</b> “Meet Another Pup”, a grey button to a random puppy.</p>
+    </div>
+
+    <div class="state">
+      <p class="state__t">The last one goes</p>
+      <p class="state__w">Every puppy reserved or adopted.</p>
+      <div class="state__card boy">
+        <div class="state__slice"><img src="img/cover-jasper.webp" alt=""></div>
+        <div class="pm-id"><div class="pm-id__row"><p class="pm-id__t"><span>Name | </span>Jasper</p><span class="chip chip--gone">Adopted</span></div><p class="pm-id__sub"><b>Male</b> · every puppy in this litter has a home</p></div>
+        <div class="pm-btn pm-btn--navy">Join the list for the next litter</div>
+        <p class="pm-note">Opens the form, pre-filled</p>
+      </div>
+      <p class="state__today state__today--bad"><b>Today:</b> no button at all — the page just ends.</p>
+    </div>
+
+    <div class="state">
+      <p class="state__t">No photos yet</p>
+      <p class="state__w">An empty folder, which is allowed.</p>
+      <div class="state__card girl">
+        <div class="state__slice" style="background:#f4f8fd; display:flex; align-items:center; justify-content:center; gap:12px; color:#e91e8c"><svg class="ic" style="font-size:46px; opacity:.4"><use href="#paw"/></svg><span style="font-size:12px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:#5d718a">Photos coming soon</span></div>
+        <div class="pm-id"><div class="pm-id__row"><p class="pm-id__t"><span>Name | </span>Puppy 3</p><span class="chip chip--soon">Ready Mar 7</span></div><p class="pm-id__sub"><b>Female</b> · 1 week old</p></div>
+        <div class="pm-btn"><svg class="ic"><use href="#paw"/></svg>Get in line for Puppy 3</div>
+        <p class="pm-note">Reserve today — $100 holds her</p>
+      </div>
+      <p class="state__today state__today--ok"><b>Today:</b> “Photos coming soon” — works, kept as is.</p>
+    </div>
+  </div>
+
+  <h3 class="sub-h">Home — HOME-8, a litter's seasons</h3>
+  <div class="states">
+    <div class="state">
+      <p class="state__t">Expecting</p>
+      <p class="state__w">A due date and no puppies yet (data doc, state 1). No photos exist yet, so the hero is a plain panel; the parents stay icons.</p>
+      <div class="state__card">
+        <div class="pm-bar"><span class="pm-bar__brand"><svg class="ic"><use href="#paw"/></svg>Doro Family Puppies</span><span class="pm-bar__menu"><svg class="ic"><use href="#burger"/></svg></span></div>
+        <div class="pm-gal pm-gal--empty" style="height:230px"><svg class="ic pm-gal__paw"><use href="#paw"/></svg><div class="pm-gal__txt"><p class="pm-gal__h">Coco is expecting</p><p class="pm-gal__s pm-gal__s--off">Due Jan 12 · Coco × Leo</p></div></div>
+        <div class="pm-glance"><div class="pm-glance__bar"></div><div class="pm-story"><div class="pm-story__hd"><span class="pm-avas"><span class="pm-ava"><img src="img/mom-coco.webp" alt="Coco"></span><span class="pm-ava"><img src="img/dad-leo.webp" alt="Leo"></span></span><p><b>Coco × Leo</b> · Mom &amp; dad · Havapoos</p></div><p class="pm-story__p">Raised in a loving home with children and other pets. <span>More about the litter ›</span></p></div></div>
+        <div class="pm-f4s"><div class="pm-f4 pm-f4--span"><span class="pm-f4__i"><svg class="ic"><use href="#cal"/></svg></span><div><small>Due</small><b>Jan 12</b></div></div></div>
+        <div class="pm-btn pm-btn--navy">Join the waitlist</div>
+      </div>
+      <p class="state__today state__today--bad"><b>Today:</b> can't be shown — there's no litter without puppies.</p>
+    </div>
+
+    <div class="state">
+      <p class="state__t">Born, no photos yet</p>
+      <p class="state__w">Names and sexes are in; folders are empty. The panel stays until the first photos land, and the Reserve banner is already up, since every puppy is available.</p>
+      <div class="state__card">
+        <div class="pm-bar"><span class="pm-bar__brand"><svg class="ic"><use href="#paw"/></svg>Doro Family Puppies</span><span class="pm-bar__menu"><svg class="ic"><use href="#burger"/></svg></span></div>
+        <div class="pm-gal pm-gal--empty" style="height:230px"><svg class="ic pm-gal__paw"><use href="#paw"/></svg><div class="pm-gal__txt"><p class="pm-gal__h">Coco &amp; Leo's litter</p><p class="pm-gal__s pm-gal__s--off">6 puppies · photos coming this week</p></div></div>
+        <div class="pm-glance"><div class="pm-glance__bar"></div><div class="pm-story"><div class="pm-story__hd"><span class="pm-avas"><span class="pm-ava"><img src="img/mom-coco.webp" alt="Coco"></span><span class="pm-ava"><img src="img/dad-leo.webp" alt="Leo"></span></span><p><b>Coco × Leo</b> · Mom &amp; dad · Havapoos</p></div><p class="pm-story__p">Raised in a loving home with children and other pets. <span>More about the litter ›</span></p></div></div>
+        <div class="pm-f4s"><div class="pm-f4"><span class="pm-f4__i"><svg class="ic"><use href="#cal"/></svg></span><div><small>Born</small><b>Jan 10</b></div></div><div class="pm-f4"><span class="pm-f4__i"><svg class="ic"><use href="#house"/></svg></span><div><small>Goes home</small><b>Mar 7</b></div></div></div>
+        <div class="pm-dep2"><span>Reserve today — <b>$100</b> holds your pup</span><span class="pm-dep2__go">Inquire →</span></div>
+        <div class="pm-sechead"><b>Meet the puppies</b><span style="color:#5d718a">photos soon</span></div>
+        <div class="pm-grid pm-grid--tight"><div class="pm-pcard girl"><div class="pm-pcard__ph"><svg class="ic"><use href="#paw"/></svg><span>Photos soon</span></div><div class="pm-pcard__row"><span class="pm-pcard__name"><svg class="ic"><use href="#paw"/></svg>Puppy 1</span><span class="chip chip--soon">Mar 7</span></div></div><div class="pm-pcard boy"><div class="pm-pcard__ph"><svg class="ic"><use href="#paw"/></svg><span>Photos soon</span></div><div class="pm-pcard__row"><span class="pm-pcard__name"><svg class="ic"><use href="#paw"/></svg>Puppy 2</span><span class="chip chip--soon">Mar 7</span></div></div></div>
+      </div>
+      <p class="state__today state__today--ok"><b>Today:</b> works per puppy (“Photos coming soon”), but Home keeps the old litter's slideshow.</p>
+    </div>
+
+    <div class="state">
+      <p class="state__t">Choosing</p>
+      <p class="state__w">Today's litter — drawn in full as HOME-8 in §02.</p>
+      <div class="state__card">
+        <div class="pm-bar"><span class="pm-bar__brand"><svg class="ic"><use href="#paw"/></svg>Doro Family Puppies</span><span class="pm-bar__menu"><svg class="ic"><use href="#burger"/></svg></span></div>
+        <div class="pm-gal" style="height:230px"><div class="pm-car__track"><img src="img/litter-1.webp" alt=""></div><span class="pm-expand"><svg class="ic"><use href="#expand"/></svg></span><div class="pm-gal__shade"></div><div class="pm-gal__txt"><p class="pm-gal__h">Coco &amp; Leo's litter</p><p class="pm-gal__s">3 of 5 still looking for a home</p></div></div>
+        <div class="pm-glance"><div class="pm-glance__bar"></div><div class="pm-story"><div class="pm-story__hd"><span class="pm-avas"><span class="pm-ava"><img src="img/mom-coco.webp" alt="Coco"></span><span class="pm-ava"><img src="img/dad-leo.webp" alt="Leo"></span></span><p><b>Coco × Leo</b> · Mom &amp; dad · Havapoos</p></div><p class="pm-story__p">Raised in a loving home with children and other pets. <span>More about the litter ›</span></p></div></div>
+        <div class="pm-f4s"><div class="pm-f4"><span class="pm-f4__i"><svg class="ic"><use href="#cal"/></svg></span><div><small>Born</small><b>Jun 2</b></div></div><div class="pm-f4"><span class="pm-f4__i"><svg class="ic"><use href="#house"/></svg></span><div><small>Goes home</small><b>Now</b></div></div><div class="pm-f4"><span class="pm-f4__i pm-f4__i--ok"><svg class="ic"><use href="#check"/></svg></span><div><small>Vet checked</small><b>Yes</b></div></div><div class="pm-f4"><span class="pm-f4__i pm-f4__i--ok"><svg class="ic"><use href="#check"/></svg></span><div><small>Dewormed</small><b>Jun 29</b></div></div></div>
+        <div class="pm-dep2"><span>Reserve today — <b>$100</b> holds your pup</span><span class="pm-dep2__go">Inquire →</span></div>
+      </div>
+      <p class="state__today state__today--ok"><b>Today:</b> the facts are there as nine cells; the photos start at y 906.</p>
+    </div>
+
+    <div class="state">
+      <p class="state__t">All spoken for <span class="state__here">The June litter, now</span></p>
+      <p class="state__w">The deposit banner hides; the button turns to the next litter.</p>
+      <div class="state__card">
+        <div class="pm-bar"><span class="pm-bar__brand"><svg class="ic"><use href="#paw"/></svg>Doro Family Puppies</span><span class="pm-bar__menu"><svg class="ic"><use href="#burger"/></svg></span></div>
+        <div class="pm-gal" style="height:230px"><div class="pm-car__track"><img src="img/litter-6.webp" alt=""></div><span class="pm-expand"><svg class="ic"><use href="#expand"/></svg></span><div class="pm-gal__shade"></div><div class="pm-gal__txt"><p class="pm-gal__h">Coco &amp; Leo's litter</p><p class="pm-gal__s pm-gal__s--off">Every puppy has a home</p></div></div>
+        <div class="pm-glance"><div class="pm-glance__bar"></div><div class="pm-story"><div class="pm-story__hd"><span class="pm-avas"><span class="pm-ava"><img src="img/mom-coco.webp" alt="Coco"></span><span class="pm-ava"><img src="img/dad-leo.webp" alt="Leo"></span></span><p><b>Coco × Leo</b> · Mom &amp; dad · Havapoos</p></div><p class="pm-story__p">Raised in a loving home with children and other pets. <span>More about the litter ›</span></p></div></div>
+        <div class="pm-f4s"><div class="pm-f4"><span class="pm-f4__i"><svg class="ic"><use href="#cal"/></svg></span><div><small>Born</small><b>Jun 2</b></div></div><div class="pm-f4"><span class="pm-f4__i"><svg class="ic"><use href="#house"/></svg></span><div><small>Goes home</small><b>Jul 28</b></div></div><div class="pm-f4"><span class="pm-f4__i pm-f4__i--ok"><svg class="ic"><use href="#check"/></svg></span><div><small>Vet checked</small><b>Yes</b></div></div><div class="pm-f4"><span class="pm-f4__i pm-f4__i--ok"><svg class="ic"><use href="#check"/></svg></span><div><small>Dewormed</small><b>Jun 29</b></div></div></div>
+        <div class="pm-btn pm-btn--navy">Join the list for the next litter</div>
+        <div class="pm-sechead"><b>Meet the puppies</b><span style="color:#5d718a">all spoken for</span></div>
+        <div class="pm-grid pm-grid--tight"><div class="pm-pcard girl"><img src="img/cover-bella.webp" alt="Bella"><div class="pm-pcard__row"><span class="pm-pcard__name"><svg class="ic"><use href="#paw"/></svg>Bella</span><span class="chip chip--gone">Adopted</span></div></div><div class="pm-pcard boy"><img src="img/cover-brownie.webp" alt="Brownie"><div class="pm-pcard__row"><span class="pm-pcard__name"><svg class="ic"><use href="#paw"/></svg>Brownie</span><span class="chip chip--res">Reserved</span></div></div></div>
+      </div>
+      <p class="state__today state__today--bad"><b>Today:</b> the banner still says “Reserve today — $100 holds your pup”.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════════════ -->
+<section class="doc-sec">
+  <p class="doc-sec__num">07 · The set</p>
+  <h2 class="doc-sec__title">HOME-8 + PUP-2, PLUS-1–6 + 8, FIX-1–7</h2>
+  <p class="subtitle">The right-hand column comes from the drawings, so it's the bar the build has to meet. After building, <code>scripts/measure/measure.mjs</code> re-measures every row and the misses get reported with their arithmetic, not rounded away.</p>
+
+  <table class="census" style="max-width:940px">
+    <thead><tr><th></th><th>Today (measured)</th><th>With the set (drawn)</th></tr></thead>
+    <tbody>
+      <tr><td>First photo on Home, phone</td><td class="num">y 906</td><td class="after">y 56 — the gallery, right under the bar</td></tr>
+      <tr><td>Litter details on Home's first screen</td><td>Nine equal cells, one reading “——”; parents as text</td><td class="after">Parents as icons and the family line · tiles for born, goes home, vet checked, dewormed</td></tr>
+      <tr><td>Height those litter details take</td><td class="num">588 px (with breed facts)</td><td class="after num">228 px — card 112, tiles 104</td></tr>
+      <tr><td>Puppies on Home's first screen, phone</td><td class="num">0</td><td class="after">2 — most of their photos; names and status 38&nbsp;px below</td></tr>
+      <tr><td>How to reserve, on Home's first screen</td><td class="num">$100 banner at y 197</td><td class="after">$100 banner at y 600, right under the tiles</td></tr>
+      <tr><td>Puppies whose status shows without a tap</td><td class="num">0 of 5</td><td class="after">5 of 5</td></tr>
+      <tr><td>Inquire on Bella's page, phone</td><td class="num">y 1260</td><td class="after num">y 564</td></tr>
+      <tr><td>Inquire on Bella's page, desktop (800 tall)</td><td class="num">y 1148</td><td class="after">first screen (drawn below)</td></tr>
+      <tr><td>Pinned header on phones</td><td class="num">128 px</td><td class="after num">56 px, and the page scrolls</td></tr>
+      <tr><td>Photos downloaded to see Bella, phone</td><td class="num">7.9 MB</td><td class="after num">≈ 0.27 MB</td></tr>
+      <tr><td>Text styles below WCAG AA</td><td class="num">All 10 pairs in §05</td><td class="after">0</td></tr>
+      <tr><td>A link that opens one puppy</td><td>No</td><td class="after">Yes</td></tr>
+      <tr><td>Seasons with nothing true to say</td><td>Expecting, sold out</td><td class="after">None</td></tr>
+    </tbody>
+  </table>
+
+  <h3 class="sub-h">Where each page spends its height</h3>
+  <p class="t-cap">Whole pages at 0.22 scale, banded by what each part is <i>for</i>. The dashed line is the end of the first screen. Today's bands are measured; the proposed ones come from the drawings, plus a 60&nbsp;px footer.</p>
+  <div class="ribbons" id="ribbons"></div>
+  <div class="legend">
+    <span><i class="rb--answer"></i>Photos — the answer</span>
+    <span><i class="rb--status"></i>Status and dates</span>
+    <span><i class="rb--action"></i>Inquire / reserve</span>
+    <span><i class="rb--trust"></i>Litter details — parents, dates, care</span>
+    <span><i class="rb--facts"></i>Puppy facts</span>
+    <span><i class="rb--chrome"></i>Header, labels, controls</span>
+    <span><i class="rb--dead"></i>Padding</span>
+  </div>
+
+  <h3 class="sub-h">First screen against first screen</h3>
+  <p class="t-cap">The same drawings as above, clipped to 844 and shown at 62%.</p>
+  <div class="minis">
+    <div><div class="mini" data-clone="home-today"></div><p class="mini-cap"><b>Home today</b> · facts as a table, no photo above the line</p></div>
+    <div><div class="mini" data-clone="home-8"></div><p class="mini-cap"><b>HOME-8</b> · the litter's photos, its details as tiles, the $100 banner, and the first two puppies coming into view</p></div>
+    <div><div class="mini" data-clone="bella-today"></div><p class="mini-cap"><b>Bella today</b> · no way to inquire on this screen</p></div>
+    <div><div class="mini" data-clone="pup-2"></div><p class="mini-cap"><b>PUP-2</b> · who, looks, status, Inquire — all above the line</p></div>
+  </div>
+
+  <h3 class="sub-h">Desktop, 1280 × 800 at 50%</h3>
+  <p class="t-cap">The sidebar stays on desktop, with status chips (PLUS-2). Home puts the gallery beside the litter card and its tiles, with all five puppies on the first screen; the puppy page puts the photo beside the facts so Inquire sits beside the first photo.</p>
+  <div class="pair" style="margin-top:16px">
+    <div class="deskwrap"><div class="desk">
+      <div class="d-head"><span style="font-size:32px">🐾</span><div><b>Doro Family Puppies</b><span>Lovingly raised, family bred</span></div></div>
+      <div class="d-body">
+        <div class="d-side">
+          <div class="pm-mrow pm-mrow--active" style="font-weight:700">Home</div>
+          <div class="pm-msec">Puppies</div>
+          <div class="pm-mrow"><svg class="ic" style="color:#e91e8c"><use href="#paw"/></svg>Bella<span class="chip chip--ok">Avail.</span></div>
+          <div class="pm-mrow"><svg class="ic" style="color:#4a90d9"><use href="#paw"/></svg>Brownie<span class="chip chip--res">Res.</span></div>
+          <div class="pm-mrow"><svg class="ic" style="color:#4a90d9"><use href="#paw"/></svg>Jasper<span class="chip chip--res">Res.</span></div>
+          <div class="pm-mrow"><svg class="ic" style="color:#e91e8c"><use href="#paw"/></svg>Olive<span class="chip chip--ok">Avail.</span></div>
+          <div class="pm-mrow"><svg class="ic" style="color:#4a90d9"><use href="#paw"/></svg>Pepper<span class="chip chip--ok">Avail.</span></div>
+          <div class="pm-mrow" style="margin-top:10px; border-top:1px solid rgba(255,255,255,.1); border-radius:0">Contact us</div>
+        </div>
+        <div class="d-main" style="padding-top:26px">
+          <div class="d-hero">
+            <div class="d-gal"><img src="img/litter-1.webp" alt=""><span class="pm-gal__count">1 / 28</span><div class="pm-gal__shade"></div><div class="pm-gal__txt"><p class="pm-gal__h" style="font-size:30px">Coco &amp; Leo's litter</p><p class="pm-gal__s" style="font-size:15px">3 of 5 still looking for a home</p></div><span class="pm-progress"><span></span></span></div>
+            <div class="d-right"><div class="pm-glance"><div class="pm-glance__bar"></div><div class="pm-story"><div class="pm-story__hd"><span class="pm-avas"><span class="pm-ava"><img src="img/mom-coco.webp" alt="Coco"></span><span class="pm-ava"><img src="img/dad-leo.webp" alt="Leo"></span></span><p><b>Coco × Leo</b> · Mom &amp; dad · Havapoos</p></div><p class="pm-story__p">Raised in a loving home with children and other pets. <span>More about the litter ›</span></p></div></div><div class="pm-f4s"><div class="pm-f4"><span class="pm-f4__i"><svg class="ic"><use href="#cal"/></svg></span><div><small>Born</small><b>Jun 2</b></div></div><div class="pm-f4"><span class="pm-f4__i"><svg class="ic"><use href="#house"/></svg></span><div><small>Goes home</small><b>Now</b></div></div><div class="pm-f4"><span class="pm-f4__i pm-f4__i--ok"><svg class="ic"><use href="#check"/></svg></span><div><small>Vet checked</small><b>Yes</b></div></div><div class="pm-f4"><span class="pm-f4__i pm-f4__i--ok"><svg class="ic"><use href="#check"/></svg></span><div><small>Dewormed</small><b>Jun 29</b></div></div></div><div class="pm-dep2"><span>Reserve today — <b>$100</b> holds your pup</span><span class="pm-dep2__go">Inquire →</span></div></div>
+          </div>
+          <div class="pm-sechead" style="margin:22px 0 10px"><b style="font-size:20px">Meet the puppies</b><span style="font-size:14px">3 available</span></div>
+          <div class="d-grid" style="margin-top:0; grid-template-columns:repeat(5, 1fr); gap:16px">
+          <div class="pm-pcard girl"><img src="img/cover-bella.webp" alt="Bella"><div class="pm-pcard__row"><span class="pm-pcard__name"><svg class="ic"><use href="#paw"/></svg>Bella</span><span class="chip chip--ok">Available</span></div></div>
+          <div class="pm-pcard boy"><img src="img/cover-brownie.webp" alt="Brownie"><div class="pm-pcard__row"><span class="pm-pcard__name"><svg class="ic"><use href="#paw"/></svg>Brownie</span><span class="chip chip--res">Reserved</span></div></div>
+          <div class="pm-pcard boy"><img src="img/cover-jasper.webp" alt="Jasper"><div class="pm-pcard__row"><span class="pm-pcard__name"><svg class="ic"><use href="#paw"/></svg>Jasper</span><span class="chip chip--res">Reserved</span></div></div>
+          <div class="pm-pcard girl"><img src="img/cover-olive.webp" alt="Olive"><div class="pm-pcard__row"><span class="pm-pcard__name"><svg class="ic"><use href="#paw"/></svg>Olive</span><span class="chip chip--ok">Available</span></div></div>
+          <div class="pm-pcard boy"><img src="img/cover-pepper.webp" alt="Pepper"><div class="pm-pcard__row"><span class="pm-pcard__name"><svg class="ic"><use href="#paw"/></svg>Pepper</span><span class="chip chip--ok">Available</span></div></div>
+          </div>
+        </div>
+      </div>
+    </div></div>
+
+    <div class="deskwrap"><div class="desk girl">
+      <div class="d-head"><span style="font-size:32px">🐾</span><div><b>Doro Family Puppies</b><span>Lovingly raised, family bred</span></div></div>
+      <div class="d-body">
+        <div class="d-side">
+          <div class="pm-mrow" style="font-weight:700; color:#fff">Home</div>
+          <div class="pm-msec">Puppies</div>
+          <div class="pm-mrow pm-mrow--active"><svg class="ic" style="color:#fff"><use href="#paw"/></svg>Bella<span class="chip chip--ok">Avail.</span></div>
+          <div class="pm-mrow"><svg class="ic" style="color:#4a90d9"><use href="#paw"/></svg>Brownie<span class="chip chip--res">Res.</span></div>
+          <div class="pm-mrow"><svg class="ic" style="color:#4a90d9"><use href="#paw"/></svg>Jasper<span class="chip chip--res">Res.</span></div>
+          <div class="pm-mrow"><svg class="ic" style="color:#e91e8c"><use href="#paw"/></svg>Olive<span class="chip chip--ok">Avail.</span></div>
+          <div class="pm-mrow"><svg class="ic" style="color:#4a90d9"><use href="#paw"/></svg>Pepper<span class="chip chip--ok">Avail.</span></div>
+          <div class="pm-mrow" style="margin-top:10px; border-top:1px solid rgba(255,255,255,.1); border-radius:0">Contact us</div>
+        </div>
+        <div class="d-main" style="padding-top:22px">
+          <div class="pm-back" style="padding:0; height:30px; font-size:15px"><span>‹ All puppies</span></div>
+          <div class="d-cols">
+            <div>
+              <div class="d-photo"><img src="img/bella-1.webp" alt=""><span class="pm-expand"><svg class="ic"><use href="#expand"/></svg></span></div>
+              <div class="d-thumbs"><img src="img/bella-1.webp" alt=""><img src="img/bella-2.webp" alt=""><img src="img/bella-3.webp" alt=""><img src="img/bella-4.webp" alt=""><img src="img/bella-5.webp" alt=""><img src="img/bella-2.webp" alt=""><img src="img/bella-3.webp" alt=""></div>
+            </div>
+            <div class="d-info">
+              <div class="pm-id__row"><p class="pm-id__t"><span>Name | </span>Bella</p><span class="chip chip--ok" style="font-size:12px">Available</span></div>
+              <p class="pm-id__sub"><b>Female</b> · ready to go home now</p>
+              <div class="pm-btn"><svg class="ic"><use href="#paw"/></svg>Inquire about Bella</div>
+              <p class="pm-note">Reserve today — $100 holds her</p>
+              <div class="pm-facts">
+                <div class="pm-fact"><span class="pm-fact__l">Color</span><span class="pm-fact__v">White &amp; black parti</span></div>
+                <div class="pm-fact"><span class="pm-fact__l">Markings</span><span class="pm-fact__v">Black face mask and side spot</span></div>
+                <div class="pm-fact"><span class="pm-fact__l">Weight</span><span class="pm-fact__v">27.8 oz at 3 weeks</span></div>
+                <div class="pm-fact"><span class="pm-fact__l">Personality</span><span class="pm-fact__v">Curiously energetic</span></div>
+              </div>
+              <div class="pm-litstrip" style="margin:16px 0 0"><span class="pm-avas"><span class="pm-ava"><img src="img/mom-coco.webp" alt="Coco"></span><span class="pm-ava"><img src="img/dad-leo.webp" alt="Leo"></span></span><p><b>From Coco × Leo's litter</b> · born Jun 2<br><span class="ok">✓ Vet checked</span> · <span class="ok">✓ Dewormed</span> · <span class="go">About the litter ›</span></p></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div></div>
+  </div>
+
+  <h3 class="sub-h">Build order — both docs, one sequence</h3>
+  <p class="subtitle">SRC, LIT, IMG, DATA and DFIX are the data doc's codes; the rest are this doc's. The work happens on a branch, because a push to main goes live: steps 1–3 can go live as they land, since visitors see nothing change but lighter photos, and the redesign goes live as one merge once it's measured.</p>
+  <ol class="order">
+    <li><b>DATA-1 with the data doc's §07 files.</b> The schema, the converted <code>litters.json</code> and the checker, wired into build, dev and test, while the pages still read <code>puppies.jsx</code>.</li>
+    <li><b>SRC-2 + LIT-2, with DFIX-4.</b> The site reads <code>litters.json</code> and the photo folders move. Every page looks as it does now apart from casing fixes — the proof that the conversion is right.</li>
+    <li><b>IMG-1, with DFIX-2.</b> Alone, so a visual regression is easy to bisect.</li>
+    <li><b>PLUS-1 links, then PLUS-4 one bar.</b> Links need step 2's slugs. The bar moves every y on the phone, so it lands before anything is measured — and alone, so the iPhone retest is about one thing.</li>
+    <li><b>DATA-2, -3, -4.</b> The words and numbers the new pages show: “White &amp; black parti”, “27.8&nbsp;oz at 3 weeks”, the cover photo.</li>
+    <li><b>PLUS-8's litter card and tiles, then HOME-8, then PUP-2</b>, with PLUS-2 and PLUS-3, which they're drawn with. The card goes first because Home, the puppy pages and every season reuse it. Gallery and carousel photos after the first load lazily — otherwise Home's 28 download at once and the 0.27&nbsp;MB row misses.</li>
+    <li><b>PLUS-5 and PLUS-6.</b> The seasons, and the inquiry that knows the puppy — checked with one real test inquiry.</li>
+    <li><b>FIX-1 … FIX-7</b> alongside — FIX-1 first if anything ships early, since it touches every page.</li>
+    <li><b>DATA-5 and DFIX-1.</b> The owner's manual describes what was actually built.</li>
+    <li><b>Re-measure</b> against the table above, plus one run per season — expecting, sold out, two litters — from fixture files, and report the misses.</li>
+    <li><b>The tutorial.</b> Once everything is built: a plain-language guide to managing litters, <code>docs/data-tutorial.html</code>, with a small working editor that checks what you type the way the build does.</li>
+  </ol>
+  <p class="subtitle" style="margin-top:14px">Then, when the next litter's details arrive, it goes in as a new litter and the June five become <code>"adopted"</code> — the owner's manual's first real use.</p>
+
+  <div class="callout">
+    <b>Before you start — four ways this ships broken.</b>
+    A push to main goes live, so the work happens on a branch.
+    · The Mac ignores the case of file names and Cloudflare's Linux build doesn't: the checker compares names with each folder's real listing, and skips the <code>.DS_Store</code> in every photo folder.
+    · <code>?parents=true</code> shows <code>/Coco.jpg</code> and <code>/Leo.jpg</code> from <code>public/</code>, and step 2 moves those files — decide the flag before step 2.
+    · The 16 tests mock today's data shape: each step that replaces a component replaces its tests, and each season gets a fixture file the tests render.
+  </div>
+
+  <div class="callout">
+    <b>The one thing I'd flag:</b> PUP-2 drops the thumbnail grid on phones. If people mostly scan a puppy's photos at a glance rather than swipe through them, keep a single row of small thumbnails under the photo: it costs about 70&nbsp;px and puts Inquire at roughly y 634 — still inside the first screen. That reverses independently of everything else.
+  </div>
+  <div class="callout">
+    <b>Needed before building, not before deciding:</b> the wording of the waitlist message · whether to ask for a phone number at all · whether the sold-out June litter simply disappears when the new one goes up, or stays below it as “every puppy has a home” · whether <code>?parents=true</code> stays, reading the parents from the data, or goes — before step 2 · whether Home's gallery keeps autoplaying every 8&nbsp;s as today; I'd keep it, paused while it's touched and for anyone with reduced motion turned on · whether the $100 deposit can differ by litter; if so, it becomes a litter field instead of a number in the code.<br>
+    <b>Not drawn yet:</b> Home with two litters listed — it happens if the June litter stays, or if a puppy is still unsold when the next litter is born. I'd lead with the newest litter as drawn and follow it with a short section for the older one: its card line and its puppies, no second gallery. And where “More about the litter” goes: I'd open it in place on Home, with a puppy page's “About the litter ›” landing on Home with it open — no new page.<br>
+    <b>Settled Nov 24:</b> the gallery leads with the first file by name, as today; the data doc's optional <code>cover</code> is only for picking a different one.
+  </div>
+</section>
+
+<p class="foot">
+  Method: <a href="../../METHOD_MOCKS_AND_MEASUREMENT.md">METHOD_MOCKS_AND_MEASUREMENT.md</a> · today's numbers from <code>scripts/measure/measure.mjs</code> against the production build (it blocks the live visit counter, so measuring never counts as a visit) · photos in <code>docs/img/</code> are small copies for these docs only.
+  Companion: <a href="puppy-data-options.html">puppy-data-options.html</a> — litters, allowed values, the checker.
+</p>
+</main>
+
+<script>
+// ── Contrast: ratios computed from the hex values in the table ────────────
+const lin = (c) => (c <= 0.04045 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4);
+const lum = (hex) => {
+  const [r, g, b] = hex.replace('#', '').match(/../g).map((x) => lin(parseInt(x, 16) / 255));
+  return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+};
+const ratio = (a, b) => { const [x, y] = [lum(a), lum(b)].sort((p, q) => q - p); return (x + 0.05) / (y + 0.05); };
+for (const row of document.querySelectorAll('#contrast tbody tr')) {
+  const need = Number(row.dataset.need);
+  const cells = row.querySelectorAll('.ratio');
+  row.querySelectorAll('.swatch').forEach((sw, i) => {
+    sw.style.color = sw.dataset.fg;
+    sw.style.background = sw.dataset.bg;
+    const r = ratio(sw.dataset.fg, sw.dataset.bg);
+    cells[i].textContent = r.toFixed(2) + ':1';
+    cells[i].classList.add(r >= need ? 'pass' : 'fail');
+    const hex = document.createElement('div');
+    hex.className = 'hex';
+    hex.textContent = `${sw.dataset.fg} on ${sw.dataset.bg}`;
+    sw.after(hex);
+  });
+}
+
+// ── PUP-2 carousel: dots and counter follow the swipe ─────────────────────
+for (const track of document.querySelectorAll('[data-carousel]')) {
+  const phone = track.closest('.phone, .pm-gal');
+  const host = track.closest('.pm-gal') || phone;
+  const dots = phone.querySelectorAll('.pm-dots i');
+  const counter = host.querySelector('[data-counter]') || phone.querySelector('[data-counter]');
+  track.addEventListener('scroll', () => {
+    const i = Math.round(track.scrollLeft / track.clientWidth);
+    dots.forEach((d, n) => d.classList.toggle('on', n === i));
+    if (counter) counter.textContent = `${i + 1} / ${track.dataset.count || dots.length}`;
+  }, { passive: true });
+}
+
+// ── Ribbons: whole pages as bands, from the census and the drawings ───────
+// [kind, top, bottom] in page pixels; scale 0.22. Fold at 844 for all four.
+const PAGES = [
+  { name: 'Home', sub: 'today', h: 1305, bands: [
+    ['chrome', 0, 128], ['dead', 128, 154], ['chrome', 154, 181], ['dead', 181, 197], ['action', 197, 274],
+    ['dead', 274, 294], ['trust', 294, 882], ['dead', 882, 906], ['answer', 906, 1186], ['chrome', 1186, 1246], ['dead', 1246, 1305]] },
+  { name: 'Home', sub: 'HOME-8', h: 1436, bands: [
+    ['chrome', 0, 56], ['answer', 56, 344], ['dead', 344, 356], ['trust', 356, 584], ['dead', 584, 600], ['action', 600, 656],
+    ['dead', 656, 672], ['chrome', 672, 690], ['dead', 690, 698], ['answer', 698, 1376], ['dead', 1376, 1436]] },
+  { name: 'Bella', sub: 'today', h: 1374, bands: [
+    ['chrome', 0, 128], ['dead', 128, 154], ['facts', 154, 181], ['dead', 181, 197], ['facts', 197, 442], ['status', 442, 469],
+    ['facts', 469, 481], ['dead', 481, 505], ['answer', 505, 785], ['chrome', 785, 845], ['dead', 845, 861], ['answer', 861, 1130],
+    ['dead', 1130, 1171], ['action', 1171, 1315], ['dead', 1315, 1374]] },
+  { name: 'Bella', sub: 'PUP-2', h: 1189, bands: [
+    ['chrome', 0, 92], ['answer', 92, 482], ['status', 482, 552], ['dead', 552, 564], ['action', 564, 638],
+    ['dead', 638, 660], ['facts', 660, 845], ['dead', 845, 861], ['trust', 861, 937], ['answer', 937, 1129], ['dead', 1129, 1189]] },
+];
+const S = 0.22;
+const host = document.getElementById('ribbons');
+for (const p of PAGES) {
+  const wrap = document.createElement('div');
+  wrap.className = 'ribbon';
+  const strip = document.createElement('div');
+  strip.className = 'ribbon__strip';
+  strip.style.height = `${p.h * S}px`;
+  for (const [kind, a, b] of p.bands) {
+    const band = document.createElement('div');
+    band.className = `rb rb--${kind}`;
+    band.style.height = `${(b - a) * S}px`;
+    strip.append(band);
+  }
+  const fold = document.createElement('div');
+  fold.className = 'ribbon__fold';
+  fold.style.top = `${844 * S}px`;
+  strip.append(fold);
+  const cap = document.createElement('p');
+  cap.className = 'ribbon__cap';
+  const above = (kind) => p.bands.filter(([k, a]) => k === kind && a < 844).reduce((s, [, a, b]) => s + Math.min(b, 844) - a, 0);
+  const trust = above('trust');
+  cap.innerHTML = `<b>${p.name} · ${p.sub}</b>${Math.round(above('answer'))} px of photos above the line` + (trust ? ` · ${Math.round(trust)} px of litter details` : '');
+  wrap.append(strip, cap);
+  host.append(wrap);
+}
+
+// ── First screens: clone the drawings above, clip to 844, show at 62% ─────
+const MINI = 0.62;
+for (const slot of document.querySelectorAll('[data-clone]')) {
+  const src = document.getElementById(slot.dataset.clone);
+  if (!src) continue;
+  const copy = src.cloneNode(true);
+  copy.removeAttribute('id');
+  copy.classList.remove('phone--clip');
+  copy.style.height = '844px';
+  copy.style.transform = `scale(${MINI})`;
+  copy.querySelectorAll('.fold, .shade').forEach((n) => n.remove());
+  slot.style.width = `${390 * MINI}px`;
+  slot.style.height = `${844 * MINI}px`;
+  slot.append(copy);
+}
+</script>
+</body>
+</html>
