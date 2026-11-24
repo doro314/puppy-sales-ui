@@ -89,6 +89,7 @@ To see changes before pushing, run `npm run dev` and open http://localhost:5173.
 | `npm test` | The test suite, including a check of the real `litters.json` and photos |
 
 - **Data layer:** components read the data only through the query functions in `src/data/puppies.jsx`. `src/data/checkLitters.js` is the checker (pure). `scripts/puppyDataPlugin.js` runs it in the build and dev server.
+- **Tutorial:** `docs/data-tutorial.html` carries copies of the checker, `src/utils.js` and the schema, so its practice editor works from disk. After changing any of them, run `node scripts/syncTutorial.js`. `npm test` fails until you do.
 - **Addresses:** `/` is Home, `/bella` is a puppy, `/contact?about=bella` or `?about=waitlist` is the form.
 - **Hidden switches:** `?parents=true` shows the parents' photos large on Home. `?count` shows the visit counter in the footer.
 - **Settings:** the deposit amount is `DEPOSIT_AMOUNT` in `src/utils.js`. Inquiries go to the Formspree form whose ID is in `src/components/ContactForm.jsx`.

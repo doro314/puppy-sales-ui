@@ -1,0 +1,1289 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Managing Your Litters</title>
+<style>
+  :root {
+    --bg: #f4f4f4;
+    --card: #ffffff;
+    --ink: #2c3e50;
+    --ink-2: #4a5d70;
+    --muted: #5d718a;
+    --hair: #e2e8f0;
+    --navy: #2c3e50;
+    --blue: #2a78c8;
+    --green: #1d8047;
+    --green-soft: #e8f8f0;
+    --red: #c0392b;
+    --red-soft: #fdf0f0;
+    --amber: #7a4f00;
+    --amber-soft: #fff8e1;
+    --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font: 16px/1.6 var(--sans); }
+  a { color: var(--blue); }
+  code { font-family: var(--mono); font-size: 0.9em; background: #eef2f6; padding: 1px 5px; border-radius: 4px; }
+  .wrap { max-width: 1040px; margin: 0 auto; padding: 0 16px; }
+
+  .top { background: linear-gradient(135deg, #1a2a3a 0%, #2c3e50 60%, #34495e 100%); border-bottom: 3px solid #4a90d9; color: white; }
+  .top .wrap { padding-top: 36px; padding-bottom: 32px; }
+  .top p.kicker { margin: 0 0 6px; font-size: 12px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(255,255,255,0.72); }
+  .top h1 { margin: 0 0 10px; font-size: clamp(28px, 5vw, 40px); line-height: 1.15; }
+  .top p.lede { margin: 0; max-width: 640px; font-size: 17px; color: rgba(255,255,255,0.88); }
+
+  nav.toc { margin: 24px 0 8px; display: flex; flex-wrap: wrap; gap: 8px; }
+  nav.toc a { padding: 6px 12px; border-radius: 8px; background: var(--card); border: 1px solid var(--hair); color: var(--ink); font-size: 14px; font-weight: 600; text-decoration: none; }
+  nav.toc a:hover { border-color: var(--blue); color: var(--blue); }
+
+  section { margin: 40px 0; }
+  h2 { margin: 0 0 6px; font-size: 26px; line-height: 1.25; }
+  h2 .n { display: inline-block; min-width: 34px; color: var(--muted); font-weight: 600; }
+  h3 { margin: 22px 0 6px; font-size: 18px; }
+  p.sub { margin: 0 0 18px; color: var(--muted); max-width: 720px; }
+  .card { background: var(--card); border-radius: 14px; box-shadow: 0 1px 6px rgba(0,0,0,0.07); padding: 20px; }
+
+  .flow { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+  .flow div { background: var(--card); border-radius: 12px; padding: 14px; box-shadow: 0 1px 4px rgba(0,0,0,0.07); }
+  .flow b { display: block; font-size: 15px; }
+  .flow span { font-size: 14px; color: var(--muted); }
+  .flow .n { display: inline-flex; width: 26px; height: 26px; align-items: center; justify-content: center; border-radius: 8px; background: #eef3f8; font-weight: 700; margin-bottom: 6px; color: var(--ink); }
+  .note { margin-top: 12px; padding: 12px 14px; border-left: 4px solid var(--green); background: var(--green-soft); border-radius: 8px; color: #1d4d33; font-size: 15px; }
+  .note--warn { border-left-color: #e07b1a; background: #fff4e6; color: #6b3a0a; }
+
+  .anatomy { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: 18px; align-items: start; }
+  pre.code { margin: 0; padding: 14px 16px; background: #1f2933; color: #e6edf3; border-radius: 12px; font: 13.5px/1.6 var(--mono); overflow-x: auto; }
+  pre.code .k { color: #9cdcfe; } pre.code .s { color: #ce9178; } pre.code .v { color: #b5cea8; } pre.code .c { color: #8b949e; }
+  ol.rules { margin: 0; padding-left: 20px; }
+  ol.rules li { margin-bottom: 10px; }
+
+  /* Practice editor */
+  .lab { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); gap: 16px; align-items: start; }
+  .editor { background: #1f2933; border-radius: 14px; overflow: hidden; box-shadow: 0 2px 12px rgba(0,0,0,0.12); }
+  .editor-bar { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 8px 12px; background: #161d24; color: #c9d1d9; font: 13px var(--sans); }
+  .editor-bar b { font-family: var(--mono); font-weight: 500; }
+  .editor-bar button { padding: 5px 10px; border: 1px solid #3a4652; border-radius: 6px; background: #26313b; color: #e6edf3; font: 600 12.5px var(--sans); cursor: pointer; }
+  .editor-bar button:hover { background: #2f3c48; }
+  .editor-body { display: flex; height: 440px; }
+  .gutter { flex: 0 0 auto; padding: 12px 8px 12px 12px; overflow: hidden; color: #6e7681; font: 13px/1.6 var(--mono); text-align: right; user-select: none; }
+  .gutter div.bad { color: #ff7b72; font-weight: 700; }
+  textarea.src { flex: 1; min-width: 0; padding: 12px; border: 0; outline: none; resize: none; background: transparent; color: #e6edf3; font: 13px/1.6 var(--mono); white-space: pre; overflow: auto; tab-size: 2; }
+  .results { display: grid; gap: 14px; }
+  .verdict { border-radius: 12px; padding: 14px 16px; font-size: 15px; }
+  .verdict--ok { background: var(--green-soft); color: #14532d; border: 1px solid #a9dfbf; }
+  .verdict--bad { background: var(--red-soft); color: #7f1d1d; border: 1px solid #f5b7b1; }
+  .verdict b { display: block; margin-bottom: 4px; font-size: 16px; }
+  .problem { margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(0,0,0,0.08); }
+  .problem .where { font: 600 12.5px var(--mono); color: inherit; opacity: 0.85; }
+  .problem .warn-tag { display: inline-block; margin-right: 6px; padding: 0 6px; border-radius: 4px; background: var(--amber-soft); color: var(--amber); font: 700 11px var(--sans); text-transform: uppercase; letter-spacing: 0.04em; }
+
+  .preview { background: var(--card); border-radius: 14px; box-shadow: 0 1px 6px rgba(0,0,0,0.07); overflow: hidden; }
+  .preview-head { padding: 10px 14px; background: #eef3f8; color: var(--muted); font-size: 13px; font-weight: 600; }
+  .preview-body { padding: 12px 14px 16px; }
+  .pv-litter + .pv-litter { margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--hair); }
+  .pv-title { margin: 0; font-size: 18px; font-weight: 700; }
+  .pv-sub { margin: 2px 0 10px; color: var(--muted); font-size: 14px; }
+  .pv-tiles { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 10px; }
+  .pv-tile { padding: 6px 10px; border-radius: 8px; background: #f6f8fb; font-size: 13.5px; }
+  .pv-tile small { display: block; color: var(--muted); font-size: 10.5px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; }
+  .pv-tile--done { background: var(--green-soft); }
+  .pv-next { margin-bottom: 10px; padding: 8px 12px; border-radius: 8px; font-size: 13.5px; font-weight: 600; }
+  .pv-next--deposit { background: #fff4e6; border-left: 4px solid #e07b1a; color: #9a4a0b; }
+  .pv-next--list { background: var(--navy); color: white; text-align: center; }
+  .pv-pup { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 8px 0; border-top: 1px solid #f0f4f8; }
+  .pv-pup b { font-size: 15px; }
+  .pv-pup span.meta { display: block; color: var(--muted); font-size: 13px; }
+  .chip { flex-shrink: 0; padding: 3px 7px; border: 1.5px solid; border-radius: 5px; font-size: 10px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; white-space: nowrap; }
+  .chip--available { color: #1d8047; background: #e8f8f0; border-color: #a9dfbf; }
+  .chip--soon { color: #5a6a7a; background: #f0f2f5; border-color: #c4cdd6; }
+  .chip--reserved { color: #7a4f00; background: #fff8e1; border-color: #ffd666; }
+  .chip--adopted { color: #c0392b; background: #fdf0f0; border-color: #f5b7b1; }
+  .pv-stopped { color: var(--muted); font-size: 14px; }
+
+  /* Lessons */
+  .lessons { display: grid; gap: 12px; }
+  .lesson { background: var(--card); border-radius: 14px; box-shadow: 0 1px 6px rgba(0,0,0,0.07); padding: 16px 18px; border: 2px solid transparent; }
+  .lesson--active { border-color: #4a90d9; }
+  .lesson--done { border-color: #a9dfbf; }
+  .lesson-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+  .lesson h3 { margin: 0; font-size: 17px; }
+  .lesson h3 .n { color: var(--muted); }
+  .lesson .why { margin: 4px 0 8px; color: var(--muted); font-size: 14.5px; }
+  .lesson ol { margin: 0 0 10px; padding-left: 20px; font-size: 15px; }
+  .lesson ol li { margin-bottom: 4px; }
+  .lesson-buttons { display: flex; gap: 8px; flex-wrap: wrap; }
+  .btn { padding: 8px 14px; border: none; border-radius: 8px; background: #2a78c8; color: white; font: 700 14px var(--sans); cursor: pointer; transition: transform 0.18s ease, box-shadow 0.18s ease, filter 0.18s ease; }
+  .btn:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.18); filter: brightness(1.08); }
+  .btn--quiet { background: #eef3f8; color: var(--ink); }
+  .lesson-status { font-size: 14px; font-weight: 700; color: var(--muted); }
+  .lesson--done .lesson-status { color: var(--green); }
+  .answer { display: none; margin-top: 10px; }
+  .answer.open { display: block; }
+
+  /* Reference */
+  .vsc { background: #1f1f1f; border-radius: 12px; color: #ccc; font: 13px/1.6 var(--mono); padding: 12px 14px; position: relative; overflow: hidden; }
+  .vsc .pop { margin-top: 6px; display: inline-block; background: #252526; border: 1px solid #454545; border-radius: 6px; box-shadow: 0 8px 24px rgba(0,0,0,0.45); font: 12.5px var(--sans); min-width: 220px; }
+  .vsc .pop div { padding: 3px 10px; }
+  .vsc .pop .sel { background: #04395e; color: white; }
+  .vsc .pop .det { border-top: 1px solid #454545; color: #bdbdbd; padding: 6px 10px; white-space: normal; max-width: 300px; }
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  table.ref { width: 100%; border-collapse: collapse; background: var(--card); border-radius: 12px; overflow: hidden; box-shadow: 0 1px 6px rgba(0,0,0,0.07); font-size: 14.5px; }
+  table.ref th, table.ref td { padding: 9px 12px; text-align: left; vertical-align: top; border-bottom: 1px solid #f0f4f8; }
+  table.ref th { background: #eef3f8; color: var(--muted); font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; }
+  table.ref td:first-child { white-space: nowrap; }
+  footer.foot { margin: 48px 0 32px; color: var(--muted); font-size: 14px; }
+
+  @media (max-width: 760px) {
+    .flow, .anatomy, .lab, .grid2 { grid-template-columns: 1fr; }
+    .editor-body { height: 380px; }
+  }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap">
+    <p class="kicker">Doro Family Puppies · hands-on guide</p>
+    <h1>Managing your litters</h1>
+    <p class="lede">Everything visitors see about the puppies comes from one file. This guide shows you how to change it with confidence — and there's a practice editor below where nothing you type can reach the real site.</p>
+  </div>
+</header>
+
+<main class="wrap">
+  <nav class="toc" aria-label="On this page">
+    <a href="#how">How it works</a>
+    <a href="#reading">Reading the file</a>
+    <a href="#practice">Practice editor</a>
+    <a href="#lessons">Lessons</a>
+    <a href="#vscode">In VS Code</a>
+    <a href="#photos">Photos</a>
+    <a href="#publish">Publishing</a>
+    <a href="#values">Allowed values</a>
+    <a href="#trouble">When the check says no</a>
+  </nav>
+
+  <section id="how">
+    <h2><span class="n">1</span>How it works</h2>
+    <p class="sub">The puppies, their litter, the dates and health details all live in <code>src/data/litters.json</code>. Photos live in folders next to it. You change the file; the site follows.</p>
+    <div class="flow">
+      <div><span class="n">1</span><b>Edit</b><span>Change a word in <code>litters.json</code> — a status, a weight, a date.</span></div>
+      <div><span class="n">2</span><b>Save</b><span>VS Code underlines anything that isn't allowed, right as you type.</span></div>
+      <div><span class="n">3</span><b>Publish</b><span>Commit and push. The site checks the file before anything changes.</span></div>
+      <div><span class="n">4</span><b>Live</b><span>A minute or two later, visitors see the update.</span></div>
+    </div>
+    <p class="note"><b>You can't break the live site.</b> If the file has a mistake, the update simply stops and the site stays exactly as it was. The message tells you where the mistake is and what to type instead.</p>
+  </section>
+
+  <section id="reading">
+    <h2><span class="n">2</span>Reading the file</h2>
+    <p class="sub">The file is a list of facts in a strict format called JSON. It looks busy at first, but it's only four kinds of thing.</p>
+    <div class="anatomy">
+<pre class="code"><span class="c">{ ← a group of facts starts</span>
+  <span class="k">"slug"</span>: <span class="s">"maple"</span>,          <span class="c">← a fact: "label": value</span>
+  <span class="k">"name"</span>: <span class="s">"Maple"</span>,
+  <span class="k">"status"</span>: <span class="s">"available"</span>,    <span class="c">← words go in "quotes"</span>
+  <span class="k">"color"</span>: [<span class="s">"white"</span>, <span class="s">"black"</span>], <span class="c">← [ ] is a list</span>
+  <span class="k">"weights"</span>: [
+    { <span class="k">"date"</span>: <span class="s">"2027-02-07"</span>, <span class="k">"oz"</span>: <span class="v">24.5</span> }
+  ]                           <span class="c">← numbers: no quotes</span>
+<span class="c">} ← the group ends</span></pre>
+      <div class="card">
+        <h3 style="margin-top:0">Three rules that prevent most mistakes</h3>
+        <ol class="rules">
+          <li><b>Words in "double quotes".</b> Numbers and <code>true</code> / <code>false</code> go without quotes.</li>
+          <li><b>A comma between items — never after the last one.</b> Adding something to a list? Put a comma after the item before it.</li>
+          <li><b>Everything that opens, closes.</b> Every <code>{</code> has its <code>}</code>, every <code>[</code> its <code>]</code>.</li>
+        </ol>
+        <p style="margin:12px 0 0; color: var(--muted); font-size: 15px">Values are lowercase: <code>"available"</code>, not <code>"Available"</code>. Dates are <code>YEAR-MONTH-DAY</code> with two-digit months and days: <code>"2027-02-07"</code>.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="practice">
+    <h2><span class="n">3</span>Practice editor</h2>
+    <p class="sub">This is a practice copy of the file — a made-up litter, nothing real. Type in it freely. On the right you'll see what the real check would say, and what visitors would see (pretending today is <b>Feb 14, 2027</b>).</p>
+    <div class="lab">
+      <div class="editor">
+        <div class="editor-bar"><b>litters.json</b> <span id="lesson-label">practice file</span> <button type="button" id="reset">Start over</button></div>
+        <div class="editor-body">
+          <div class="gutter" id="gutter" aria-hidden="true"></div>
+          <textarea class="src" id="src" spellcheck="false" autocapitalize="off" autocomplete="off" aria-label="Practice litters.json"></textarea>
+        </div>
+      </div>
+      <div class="results">
+        <div id="verdict" class="verdict" role="status" aria-live="polite"></div>
+        <div class="preview">
+          <div class="preview-head">What visitors would see</div>
+          <div class="preview-body" id="preview"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="lessons">
+    <h2><span class="n">4</span>Lessons</h2>
+    <p class="sub">Each lesson loads its own starting file into the practice editor above. Follow the steps; the lesson ticks itself off when you've got it.</p>
+    <div class="lessons" id="lesson-list"></div>
+  </section>
+
+  <section id="vscode">
+    <h2><span class="n">5</span>Doing it for real, in VS Code</h2>
+    <p class="sub">The real file works like the practice editor, with extra help: VS Code knows every allowed value and fills in whole puppies for you.</p>
+    <div class="grid2">
+      <div class="card">
+        <h3 style="margin-top:0">Open the file</h3>
+        <ol class="rules">
+          <li>Open the <code>puppy-sales-ui</code> folder in VS Code.</li>
+          <li>In the file list, open <code>src</code> → <code>data</code> → <code>litters.json</code>.</li>
+          <li>Make your change and save with <b>⌘ S</b>.</li>
+        </ol>
+        <h3>Let VS Code help</h3>
+        <ol class="rules">
+          <li><b>Allowed values:</b> click inside the quotes of a value and press <b>⌃ Space</b> (Control and Space). A list of every allowed value appears, each explained.</li>
+          <li><b>A whole new puppy:</b> click inside a litter's <code>"puppies": [ … ]</code> list and press <b>⌃ Space</b>, then choose <b>New puppy</b>. Press Tab to jump between the blanks. <b>New litter</b> works the same way inside <code>"litters"</code>.</li>
+          <li><b>Mistakes:</b> anything not allowed gets a wavy underline. Point at it to read why.</li>
+        </ol>
+      </div>
+      <div>
+        <div class="vsc" aria-label="Drawing: VS Code suggesting status values">
+          <div>"slug": "maple", "name": "Maple",</div>
+          <div>"status": "|"</div>
+          <div class="pop">
+            <div class="sel">"available"</div>
+            <div>"reserved"</div>
+            <div>"adopted"</div>
+            <div class="det" id="vsc-help"></div>
+          </div>
+        </div>
+        <p class="note" style="margin-top:12px">Want to see a change before it goes live? In VS Code's terminal run <code>npm run dev</code> and open the address it shows. A mistake appears there too, as a red box with the same message.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="photos">
+    <h2><span class="n">6</span>Photos</h2>
+    <p class="sub">Photos aren't in the file — they're in folders, and the folder names tie them to the file.</p>
+    <table class="ref">
+      <thead><tr><th>Photos of</th><th>Go in</th><th>Example</th></tr></thead>
+      <tbody>
+        <tr><td>The litter (Home's gallery)</td><td>the litter's folder</td><td><code>src/images/2027-01-coco-leo/</code></td></tr>
+        <tr><td>One puppy</td><td>a folder inside it, named after the puppy's slug</td><td><code>src/images/2027-01-coco-leo/maple/</code></td></tr>
+        <tr><td>The parents (small round icons only)</td><td>the parents folder</td><td><code>src/images/parents/coco.jpg</code></td></tr>
+      </tbody>
+    </table>
+    <ul style="margin-top:14px">
+      <li><b>Order:</b> photos show in file-name order. To lead with a different photo without renaming anything, add <code>"cover": "IMG_1876.jpeg"</code> to the puppy (or the litter) — spelled exactly like the file, capitals included.</li>
+      <li><b>Formats:</b> JPEG, PNG, WebP and AVIF work. iPhone <b>HEIC</b> photos don't show in browsers — export them as JPEG, or set <i>Settings → Camera → Formats → Most Compatible</i> so the phone saves JPEGs.</li>
+      <li><b>No photos yet?</b> That's fine. The puppy shows "Photos coming soon" until you add some.</li>
+      <li><b>Size doesn't matter:</b> drop in full-size photos. The site makes small copies for phones by itself.</li>
+    </ul>
+  </section>
+
+  <section id="publish">
+    <h2><span class="n">7</span>Publishing your changes</h2>
+    <p class="sub">"Publishing" means saving a snapshot of your change (a <i>commit</i>) and sending it to GitHub (a <i>push</i>). The site rebuilds itself from there.</p>
+    <div class="card">
+      <ol class="rules">
+        <li>In VS Code, click the <b>Source Control</b> icon in the left bar (it shows a number when files have changed).</li>
+        <li>Type a short note about what you changed — "Maple reserved", "Week 5 weights".</li>
+        <li>Click <b>Commit</b>, then <b>Sync Changes</b> (or <b>Push</b>).</li>
+        <li>Wait a minute or two and reload the site.</li>
+      </ol>
+      <p class="note note--warn" style="margin-bottom:0">Didn't change? On GitHub, the latest commit shows a red ✗ when the check stopped the update. Click it to read the message — it's the same one you'd see here — fix the file, and publish again.</p>
+    </div>
+  </section>
+
+  <section id="values">
+    <h2><span class="n">8</span>Allowed values</h2>
+    <p class="sub">Read straight from <code>litters.schema.json</code> — the same list VS Code suggests and the check enforces. Add a new word there (say, a new color) and all three know it.</p>
+    <div id="values-list" class="grid2"></div>
+  </section>
+
+  <section id="trouble">
+    <h2><span class="n">9</span>When the check says no</h2>
+    <p class="sub">Every message names the place (litter › puppy › field) and what to do. The ones you're most likely to meet:</p>
+    <table class="ref">
+      <thead><tr><th>The message says</th><th>What to do</th></tr></thead>
+      <tbody>
+        <tr><td><code>"Available" isn't an allowed value … Did you mean "available"?</code></td><td>Values are lowercase. Use the suggestion.</td></tr>
+        <tr><td><code>"2027-2-7" doesn't fit. Write dates as YYYY-MM-DD</code></td><td>Use two-digit months and days: <code>2027-02-07</code>.</td></tr>
+        <tr><td><code>Should be a plain number, like 31.5 — not "31.5 oz"</code></td><td>Weights are numbers of ounces, with no quotes and no "oz".</td></tr>
+        <tr><td><code>This isn't valid JSON … missing or extra comma</code></td><td>Look at the line it names (and the one before): a comma missing between items, an extra one after the last item, or a missing quote.</td></tr>
+        <tr><td><code>"status" is missing — every puppy needs it</code></td><td>Every puppy needs a slug, name, sex and status.</td></tr>
+        <tr><td><code>The slug "bella" is already used …</code></td><td>Each puppy needs its own slug, across every litter. Try <code>bella-2</code>.</td></tr>
+        <tr><td><code>"IMG_1876.jpg" isn't in src/images/… The file there is "IMG_1876.JPEG"</code></td><td>Copy the file name exactly, capitals included.</td></tr>
+        <tr><td><code>No litter has "listed": true</code></td><td>Keep at least one litter listed — the sold-out one is fine until the next arrives.</td></tr>
+      </tbody>
+    </table>
+    <p style="color: var(--muted)">Some messages are only <b>warnings</b> — a puppy with no photos yet, a HEIC file. They never stop an update.</p>
+  </section>
+
+  <footer class="foot">The practice editor runs the site's real check: this page carries exact copies of <code>src/data/checkLitters.js</code>, <code>src/utils.js</code> and <code>src/data/litters.schema.json</code>, refreshed by <code>node scripts/syncTutorial.js</code> (the tests fail if they fall behind).</footer>
+</main>
+
+<script type="text/plain" id="src-checker">/* BEGIN src/data/checkLitters.js */
+// Checks litters.json against litters.schema.json, plus the rules a schema can't
+// express: real dates, unique slugs, photos that exist. It is pure — folder listings
+// are passed in — so the build, the dev server, the tests and the tutorial's editor
+// all run exactly the same checks.
+
+const WEB_PHOTO = /\.(jpe?g|png|gif|webp|avif)$/i;
+const RESERVED_SLUGS = ['contact'];
+const RESERVED_LITTER_IDS = ['parents'];
+const CONTAINER_NOUNS = { litters: 'litter', puppies: 'puppy', weights: 'weigh-in', care: 'care step' };
+
+export function checkLitters(data, schema, { files } = {}) {
+  const report = { errors: [], warnings: [] };
+  const ctx = { schema, data, report };
+  validate(schema, data, [], ctx);
+  if (report.errors.length > 0) return report;
+  checkRules(data, ctx);
+  if (files) checkFiles(data, files, ctx);
+  return report;
+}
+
+export function checkLittersText(text, schema, options) {
+  try {
+    return checkLitters(JSON.parse(text), schema, options);
+  } catch (err) {
+    if (!(err instanceof SyntaxError)) throw err;
+    return {
+      errors: [{ where: 'litters.json', message: `This isn't valid JSON: ${err.message}. Usually a missing or extra comma, or a missing quote.` }],
+      warnings: [],
+    };
+  }
+}
+
+export function formatReport({ errors, warnings }, mode = 'build') {
+  const lines = [];
+  const plural = (n, word) => `${n} ${word}${n === 1 ? '' : 's'}`;
+  if (errors.length > 0) {
+    lines.push(mode === 'build'
+      ? `✗ Puppy data has ${plural(errors.length, 'problem')} — build stopped. The live site is unchanged.`
+      : `✗ Puppy data has ${plural(errors.length, 'problem')} — fix and save, and the page reloads.`);
+    for (const e of errors) lines.push('', `  ${e.where}`, `  ${e.message}`);
+  }
+  if (warnings.length > 0) {
+    if (lines.length > 0) lines.push('');
+    lines.push(`⚠ ${plural(warnings.length, 'warning')} — the site still works`);
+    for (const w of warnings) lines.push('', `  ${w.where}`, `  ${w.message}`);
+  }
+  return lines.join('\n');
+}
+
+// ── Reporting ──────────────────────────────────────────────────────────────
+
+function add(ctx, kind, where, message) {
+  const label = typeof where === 'string' ? where : describePath(where, ctx.data);
+  ctx.report[kind].push({ where: label, message });
+}
+
+// ['litters', 0, 'puppies', 3, 'status'] → "2026-06-coco-leo › olive › status"
+function describePath(path, data) {
+  const parts = [];
+  let node = data;
+  path.forEach((key, i) => {
+    node = node?.[key];
+    if (typeof key !== 'number') {
+      if (key !== 'litters' && key !== 'puppies') parts.push(key);
+      return;
+    }
+    const container = path[i - 1];
+    if (container === 'litters') parts.push(node?.id || `litter ${key + 1}`);
+    else if (container === 'puppies') parts.push(node?.slug || `puppy ${key + 1}`);
+    else parts[parts.length - 1] = `${parts[parts.length - 1]} #${key + 1}`;
+  });
+  return parts.join(' › ') || 'litters.json';
+}
+
+function nounFor(path) {
+  const last = path[path.length - 1];
+  if (typeof last === 'number') return CONTAINER_NOUNS[path[path.length - 2]] ?? 'entry';
+  if (last === 'mom' || last === 'dad') return 'parent';
+  return 'entry';
+}
+
+// ── Schema (the subset litters.schema.json uses) ───────────────────────────
+
+function resolve(node, schema) {
+  if (!node.$ref) return node;
+  const target = node.$ref.replace(/^#\//, '').split('/').reduce((obj, key) => obj[key], schema);
+  return resolve(target, schema);
+}
+
+function validate(node, value, path, ctx) {
+  const s = resolve(node, ctx.schema);
+  if (s.type && !hasType(value, s.type)) return add(ctx, 'errors', path, typeMessage(s.type, value));
+  if (s.enum && !s.enum.includes(value)) return add(ctx, 'errors', path, enumMessage(s.enum, value));
+
+  if (typeof value === 'string') {
+    if (s.minLength && value.trim().length < s.minLength) add(ctx, 'errors', path, "Can't be empty. Fill it in, or leave the field out.");
+    if (s.pattern && !new RegExp(s.pattern).test(value)) add(ctx, 'errors', path, `"${value}" doesn't fit. ${s.patternErrorMessage ?? ''}`.trim());
+  }
+  if (typeof value === 'number') {
+    if (s.exclusiveMinimum !== undefined && !(value > s.exclusiveMinimum)) add(ctx, 'errors', path, `Must be more than ${s.exclusiveMinimum}.`);
+    if (s.minimum !== undefined && value < s.minimum) add(ctx, 'errors', path, `Must be at least ${s.minimum}.`);
+  }
+  if (Array.isArray(value)) validateList(s, value, path, ctx);
+  if (isPlainObject(value)) validateFields(s, value, path, ctx);
+}
+
+function validateList(s, value, path, ctx) {
+  if (s.minItems !== undefined && value.length < s.minItems) add(ctx, 'errors', path, `Needs at least ${s.minItems} ${s.minItems === 1 ? 'entry' : 'entries'}.`);
+  if (s.maxItems !== undefined && value.length > s.maxItems) add(ctx, 'errors', path, `Can hold at most ${s.maxItems} entries.`);
+  if (s.uniqueItems) {
+    const repeated = value.find((v, i) => value.indexOf(v) !== i);
+    if (repeated !== undefined) add(ctx, 'errors', path, `Lists "${repeated}" twice.`);
+  }
+  if (s.items) value.forEach((item, i) => validate(s.items, item, [...path, i], ctx));
+}
+
+function validateFields(s, value, path, ctx) {
+  const allowed = Object.keys(s.properties ?? {}).filter((k) => k !== '$schema');
+  for (const key of s.required ?? []) {
+    if (!(key in value)) add(ctx, 'errors', path, `"${key}" is missing — every ${nounFor(path)} needs it.`);
+  }
+  for (const [key, v] of Object.entries(value)) {
+    if (s.properties?.[key]) validate(s.properties[key], v, [...path, key], ctx);
+    else if (s.additionalProperties === false) add(ctx, 'errors', [...path, key], unknownFieldMessage(key, allowed));
+  }
+}
+
+function hasType(value, type) {
+  if (type === 'object') return isPlainObject(value);
+  if (type === 'array') return Array.isArray(value);
+  if (type === 'integer') return Number.isInteger(value);
+  if (type === 'number') return typeof value === 'number' && Number.isFinite(value);
+  return typeof value === type;
+}
+
+function isPlainObject(value) {
+  return value !== null && typeof value === 'object' && !Array.isArray(value);
+}
+
+function typeMessage(type, value) {
+  if (type === 'number' && typeof value === 'string' && !Number.isNaN(parseFloat(value))) {
+    return `Should be a plain number, like ${parseFloat(value)} — not "${value}".`;
+  }
+  if (type === 'boolean' && (value === 'true' || value === 'false')) return `Should be ${value} without quotes.`;
+  const wanted = {
+    string: 'text in quotes, like "Bella"',
+    number: 'a number, like 27.8',
+    integer: 'a whole number, like 5',
+    boolean: 'true or false, without quotes',
+    array: 'a list in square brackets: [ … ]',
+    object: 'a group in curly braces: { … }',
+  };
+  return `Should be ${wanted[type] ?? type}.`;
+}
+
+function enumMessage(allowed, value) {
+  const shown = typeof value === 'string' ? `"${value}"` : JSON.stringify(value);
+  const suggestion = typeof value === 'string' ? closest(value, allowed) : null;
+  const hint = suggestion ? ` Did you mean "${suggestion}"?` : '';
+  return `${shown} isn't an allowed value. Use one of: ${allowed.join(', ')}.${hint}`;
+}
+
+function unknownFieldMessage(key, allowed) {
+  const suggestion = closest(key, allowed);
+  if (suggestion) return `"${key}" isn't a field here. Did you mean "${suggestion}"?`;
+  return `"${key}" isn't a field here. The fields are: ${allowed.join(', ')}.`;
+}
+
+function closest(word, options) {
+  const lower = word.toLowerCase();
+  const exact = options.find((o) => String(o).toLowerCase() === lower);
+  if (exact) return exact;
+  let best = null;
+  let bestDistance = 3;
+  for (const option of options) {
+    const d = editDistance(lower, String(option).toLowerCase());
+    if (d < bestDistance) { best = option; bestDistance = d; }
+  }
+  return best;
+}
+
+function editDistance(a, b) {
+  const row = Array.from({ length: b.length + 1 }, (_, i) => i);
+  for (let i = 1; i <= a.length; i++) {
+    let prev = row[0];
+    row[0] = i;
+    for (let j = 1; j <= b.length; j++) {
+      const current = row[j];
+      row[j] = Math.min(row[j] + 1, row[j - 1] + 1, prev + (a[i - 1] === b[j - 1] ? 0 : 1));
+      prev = current;
+    }
+  }
+  return row[b.length];
+}
+
+// ── Rules a schema can't express ───────────────────────────────────────────
+
+function checkRules(data, ctx) {
+  const { litters } = data;
+  if (!litters.some((litter) => litter.listed)) {
+    add(ctx, 'errors', ['litters'], 'No litter has "listed": true, so Home would have nothing to show. Keep the last litter listed until the next one goes in.');
+  }
+
+  const litterIds = new Set();
+  const slugOwners = new Map();
+  litters.forEach((litter, li) => {
+    const lp = ['litters', li];
+    if (litterIds.has(litter.id)) add(ctx, 'errors', [...lp, 'id'], `Two litters use the id "${litter.id}". Each needs its own.`);
+    litterIds.add(litter.id);
+    if (RESERVED_LITTER_IDS.includes(litter.id)) {
+      add(ctx, 'errors', [...lp, 'id'], `"${litter.id}" can't be a litter id — src/images/${litter.id}/ holds the parents' photos.`);
+    }
+
+    for (const field of ['due', 'born', 'readyDate']) checkRealDate(litter[field], [...lp, field], ctx);
+    (litter.care ?? []).forEach((step, ci) => checkRealDate(step.date, [...lp, 'care', ci, 'date'], ctx));
+    if (litter.born && litter.readyDate && litter.readyDate < litter.born) {
+      add(ctx, 'errors', [...lp, 'readyDate'], `readyDate (${formatDay(litter.readyDate)}) is before born (${formatDay(litter.born)}).`);
+    }
+    if (!litter.born && !litter.due) add(ctx, 'warnings', lp, 'Has neither "due" nor "born", so the site can\'t say when.');
+    if (litter.litterSize !== undefined && litter.litterSize < litter.puppies.length) {
+      add(ctx, 'warnings', [...lp, 'litterSize'], `litterSize is ${litter.litterSize}, but ${litter.puppies.length} puppies are listed.`);
+    }
+
+    litter.puppies.forEach((puppy, pi) => {
+      const pp = [...lp, 'puppies', pi];
+      if (RESERVED_SLUGS.includes(puppy.slug)) {
+        add(ctx, 'errors', [...pp, 'slug'], `"${puppy.slug}" can't be a slug — /${puppy.slug} is the address of a page.`);
+      }
+      const owner = slugOwners.get(puppy.slug);
+      if (owner) add(ctx, 'errors', [...pp, 'slug'], `The slug "${puppy.slug}" is already used in ${owner}. Add a number, e.g. "${puppy.slug}-2".`);
+      else slugOwners.set(puppy.slug, litter.id);
+
+      (puppy.weights ?? []).forEach((weight, wi) => {
+        const wp = [...pp, 'weights', wi, 'date'];
+        checkRealDate(weight.date, wp, ctx);
+        if (litter.born && weight.date < litter.born) {
+          add(ctx, 'errors', wp, `This weigh-in (${formatDay(weight.date)}) is before the litter was born (${formatDay(litter.born)}).`);
+        }
+      });
+      for (const field of ['markings', 'personality']) {
+        if (puppy[field] && /^[a-z]/.test(puppy[field])) {
+          add(ctx, 'warnings', [...pp, field], `Starts with a lowercase letter: "${puppy[field]}". Start it with a capital.`);
+        }
+      }
+    });
+  });
+}
+
+function checkRealDate(value, path, ctx) {
+  if (!value || isRealDate(value)) return;
+  add(ctx, 'errors', path, `"${value}" isn't a real date.`);
+}
+
+function isRealDate(value) {
+  const [y, m, d] = value.split('-').map(Number);
+  const date = new Date(Date.UTC(y, m - 1, d));
+  return date.getUTCFullYear() === y && date.getUTCMonth() === m - 1 && date.getUTCDate() === d;
+}
+
+function formatDay(value) {
+  const [y, m, d] = value.split('-').map(Number);
+  return new Date(Date.UTC(y, m - 1, d)).toLocaleDateString('en-US', { timeZone: 'UTC', month: 'short', day: 'numeric', year: 'numeric' });
+}
+
+// ── Photos ─────────────────────────────────────────────────────────────────
+
+// files: { 'parents': ['coco.jpg'], '2026-06-coco-leo': [...], '2026-06-coco-leo/bella': [...] }
+// Names are compared exactly: the Mac ignores capitals in file names, the Linux build doesn't.
+function checkFiles(data, files, ctx) {
+  const expected = new Set(['parents']);
+  data.litters.forEach((litter, li) => {
+    const lp = ['litters', li];
+    expected.add(litter.id);
+    if (litter.cover) needFile(files[litter.id], litter.cover, `src/images/${litter.id}/`, [...lp, 'cover'], ctx);
+    for (const parent of ['mom', 'dad']) {
+      if (litter[parent].photo) needFile(files.parents, litter[parent].photo, 'src/images/parents/', [...lp, parent, 'photo'], ctx);
+    }
+    litter.puppies.forEach((puppy, pi) => {
+      const pp = [...lp, 'puppies', pi];
+      const folder = `${litter.id}/${puppy.slug}`;
+      expected.add(folder);
+      const names = files[folder];
+      if (!names) add(ctx, 'warnings', pp, `No photo folder yet — make src/images/${folder}/. Until then the page says "Photos coming soon".`);
+      else if (!names.some((n) => WEB_PHOTO.test(n))) add(ctx, 'warnings', pp, `src/images/${folder}/ has no photos yet, so the page says "Photos coming soon".`);
+      if (puppy.cover) needFile(names, puppy.cover, `src/images/${folder}/`, [...pp, 'cover'], ctx);
+    });
+  });
+
+  for (const [folder, names] of Object.entries(files)) {
+    if (!expected.has(folder)) {
+      add(ctx, 'warnings', `src/images/${folder}/`, "This folder doesn't belong to any litter or puppy in litters.json, so its photos aren't shown.");
+    }
+    for (const name of names) {
+      if (!WEB_PHOTO.test(name)) add(ctx, 'warnings', `src/images/${folder}/${name}`, "Not a photo format browsers can show, so it's skipped. Save it as a JPEG.");
+    }
+  }
+}
+
+function needFile(names, name, where, path, ctx) {
+  if (names?.includes(name)) return;
+  const near = names?.find((n) => n.toLowerCase() === name.toLowerCase());
+  const hint = near
+    ? ` The file there is "${near}" — names must match exactly, capitals included.`
+    : '';
+  add(ctx, 'errors', path, `"${name}" isn't in ${where}.${hint}`);
+}
+/* END src/data/checkLitters.js */</script>
+<script type="text/plain" id="src-utils">/* BEGIN src/utils.js */
+// light: bars, paws and borders. strong: text and button fills — dark enough for
+// white text and small type to pass WCAG AA (4.5:1).
+export const ACCENTS = {
+  female: { light: "#e91e8c", strong: "#df1683" },
+  male: { light: "#4a90d9", strong: "#2a78c8" },
+  neutral: { light: "#8a9bb0", strong: "#5d718a" },
+};
+export const DEPOSIT_AMOUNT = 100;
+
+const DAY_MS = 24 * 60 * 60 * 1000;
+const OZ_PER_LB = 16;
+const POUNDS_FROM_OZ = 32;
+
+export function capitalize(text) {
+  return text.charAt(0).toUpperCase() + text.slice(1);
+}
+
+// "Havapoo" → "Havapoos", "Poodle mix" → "Poodle mixes"
+export function pluralize(word) {
+  return /(s|x|z|ch|sh)$/i.test(word) ? `${word}es` : `${word}s`;
+}
+
+// The opening of a description, short enough for a card: its first sentence, or —
+// when that runs long — the words up to its first comma.
+export function firstClause(text, maxLength = 90) {
+  const sentence = text.split(/(?<=[.!?])\s/)[0];
+  if (sentence.length <= maxLength) return sentence;
+  const clause = sentence.split(",")[0].trim();
+  return clause.length < sentence.length ? `${clause}.` : sentence;
+}
+
+// Today's local calendar date as YYYY-MM-DD. Compare these strings, never timestamps:
+// a timestamp comparison flips at the wrong hour in every time zone but UTC.
+export function todayString(now = new Date()) {
+  const pad = (n) => String(n).padStart(2, "0");
+  return `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`;
+}
+
+// UTC arithmetic on calendar dates, so a daylight-saving change can't make a day 23 hours long.
+function dayNumber(value) {
+  const [y, m, d] = value.split("-").map(Number);
+  return Date.UTC(y, m - 1, d) / DAY_MS;
+}
+
+export function daysBetween(from, to) {
+  return dayNumber(to) - dayNumber(from);
+}
+
+// "2026-06-02" → "Jun 2", or "Jun 2, 2026" with { withYear: true }
+export function formatDay(value, { withYear = false } = {}) {
+  const [y, m, d] = value.split("-").map(Number);
+  return new Date(Date.UTC(y, m - 1, d)).toLocaleDateString("en-US", {
+    timeZone: "UTC",
+    month: "short",
+    day: "numeric",
+    ...(withYear ? { year: "numeric" } : {}),
+  });
+}
+
+// "2026-06-02" → "June 2026"
+export function formatMonthYear(value) {
+  const [y, m] = value.split("-").map(Number);
+  return new Date(Date.UTC(y, m - 1, 1)).toLocaleDateString("en-US", { timeZone: "UTC", month: "long", year: "numeric" });
+}
+
+function formatSpan(days) {
+  if (days < 7) return `${days} day${days === 1 ? "" : "s"}`;
+  const weeks = Math.floor(days / 7);
+  return `${weeks} week${weeks === 1 ? "" : "s"}`;
+}
+
+// "5 weeks old"; "born today" on the day itself
+export function formatAge(born, on) {
+  const days = daysBetween(born, on);
+  if (days <= 0) return "born today";
+  return `${formatSpan(days)} old`;
+}
+
+// 27.8 → "27.8 oz"; from 32 oz on, pounds: 36 → "2 lb 4 oz"
+export function formatOunces(oz) {
+  const tenth = (n) => Math.round(n * 10) / 10;
+  if (oz < POUNDS_FROM_OZ) return `${tenth(oz)} oz`;
+  const pounds = Math.floor(oz / OZ_PER_LB);
+  const rest = tenth(oz - pounds * OZ_PER_LB);
+  return rest ? `${pounds} lb ${rest} oz` : `${pounds} lb`;
+}
+
+// The latest weigh-in, with the puppy's age that day: "27.8 oz at 3 weeks"
+export function formatWeight(weights, born) {
+  if (!weights?.length) return null;
+  const latest = weights.reduce((a, b) => (b.date >= a.date ? b : a));
+  if (!born) return formatOunces(latest.oz);
+  return `${formatOunces(latest.oz)} at ${formatSpan(daysBetween(born, latest.date))}`;
+}
+
+// ["white", "black"] + "parti" → "White & black parti"; ["brown"] + "solid" → "Solid brown"
+export function formatCoat(colors = [], pattern) {
+  if (colors.length === 0) return pattern ? capitalize(pattern) : null;
+  const names = colors.length === 1
+    ? colors[0]
+    : `${colors.slice(0, -1).join(", ")} & ${colors[colors.length - 1]}`;
+  if (!pattern) return capitalize(names);
+  if (pattern === "solid") return `Solid ${names}`;
+  return capitalize(`${names} ${pattern}`);
+}
+
+// Moves the photo named `cover` to the front; without one, file-name order stands.
+export function withCoverFirst(photos, cover) {
+  const index = cover ? photos.findIndex((p) => p.name === cover) : -1;
+  if (index <= 0) return photos;
+  return [photos[index], ...photos.slice(0, index), ...photos.slice(index + 1)];
+}
+
+export function isLikelyBot() {
+  if (navigator.webdriver) return true;
+  return /bot|crawl|spider|scrape|headless|phantom|selenium|puppeteer/i.test(navigator.userAgent);
+}
+/* END src/utils.js */</script>
+<script type="text/plain" id="src-schema">/* BEGIN src/data/litters.schema.json */
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Doro Family Puppies — litters",
+  "description": "Every litter and puppy on the site. Edit litters.json; this file lists what each field may hold.",
+  "type": "object",
+  "required": ["litters"],
+  "additionalProperties": false,
+  "properties": {
+    "$schema": { "type": "string" },
+    "litters": {
+      "description": "Newest first. The site shows every litter whose listed is true.",
+      "type": "array",
+      "items": { "$ref": "#/definitions/litter" }
+    }
+  },
+  "definitions": {
+    "date": {
+      "type": "string",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$",
+      "patternErrorMessage": "Write dates as YYYY-MM-DD, e.g. 2026-07-04."
+    },
+    "slug": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+      "patternErrorMessage": "Lowercase letters, numbers and dashes only, e.g. bella or mr-pickles."
+    },
+    "text": { "type": "string", "minLength": 1 },
+    "parent": {
+      "type": "object",
+      "required": ["name", "breed"],
+      "additionalProperties": false,
+      "properties": {
+        "name": { "$ref": "#/definitions/text", "description": "The parent's name, e.g. Coco." },
+        "breed": { "$ref": "#/definitions/text", "description": "e.g. Havapoo." },
+        "photo": { "type": "string", "description": "A file in src/images/parents/, shown only as a small round icon on the litter card." }
+      }
+    },
+    "sex": {
+      "description": "Sets the pink or blue accent and paw.",
+      "enum": ["female", "male"],
+      "enumDescriptions": ["Pink accent. Shows Female.", "Blue accent. Shows Male."]
+    },
+    "status": {
+      "description": "What a visitor can do. The Ready (date) badge is never typed: it comes from the litter's readyDate.",
+      "enum": ["available", "reserved", "adopted"],
+      "enumDescriptions": [
+        "Shows the Inquire button. Before the litter's readyDate the badge reads Ready and the date, e.g. Ready Jul 28.",
+        "Deposit paid. Amber badge; the page points to littermates still available.",
+        "Gone home. The page points to littermates still available, or the waitlist."
+      ]
+    },
+    "color": {
+      "enum": ["white", "cream", "apricot", "gold", "red", "brown", "black", "silver"],
+      "enumDescriptions": [
+        "White.",
+        "Pale, off-white.",
+        "Light orange-gold.",
+        "Deeper yellow-gold.",
+        "Deep red-orange.",
+        "Brown. Breed clubs call it chocolate.",
+        "Black.",
+        "Born dark, clears to grey-silver."
+      ]
+    },
+    "pattern": {
+      "description": "Joins the color on the page: White and black parti.",
+      "enum": ["solid", "parti", "tuxedo", "phantom", "abstract", "sable", "brindle", "merle"],
+      "enumDescriptions": [
+        "One color all over.",
+        "Mostly white with patches of a second color.",
+        "Solid, with a white chest, belly and feet.",
+        "Two colors, with tan or cream points on face, chest and legs.",
+        "Solid, with small white marks.",
+        "Darker tips on lighter hair; often lightens with age.",
+        "Striped, like a tiger.",
+        "Marbled patches of a diluted color."
+      ]
+    },
+    "careType": {
+      "enum": ["vet-check", "dewormed", "vaccinated", "microchipped"],
+      "enumDescriptions": ["Shows Vet checked.", "Shows Dewormed and the date.", "Shows Vaccinated, the date and the note.", "Shows Microchipped."]
+    },
+    "careEvent": {
+      "type": "object",
+      "required": ["type"],
+      "additionalProperties": false,
+      "properties": {
+        "type": { "$ref": "#/definitions/careType" },
+        "date": { "$ref": "#/definitions/date" },
+        "note": { "type": "string", "description": "e.g. First DHPP." }
+      }
+    },
+    "weight": {
+      "type": "object",
+      "required": ["date", "oz"],
+      "additionalProperties": false,
+      "properties": {
+        "date": { "$ref": "#/definitions/date" },
+        "oz": { "type": "number", "exclusiveMinimum": 0, "description": "Ounces as a number: 27.8, not \"27.8 oz\"." }
+      }
+    },
+    "puppy": {
+      "type": "object",
+      "required": ["slug", "name", "sex", "status"],
+      "additionalProperties": false,
+      "properties": {
+        "slug": { "$ref": "#/definitions/slug", "description": "Unique across all litters. Also the photo folder: src/images/(litter id)/(slug)/." },
+        "name": { "$ref": "#/definitions/text" },
+        "sex": { "$ref": "#/definitions/sex" },
+        "status": { "$ref": "#/definitions/status" },
+        "color": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 3,
+          "uniqueItems": true,
+          "items": { "$ref": "#/definitions/color" },
+          "description": "Main color first, e.g. [\"white\", \"black\"]."
+        },
+        "pattern": { "$ref": "#/definitions/pattern" },
+        "markings": { "$ref": "#/definitions/text", "description": "A short phrase starting with a capital, e.g. Black spot on left eye." },
+        "personality": { "$ref": "#/definitions/text", "description": "One to three words, e.g. Chill cuddler." },
+        "weights": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/weight" },
+          "description": "Append one entry per weigh-in. The page shows the latest with the puppy's age."
+        },
+        "cover": { "type": "string", "description": "A file in this puppy's folder to show first. Default: the first file alphabetically." }
+      },
+      "defaultSnippets": [
+        {
+          "label": "New puppy",
+          "description": "Then make the folder src/images/(litter id)/(slug)/",
+          "body": {
+            "slug": "${1:name}",
+            "name": "${2:Name}",
+            "sex": "${3|female,male|}",
+            "status": "available",
+            "color": ["${4|white,cream,apricot,gold,red,brown,black,silver|}"],
+            "markings": "$5",
+            "personality": "$6",
+            "weights": []
+          }
+        }
+      ]
+    },
+    "litter": {
+      "type": "object",
+      "required": ["id", "listed", "breed", "mom", "dad", "puppies"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "$ref": "#/definitions/slug", "description": "Year-month-mom-dad, e.g. 2026-06-coco-leo. Never rename once photos exist: it is the folder name." },
+        "listed": { "type": "boolean", "description": "false hides this litter from the site without deleting anything." },
+        "breed": { "$ref": "#/definitions/text" },
+        "mom": { "$ref": "#/definitions/parent" },
+        "dad": { "$ref": "#/definitions/parent" },
+        "due": { "$ref": "#/definitions/date", "description": "While expecting. The site shows Due (date) until born is set." },
+        "born": { "$ref": "#/definitions/date" },
+        "readyDate": { "$ref": "#/definitions/date", "description": "Ready to go home. Until then, available puppies' badges read Ready and this date." },
+        "litterSize": { "type": "integer", "minimum": 1, "description": "Only if not every puppy is listed. Otherwise the puppies are counted." },
+        "care": { "type": "array", "items": { "$ref": "#/definitions/careEvent" } },
+        "description": { "$ref": "#/definitions/text" },
+        "facts": { "type": "array", "items": { "$ref": "#/definitions/text" }, "description": "Key breed facts, one short sentence each." },
+        "cover": { "type": "string", "description": "A file in src/images/(litter id)/ to lead Home's gallery. Default: the first file alphabetically." },
+        "puppies": { "type": "array", "items": { "$ref": "#/definitions/puppy" } }
+      },
+      "defaultSnippets": [
+        {
+          "label": "New litter",
+          "description": "An expecting litter. Add born, readyDate and puppies when they arrive.",
+          "body": {
+            "id": "${1:2027-01-coco-leo}",
+            "listed": true,
+            "breed": "${2:Havapoo}",
+            "mom": { "name": "${3:Coco}", "breed": "${2:Havapoo}", "photo": "${4:coco.jpg}" },
+            "dad": { "name": "${5:Leo}", "breed": "${2:Havapoo}", "photo": "${6:leo.jpg}" },
+            "due": "${7:2027-01-12}",
+            "puppies": []
+          }
+        }
+      ]
+    }
+  }
+}
+/* END src/data/litters.schema.json */</script>
+
+<script type="module">
+// The site's own code, loaded from the copies above — each in its own module, as in the app.
+const source = (id) => document.getElementById(id).textContent;
+const load = (id) => import(URL.createObjectURL(new Blob([source(id)], { type: 'text/javascript' })));
+const [{ checkLittersText }, { formatCoat, formatDay, formatWeight }] = await Promise.all([load('src-checker'), load('src-utils')]);
+const SCHEMA = JSON.parse(source('src-schema').replace(/\/\*[\s\S]*?\*\//g, ''));
+
+const TODAY = '2027-02-14';
+const STATUS_LABELS = { available: 'Available', reserved: 'Reserved', adopted: 'Adopted' };
+const CARE_LABELS = { 'vet-check': 'Vet checked', dewormed: 'Dewormed', vaccinated: 'Vaccinated', microchipped: 'Microchipped' };
+
+const PRACTICE = `{
+  "$schema": "./litters.schema.json",
+  "litters": [
+    {
+      "id": "2027-01-coco-leo",
+      "listed": true,
+      "breed": "Havapoo",
+      "mom": { "name": "Coco", "breed": "Havapoo" },
+      "dad": { "name": "Leo", "breed": "Havapoo" },
+      "born": "2027-01-10",
+      "readyDate": "2027-03-07",
+      "care": [
+        { "type": "dewormed", "date": "2027-02-07" }
+      ],
+      "puppies": [
+        {
+          "slug": "maple", "name": "Maple", "sex": "female", "status": "available",
+          "color": ["white", "black"], "pattern": "parti",
+          "markings": "Black ears", "personality": "Bold and curious",
+          "weights": [
+            { "date": "2027-02-07", "oz": 24.5 }
+          ]
+        },
+        {
+          "slug": "rocky", "name": "Rocky", "sex": "male", "status": "available",
+          "color": ["brown"], "pattern": "solid",
+          "personality": "Sleepy cuddler",
+          "weights": [
+            { "date": "2027-02-07", "oz": 27.1 }
+          ]
+        }
+      ]
+    }
+  ]
+}`;
+
+const parse = (text) => { try { return JSON.parse(text); } catch { return null; } };
+const firstLitter = (data) => data?.litters?.[0];
+const puppy = (data, slug) => data?.litters?.flatMap((l) => l.puppies ?? []).find((p) => p.slug === slug);
+
+const LESSONS = [
+  {
+    title: 'Mark a puppy reserved',
+    why: 'The change you’ll make most often: one word.',
+    steps: [
+      'In the editor, find Rocky (look for <code>"name": "Rocky"</code>).',
+      'On the same line, change <code>"available"</code> to <code>"reserved"</code>. Keep the quotes; keep it lowercase.',
+      'Watch his badge on the right turn to Reserved.',
+    ],
+    start: PRACTICE,
+    answer: '"slug": "rocky", "name": "Rocky", "sex": "male", "status": "reserved",',
+    isDone: (data) => puppy(data, 'rocky')?.status === 'reserved',
+  },
+  {
+    title: 'Fix a typo from the message',
+    why: 'A capital letter is enough to stop an update. The message tells you exactly what to change.',
+    steps: [
+      'Read the red box on the right: it names the litter, the puppy and the field.',
+      'Find that spot in the editor and type what the message suggests.',
+      'The red box turns green when the file is right again.',
+    ],
+    start: PRACTICE.replace('"slug": "maple", "name": "Maple", "sex": "female", "status": "available"', '"slug": "maple", "name": "Maple", "sex": "female", "status": "Available"'),
+    answer: '"status": "available"  ← lowercase, like every value',
+    isDone: (data) => puppy(data, 'maple')?.status === 'available',
+  },
+  {
+    title: 'Add this week’s weight',
+    why: 'Weigh-ins are a list: you add a line instead of replacing one. This is the lesson about commas.',
+    steps: [
+      'Find Maple’s <code>"weights"</code> list.',
+      'Put a comma right after <code>{ "date": "2027-02-07", "oz": 24.5 }</code>.',
+      'On the next line add <code>{ "date": "2027-02-14", "oz": 31.5 }</code> — no comma after it, because it’s now the last item.',
+      'Maple’s weight on the right becomes “31.5 oz at 5 weeks”.',
+    ],
+    start: PRACTICE,
+    answer: `"weights": [
+  { "date": "2027-02-07", "oz": 24.5 },
+  { "date": "2027-02-14", "oz": 31.5 }
+]`,
+    isDone: (data) => (puppy(data, 'maple')?.weights ?? []).some((w) => w.date === '2027-02-14'),
+  },
+  {
+    title: 'Record a vet check',
+    why: 'Health steps buyers look for. Each kind gets its own tile on Home the day you add it.',
+    steps: [
+      'Find the litter’s <code>"care"</code> list.',
+      'After the dewormed line, add a comma and <code>{ "type": "vet-check", "date": "2027-02-12" }</code>.',
+      'A “Vet checked” tile appears on the right.',
+    ],
+    start: PRACTICE,
+    answer: `"care": [
+  { "type": "dewormed", "date": "2027-02-07" },
+  { "type": "vet-check", "date": "2027-02-12" }
+],`,
+    isDone: (data) => (firstLitter(data)?.care ?? []).some((c) => c.type === 'vet-check'),
+  },
+  {
+    title: 'Add a puppy',
+    why: 'In VS Code, ⌃ Space → New puppy writes this for you. Here, you’ll copy one instead.',
+    steps: [
+      'Copy Rocky’s whole block, from his <code>{</code> to his closing <code>}</code>.',
+      'Put a comma after Rocky’s <code>}</code>, then paste.',
+      'In the copy, change the slug to <code>"juniper"</code>, the name to <code>"Juniper"</code> and the sex to <code>"female"</code>.',
+      'For real, you’d also make her photo folder: <code>src/images/2027-01-coco-leo/juniper/</code>.',
+    ],
+    start: PRACTICE,
+    answer: `},
+{
+  "slug": "juniper", "name": "Juniper", "sex": "female", "status": "available",
+  "color": ["cream"], "personality": "Gentle"
+}`,
+    isDone: (data) => Boolean(puppy(data, 'juniper')),
+  },
+  {
+    title: 'Get ready for the next litter',
+    why: 'Before the puppies are born, Home can already say who’s expecting and when — and collect a waitlist.',
+    steps: [
+      'Put the cursor right after <code>"litters": [</code> and press Enter.',
+      'Paste the new litter below, followed by a comma (the January litter comes after it).',
+      'The right side now leads with “Coco is expecting” and a waitlist button.',
+    ],
+    start: PRACTICE,
+    answer: `{
+  "id": "2027-06-coco-leo", "listed": true, "breed": "Havapoo",
+  "mom": { "name": "Coco", "breed": "Havapoo" },
+  "dad": { "name": "Leo", "breed": "Havapoo" },
+  "due": "2027-06-20",
+  "puppies": []
+},`,
+    isDone: (data) => (data?.litters ?? []).length > 1 && !firstLitter(data)?.born && Boolean(firstLitter(data)?.due),
+  },
+  {
+    title: 'Retire a litter',
+    why: 'When a litter is all home, it can leave the site — nothing is deleted.',
+    steps: [
+      'This file has two litters. Find the January one (<code>"id": "2027-01-coco-leo"</code>).',
+      'Change its <code>"listed": true</code> to <code>"listed": false</code>.',
+      'It disappears on the right. Try setting the other litter to false too — the check explains why one must stay.',
+    ],
+    start: PRACTICE.replace('  "litters": [\n', `  "litters": [
+    {
+      "id": "2027-06-coco-leo", "listed": true, "breed": "Havapoo",
+      "mom": { "name": "Coco", "breed": "Havapoo" },
+      "dad": { "name": "Leo", "breed": "Havapoo" },
+      "due": "2027-06-20",
+      "puppies": []
+    },
+`),
+    answer: '"id": "2027-01-coco-leo",\n"listed": false,',
+    isDone: (data) => (data?.litters ?? []).some((l) => l.id === '2027-01-coco-leo' && l.listed === false) && (data?.litters ?? []).some((l) => l.listed),
+  },
+];
+
+// ── The editor ───────────────────────────────────────────────────────────────
+
+const editor = document.getElementById('src');
+const gutter = document.getElementById('gutter');
+const verdict = document.getElementById('verdict');
+const previewEl = document.getElementById('preview');
+const lessonLabel = document.getElementById('lesson-label');
+let activeLesson = null;
+const doneLessons = new Set();
+
+const escapeHtml = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
+
+// Finds the line a message points to: "2027-01-coco-leo › maple › status" → the status line in Maple's block.
+function lineOf(text, where) {
+  if (where === 'litters.json') return null;
+  let at = 0;
+  for (const part of where.split(' › ')) {
+    const field = part.replace(/ #\d+$/, '');
+    const needle = /^[a-z0-9]+(-[a-z0-9]+)*$/.test(field) && !SCHEMA_FIELDS.has(field) ? `"${field}"` : `"${field}":`;
+    const found = text.indexOf(needle, at);
+    if (found < 0) break;
+    at = found;
+  }
+  return at ? text.slice(0, at).split('\n').length : null;
+}
+const SCHEMA_FIELDS = new Set(Object.values(SCHEMA.definitions).flatMap((d) => Object.keys(d.properties ?? {})));
+
+function syntaxLine(message) {
+  const m = message.match(/line (\d+)/);
+  return m ? Number(m[1]) : null;
+}
+
+function renderGutter(text, badLines) {
+  const count = text.split('\n').length;
+  gutter.innerHTML = Array.from({ length: count }, (_, i) => `<div${badLines.has(i + 1) ? ' class="bad"' : ''}>${i + 1}</div>`).join('');
+  gutter.scrollTop = editor.scrollTop;
+}
+
+function chip(status, readyDate) {
+  const label = status === 'soon' ? `Ready ${formatDay(readyDate)}` : STATUS_LABELS[status];
+  return `<span class="chip chip--${status}">${escapeHtml(label)}</span>`;
+}
+
+function previewLitter(litter) {
+  const statusOf = (p) => (p.status === 'available' && litter.readyDate && TODAY < litter.readyDate ? 'soon' : p.status);
+  const available = litter.puppies.filter((p) => p.status === 'available').length;
+  const isSpokenFor = litter.puppies.length > 0 && available === 0;
+  const title = litter.born ? `${litter.mom.name} & ${litter.dad.name}'s litter` : `${litter.mom.name} is expecting`;
+  let sub = `${available} of ${litter.puppies.length} still looking for a home`;
+  if (!litter.born) sub = litter.due ? `Due ${formatDay(litter.due)}` : 'Coming soon';
+  else if (isSpokenFor) sub = 'Every puppy has a home';
+
+  const tiles = [];
+  if (!litter.born && litter.due) tiles.push(['Due', formatDay(litter.due)]);
+  if (litter.born) tiles.push(['Born', formatDay(litter.born)]);
+  if (litter.born && litter.readyDate) tiles.push(['Goes home', TODAY >= litter.readyDate && !isSpokenFor ? 'Now' : formatDay(litter.readyDate)]);
+  const care = {};
+  for (const step of litter.care ?? []) if (!care[step.type] || (step.date ?? '') >= (care[step.type].date ?? '')) care[step.type] = step;
+  for (const type of Object.keys(CARE_LABELS)) if (care[type]) tiles.push([CARE_LABELS[type], care[type].date ? formatDay(care[type].date) : 'Yes', true]);
+
+  let next = '';
+  if (!litter.born || isSpokenFor) next = `<div class="pv-next pv-next--list">${!litter.born ? 'Join the waitlist' : 'Join the list for the next litter'}</div>`;
+  else if (available > 0) next = '<div class="pv-next pv-next--deposit">Reserve today — <b>$100</b> holds your pup · Inquire →</div>';
+
+  const pups = litter.puppies.map((p) => {
+    const meta = [formatCoat(p.color, p.pattern), formatWeight(p.weights, litter.born)].filter(Boolean).join(' · ');
+    return `<div class="pv-pup"><div><b>${escapeHtml(p.name)}</b><span class="meta">${escapeHtml(meta || ' ')}</span></div>${chip(statusOf(p), litter.readyDate)}</div>`;
+  }).join('');
+
+  return `<div class="pv-litter">
+    <p class="pv-title">${escapeHtml(title)}</p>
+    <p class="pv-sub">${escapeHtml(sub)}</p>
+    ${tiles.length ? `<div class="pv-tiles">${tiles.map(([label, value, done]) => `<div class="pv-tile${done ? ' pv-tile--done' : ''}"><small>${escapeHtml(label)}</small>${escapeHtml(value)}</div>`).join('')}</div>` : ''}
+    ${next}${pups}
+  </div>`;
+}
+
+function update() {
+  const text = editor.value;
+  const { errors, warnings } = checkLittersText(text, SCHEMA);
+  const badLines = new Set(errors.map((e) => (e.where === 'litters.json' ? syntaxLine(e.message) : lineOf(text, e.where))).filter(Boolean));
+  renderGutter(text, badLines);
+
+  const list = (items, isWarning) => items.map((item) => {
+    const line = item.where === 'litters.json' ? syntaxLine(item.message) : lineOf(text, item.where);
+    return `<div class="problem">${isWarning ? '<span class="warn-tag">warning</span>' : ''}<span class="where">${escapeHtml(item.where)}${line ? ` · line ${line}` : ''}</span><br>${escapeHtml(item.message)}</div>`;
+  }).join('');
+
+  if (errors.length) {
+    verdict.className = 'verdict verdict--bad';
+    verdict.innerHTML = `<b>✗ The check would stop this update</b>The live site would stay as it was until ${errors.length === 1 ? 'this is' : 'these are'} fixed.${list(errors)}${list(warnings, true)}`;
+    previewEl.innerHTML = '<p class="pv-stopped">Nothing changes for visitors while the file has a problem.</p>';
+  } else {
+    verdict.className = 'verdict verdict--ok';
+    verdict.innerHTML = `<b>✓ This file would go live</b>The check found nothing wrong.${list(warnings, true)}`;
+    const data = JSON.parse(text);
+    const listed = data.litters.filter((l) => l.listed);
+    previewEl.innerHTML = listed.map(previewLitter).join('');
+  }
+
+  const data = errors.length ? null : parse(text);
+  if (activeLesson !== null && data && LESSONS[activeLesson].isDone(data)) doneLessons.add(activeLesson);
+  renderLessons();
+}
+
+function loadText(text, label) {
+  editor.value = text;
+  lessonLabel.textContent = label;
+  editor.scrollTop = 0;
+  update();
+}
+
+let timer;
+editor.addEventListener('input', () => { clearTimeout(timer); timer = setTimeout(update, 200); });
+editor.addEventListener('scroll', () => { gutter.scrollTop = editor.scrollTop; });
+// Tab inserts two spaces instead of leaving the editor.
+editor.addEventListener('keydown', (e) => {
+  if (e.key !== 'Tab' || e.shiftKey) return;
+  e.preventDefault();
+  editor.setRangeText('  ', editor.selectionStart, editor.selectionEnd, 'end');
+  editor.dispatchEvent(new Event('input'));
+});
+document.getElementById('reset').addEventListener('click', () => {
+  if (activeLesson === null) loadText(PRACTICE, 'practice file');
+  else loadText(LESSONS[activeLesson].start, `lesson ${activeLesson + 1}`);
+});
+
+// ── Lessons ──────────────────────────────────────────────────────────────────
+
+const lessonList = document.getElementById('lesson-list');
+function renderLessons() {
+  lessonList.innerHTML = LESSONS.map((lesson, i) => {
+    const isDone = doneLessons.has(i);
+    let className = 'lesson';
+    if (isDone) className += ' lesson--done';
+    else if (i === activeLesson) className += ' lesson--active';
+    let status = 'Not started';
+    if (isDone) status = '✓ Done';
+    else if (i === activeLesson) status = 'In the editor';
+    return `<article class="${className}">
+      <div class="lesson-head"><h3><span class="n">${i + 1}.</span> ${escapeHtml(lesson.title)}</h3><span class="lesson-status">${status}</span></div>
+      <p class="why">${escapeHtml(lesson.why)}</p>
+      <ol>${lesson.steps.map((s) => `<li>${s}</li>`).join('')}</ol>
+      <div class="lesson-buttons">
+        <button type="button" class="btn" data-start="${i}">${i === activeLesson ? 'Restart this lesson' : 'Start this lesson'}</button>
+        <button type="button" class="btn btn--quiet" data-answer="${i}">Show me</button>
+      </div>
+      <div class="answer${openAnswers.has(i) ? ' open' : ''}"><pre class="code">${escapeHtml(lesson.answer)}</pre></div>
+    </article>`;
+  }).join('');
+}
+const openAnswers = new Set();
+lessonList.addEventListener('click', (e) => {
+  const start = e.target.closest('[data-start]');
+  const answer = e.target.closest('[data-answer]');
+  if (start) {
+    activeLesson = Number(start.dataset.start);
+    loadText(LESSONS[activeLesson].start, `lesson ${activeLesson + 1}`);
+    document.getElementById('practice').scrollIntoView({ behavior: 'smooth' });
+  } else if (answer) {
+    const i = Number(answer.dataset.answer);
+    if (openAnswers.has(i)) openAnswers.delete(i); else openAnswers.add(i);
+    renderLessons();
+  }
+});
+
+// ── Allowed values, read from the schema ─────────────────────────────────────
+
+const ENUMS = [
+  ['status', 'A puppy’s status'],
+  ['sex', 'sex'],
+  ['color', 'color (a list of 1 to 3, main color first)'],
+  ['pattern', 'pattern'],
+  ['careType', 'care › type'],
+];
+document.getElementById('values-list').innerHTML = ENUMS.map(([key, title]) => {
+  const def = SCHEMA.definitions[key];
+  const rows = def.enum.map((value, i) => `<tr><td><code>${escapeHtml(value)}</code></td><td>${escapeHtml(def.enumDescriptions?.[i] ?? '')}</td></tr>`).join('');
+  return `<table class="ref"><thead><tr><th colspan="2">${escapeHtml(title)}</th></tr></thead><tbody>${rows}</tbody></table>`;
+}).join('');
+document.getElementById('vsc-help').textContent = SCHEMA.definitions.status.enumDescriptions[0];
+
+loadText(PRACTICE, 'practice file');
+</script>
+</body>
+</html>
