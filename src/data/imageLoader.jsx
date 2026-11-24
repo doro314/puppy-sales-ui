@@ -1,18 +1,15 @@
-// Dynamically import ALL images from ALL subfolders under /images
+// Every photo under src/images, imported at build time. Vite hands the paths over
+// sorted by name, so each folder's photos come in file-name order.
 const imageModules = import.meta.glob("../images/**/*.{jpg,jpeg,png,gif,JPG,JPEG,PNG,GIF}", {
   eager: true,
 });
 
-// Convert the imported modules into a structured object:
-// { puppies: [img1, img2], adults: [...], seniors: [...] }
+// { "2026-06-coco-leo": [...], bella: [...], parents: [...] } — keyed by the folder each photo sits in
 export function getImagesByFolder() {
   const folders = {};
 
   for (const path in imageModules) {
-    const module = imageModules[path];
-    const src = module.default;
-
-    // Extract folder name: "../images/puppies/dog1.jpg" → "puppies"
+    const src = imageModules[path].default;
     const parts = path.split("/");
     const folder = parts[parts.length - 2];
 
@@ -21,4 +18,9 @@ export function getImagesByFolder() {
   }
 
   return folders;
+}
+
+// getPhotoSrc("parents", "coco.jpg") → the built URL, or null if there's no such file
+export function getPhotoSrc(folder, fileName) {
+  return imageModules[`../images/${folder}/${fileName}`]?.default ?? null;
 }

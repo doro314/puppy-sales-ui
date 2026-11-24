@@ -30,7 +30,7 @@ function DepositBanner({ onNavigate }) {
   );
 }
 
-function ParentsSection({ dadName, momName }) {
+function ParentsSection({ dadName, momName, dadPhoto, momPhoto }) {
   return (
     <div className="parents-section">
       <div className="parents-top-bar" />
@@ -40,7 +40,7 @@ function ParentsSection({ dadName, momName }) {
         <div className="parents-grid">
           <div className="parent-card">
             <div className="parent-img-wrap">
-              <img src="/Leo.jpg" alt={`${dadName} — Dad`} className="parent-img" />
+              <img src={dadPhoto} alt={`${dadName} — Dad`} className="parent-img" />
               <div className="parent-overlay">
                 <span className="parent-role parent-role--dad">Dad</span>
                 <span className="parent-name">{dadName}</span>
@@ -49,7 +49,7 @@ function ParentsSection({ dadName, momName }) {
           </div>
           <div className="parent-card">
             <div className="parent-img-wrap">
-              <img src="/Coco.jpg" alt={`${momName} — Mom`} className="parent-img" />
+              <img src={momPhoto} alt={`${momName} — Mom`} className="parent-img" />
               <div className="parent-overlay">
                 <span className="parent-role parent-role--mom">Mom</span>
                 <span className="parent-name">{momName}</span>
@@ -187,13 +187,13 @@ function ImageGallery({ activeCategory, onInquire, onNavigate, categories = [], 
 
   const imageList = useMemo(() => {
     if (activeCategory === "home") {
-      return (allImagesByFolder["home"] ?? []).map(src => ({ src, puppyName: null }));
+      return (allImagesByFolder[litterInfo?.photoFolder] ?? []).map(src => ({ src, puppyName: null }));
     }
     if (categoryFolder && allImagesByFolder[categoryFolder]) {
       return allImagesByFolder[categoryFolder].map(src => ({ src, puppyName: null }));
     }
     return [];
-  }, [activeCategory, categoryFolder]);
+  }, [activeCategory, categoryFolder, litterInfo?.photoFolder]);
 
   const [bigImage, setBigImage] = useState(null);
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -311,7 +311,7 @@ function ImageGallery({ activeCategory, onInquire, onNavigate, categories = [], 
           </h2>
         </header>
         {isHome && <DepositBanner onNavigate={onNavigate} />}
-        {activeCategory === 'home' && showParents && <ParentsSection dadName={litterInfo?.details?.dad} momName={litterInfo?.details?.mom} />}
+        {activeCategory === 'home' && showParents && <ParentsSection dadName={litterInfo?.details?.dad} momName={litterInfo?.details?.mom} dadPhoto={litterInfo?.parentPhotos?.dad} momPhoto={litterInfo?.parentPhotos?.mom} />}
         <PuppyDetails details={categoryInfo?.details} genderColor={accentColor} isAvailableSoon={isAvailableSoon} />
         <div className="paw-placeholder-container">
           <PawPlaceholder color={accentColor} />
@@ -348,7 +348,7 @@ function ImageGallery({ activeCategory, onInquire, onNavigate, categories = [], 
       </header>
 
       {isHome && <DepositBanner onNavigate={onNavigate} />}
-      {activeCategory === 'home' && showParents && <ParentsSection dadName={litterInfo?.details?.dad} momName={litterInfo?.details?.mom} />}
+      {activeCategory === 'home' && showParents && <ParentsSection dadName={litterInfo?.details?.dad} momName={litterInfo?.details?.mom} dadPhoto={litterInfo?.parentPhotos?.dad} momPhoto={litterInfo?.parentPhotos?.mom} />}
       <PuppyDetails details={categoryInfo?.details} genderColor={accentColor} isAvailableSoon={isAvailableSoon} />
 
       <div className="main-image-container" ref={containerRef}>

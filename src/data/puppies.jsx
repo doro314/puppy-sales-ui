@@ -1,116 +1,84 @@
-// Category definitions for the gallery
-//
-// To add a new puppy:
-//   1. Create a folder under /src/images/<foldername>/ folders can be empty but must be created for the puppy to show up
-//   2. Add an entry below with the matching folder name
-//   3. Add photos to the folder — they are picked up automatically
-//
-// Special fields:
-//   icon            — "paw-blue" (male) | "paw-pink" (female) | null (litter)
-//   folder          — image subfolder name; null for the litter overview
-//   available       — "available" | "reserved" | "adopted" | null (null hides the status badge)
-//                     "reserved" overrides the global Available Soon state and shows its own badge/CTA
-//   litterDescription — shown as a paragraph below the stat grid, not as a stat row
-//
-// "Available Soon" state:
-//   Driven by readyToAdoptDate on the "all" entry — if today is before that date,
-//   all individual puppy CTAs show "Available Soon" regardless of their available flag.
-//   Exception: "reserved" always shows its own badge and CTA regardless of the date.
+// Query functions over litters.json — components import these, never the file itself.
+// To add or change a litter or puppy, edit litters.json; VS Code lists every allowed
+// value as you type, and the build stops with a plain explanation if something's off.
 
-const categories = [
-  {
+import data from "./litters.json";
+import { getPhotoSrc } from "./imageLoader";
+
+const PAW_ICONS = { female: "paw-pink", male: "paw-blue" };
+
+const litters = data.litters;
+
+export function getListedLitters() {
+  return litters.filter((litter) => litter.listed);
+}
+
+// Newest first: the first listed litter is the one Home leads with.
+export function getLeadLitter() {
+  return getListedLitters()[0];
+}
+
+// ── Transitional: today's pages read one "home" record plus one per puppy ──
+
+const capitalize = (word) => word.charAt(0).toUpperCase() + word.slice(1);
+
+function latestCare(litter, type) {
+  return (litter.care ?? []).filter((step) => step.type === type).at(-1);
+}
+
+function homeRecord(litter) {
+  const vaccinations = (litter.care ?? [])
+    .filter((step) => step.type === "vaccinated")
+    .map((step) => step.note ?? step.date)
+    .join(", ");
+
+  return {
     id: "home",
     name: "Home",
     icon: null,
     folder: null,
-    details: {
-      breed: "Havapoo",
-      mom: "Coco / Havapoo",
-      dad: "Leo / Havapoo",
-      birthDate: "2026-06-02",
-      litterSize: 5,
-      readyToAdoptDate: "2026-07-28", // ← controls "Available Soon" for all puppies
-      vaccinations: "",
-      dewormingDate: "2026-06-29",
-      vetChecked: true,
-      litterDescription: "Raised in a loving home with children and other pets, making them well-socialized and ready to settle into family life from day one.",
-      facts: [
-        "Typically range from 7 to 20 lbs",
-        "Hypoallergenic, making them a good match for those with mild pet allergies",
-        "Highly trainable and eager to please",
-      ],
+    photoFolder: litter.id,
+    parentPhotos: {
+      mom: litter.mom.photo ? getPhotoSrc("parents", litter.mom.photo) : null,
+      dad: litter.dad.photo ? getPhotoSrc("parents", litter.dad.photo) : null,
     },
-  },
-  {
-    id: "Bella",
-    name: "Bella",
-    icon: "paw-pink",
-    folder: "bella",
     details: {
-      sex: "Female",
-      color: "White/Black",
-      weightAsOf: { value: "27.8 oz", asOf: "2026-06-28" },
-      markings: "Black face mask and side spot",
-      personality: "Curiously energetic",
-      available: "available",
+      breed: litter.breed,
+      mom: `${litter.mom.name} / ${litter.mom.breed}`,
+      dad: `${litter.dad.name} / ${litter.dad.breed}`,
+      birthDate: litter.born,
+      litterSize: litter.litterSize ?? litter.puppies.length,
+      readyToAdoptDate: litter.readyDate,
+      vaccinations,
+      dewormingDate: latestCare(litter, "dewormed")?.date,
+      vetChecked: Boolean(latestCare(litter, "vet-check")),
+      litterDescription: litter.description,
+      facts: litter.facts,
     },
-  },
-  {
-    id: "Brownie",
-    name: "Brownie",
-    icon: "paw-blue",
-    folder: "brownie",
+  };
+}
+
+function puppyRecord(puppy) {
+  const latestWeight = puppy.weights?.at(-1);
+  return {
+    id: puppy.slug,
+    name: puppy.name,
+    icon: PAW_ICONS[puppy.sex],
+    folder: puppy.slug,
     details: {
-      sex: "Male",
-      color: "Brown",
-      weightAsOf: { value: "29.6 oz", asOf: "2026-06-28" },
-      markings: "White toes",
-      personality: "Cautious Explorer",
-      available: "reserved",
+      sex: capitalize(puppy.sex),
+      color: (puppy.color ?? []).map(capitalize).join("/"),
+      weightAsOf: { value: latestWeight ? `${latestWeight.oz} oz` : null, asOf: latestWeight?.date ?? null },
+      markings: puppy.markings,
+      personality: puppy.personality,
+      available: puppy.status,
     },
-  },
-  {
-    id: "Jasper",
-    name: "Jasper",
-    icon: "paw-blue",
-    folder: "jasper",
-    details: {
-      sex: "Male",
-      color: "Brown",
-      weightAsOf: { value: "26.5 oz", asOf: "2026-06-28" },
-      markings: "White Back paws and tip of tail",
-      personality: "Chill Explorer",
-      available: "reserved",
-    },
-  },
-  {
-    id: "Olive",
-    name: "Olive",
-    icon: "paw-pink",
-    folder: "olive",
-    details: {
-      sex: "Female",
-      color: "White/Black",
-      weightAsOf: { value: "28.5 oz", asOf: "2026-06-28" },
-      markings: "Black spot on left eye",
-      personality: "Chill cuddler",
-      available: "available",
-    },
-  },
-  {
-    id: "Pepper",
-    name: "Pepper",
-    icon: "paw-blue",
-    folder: "pepper",
-    details: {
-      sex: "Male",
-      color: "White/Brown",
-      weightAsOf: { value: "29.7 oz", asOf: "2026-06-28" },
-      markings: "brown face mask and rear spot",
-      personality: "Outgoingly brave",
-      available: "available",
-    },
-  },
+  };
+}
+
+const categories = [
+  homeRecord(getLeadLitter()),
+  ...getListedLitters().flatMap((litter) => litter.puppies.map(puppyRecord)),
 ];
 
 export function getCategories() {

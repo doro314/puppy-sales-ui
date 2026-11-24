@@ -13,6 +13,7 @@ export default defineConfig({
     puppyDataPlugin({
       dataFile: fromRoot('./src/data/litters.json'),
       schemaFile: fromRoot('./src/data/litters.schema.json'),
+      imagesDir: fromRoot('./src/images'),
     }),
     // Compresses image assets during `vite build` (not in dev). Puppy photos
     // come straight from a phone camera, so this keeps the production bundle
