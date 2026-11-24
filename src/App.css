@@ -40,7 +40,10 @@
     grid-template-areas: "header header" "nav main";
   }
 
+  /* The pages were drawn at 1280 px, where this column is 1000 px wide; wider screens
+     keep that width rather than stretching cards and tiles across the whole window. */
   .main-content {
+    max-width: 1000px;
     padding: 20px;
   }
 }

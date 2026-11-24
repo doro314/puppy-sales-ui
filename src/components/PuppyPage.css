@@ -269,22 +269,13 @@
   color: #4a90d9;
 }
 
-/* Desktop — the photo beside her facts, so Inquire sits beside the first photo */
+/* Tablet and up — beside the sidebar: the photo (at most 440 px), then who, can I, how */
 @media (min-width: 768px) {
   .pup {
-    display: grid;
-    grid-template-columns: minmax(0, 440px) minmax(0, 1fr);
-    grid-template-areas:
-      "back back"
-      "photos main"
-      "mates mates";
-    column-gap: 32px;
-    align-items: start;
     padding: 14px 28px 8px;
   }
 
   .pup-back {
-    grid-area: back;
     height: auto;
     margin-bottom: 12px;
     padding: 0;
@@ -296,7 +287,7 @@
 
   .pup-photos,
   .pup-photos-empty {
-    grid-area: photos;
+    max-width: 440px;
   }
 
   .pup-photos .carousel-frame,
@@ -304,21 +295,12 @@
     border-radius: 14px;
   }
 
-  .pup-main {
-    grid-area: main;
-  }
-
-  .pup-main > .pup-mates {
-    grid-area: auto;
-  }
-
   .pup > .pup-mates {
-    grid-area: mates;
     padding-top: 28px;
   }
 
   .pup-id {
-    padding: 0;
+    padding: 14px 0 0;
   }
 
   .pup-button {
@@ -341,6 +323,47 @@
   }
 
   .pup-mates-row {
+    padding: 0;
+  }
+}
+
+/* Desktop — the photo beside her facts, so Inquire sits beside the first photo. Below
+   1000 px her column would drop under the 280 px it needs, so the page stacks instead.
+   Her column's minimum is claimed first; the photo takes what's left, up to 440 px. */
+@media (min-width: 1000px) {
+  .pup {
+    display: grid;
+    grid-template-columns: minmax(0, 440px) minmax(280px, 1fr);
+    grid-template-areas:
+      "back back"
+      "photos main"
+      "mates mates";
+    column-gap: 32px;
+    align-items: start;
+  }
+
+  .pup-back {
+    grid-area: back;
+  }
+
+  .pup-photos,
+  .pup-photos-empty {
+    grid-area: photos;
+  }
+
+  .pup-main {
+    grid-area: main;
+  }
+
+  .pup-main > .pup-mates {
+    grid-area: auto;
+  }
+
+  .pup > .pup-mates {
+    grid-area: mates;
+  }
+
+  .pup-id {
     padding: 0;
   }
 }

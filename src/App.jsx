@@ -14,6 +14,7 @@ const SHOW_CONTACT = true;
 const SITE_NAME = 'Doro Family Puppies';
 const TAGLINE = 'Lovingly raised, family bred';
 const COUNTER_BASE = 'https://api.counterapi.dev/v1/doro-family-puppies';
+const VISITED_KEY = 'dfp-visited';
 const WAITLIST = 'waitlist';
 const WAITLIST_MESSAGE = "Hi! We'd love to join the list for your next litter. Please let us know when puppies are on the way.";
 
@@ -38,9 +39,15 @@ function useVisitCounter() {
       .then(d => setVisitorCount(d.count ?? null))
       .catch(() => {});
 
-    const isNewVisitor = !localStorage.getItem('dfp-visited');
+    // Storage throws when the visitor blocks site data; uncaught here it would blank the page.
+    let isNewVisitor = false;
+    try {
+      isNewVisitor = !localStorage.getItem(VISITED_KEY);
+      if (isNewVisitor) localStorage.setItem(VISITED_KEY, '1');
+    } catch {
+      isNewVisitor = false;
+    }
     if (isNewVisitor) {
-      localStorage.setItem('dfp-visited', '1');
       fetch(`${COUNTER_BASE}/uniques/up`)
         .then(r => r.json())
         .then(d => setUniqueCount(d.count ?? null))

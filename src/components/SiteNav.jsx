@@ -7,12 +7,12 @@ import { ACCENTS } from '../utils';
 
 import './SiteNav.css';
 
-function NavLink({ to, isActive, isBold = false, children }) {
+function NavLink({ to, isActive, isBold = false, onNavigate, children }) {
   let className = 'site-nav-link';
   if (isBold) className += ' site-nav-link--bold';
   if (isActive) className += ' site-nav-link--active';
   return (
-    <Link to={to} className={className} aria-current={isActive ? 'page' : undefined}>
+    <Link to={to} className={className} aria-current={isActive ? 'page' : undefined} onClick={onNavigate}>
       {children}
     </Link>
   );
@@ -24,8 +24,10 @@ function NavLink({ to, isActive, isBold = false, children }) {
 // puppyGroups: one group per listed litter with puppies — [{ id, label, puppies }].
 function SiteNav({ siteName, tagline, puppyGroups, activeId, showContact = false }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const closeMenu = () => setIsMenuOpen(false);
 
-  // Any navigation closes the menu — a menu item, Back, or a link inside the page.
+  // Any navigation closes the menu — Back, or a link inside the page. A tap on the
+  // page you're already on changes nothing here, so the links close it themselves.
   useEffect(() => {
     setIsMenuOpen(false);
   }, [activeId]);
@@ -40,7 +42,7 @@ function SiteNav({ siteName, tagline, puppyGroups, activeId, showContact = false
   return (
     <>
       <header className="site-header">
-        <Link to="/" className="site-brand">
+        <Link to="/" className="site-brand" onClick={closeMenu}>
           <PawSvg className="site-brand-paw" aria-hidden="true" />
           <span className="site-brand-emoji" aria-hidden="true">🐾</span>
           <span className="site-brand-text">
@@ -60,10 +62,10 @@ function SiteNav({ siteName, tagline, puppyGroups, activeId, showContact = false
         </button>
       </header>
 
-      {isMenuOpen && <div className="site-nav-scrim" onClick={() => setIsMenuOpen(false)} aria-hidden="true" />}
+      {isMenuOpen && <div className="site-nav-scrim" onClick={closeMenu} aria-hidden="true" />}
 
       <nav id="site-nav" className={`site-nav${isMenuOpen ? ' site-nav--open' : ''}`} aria-label="Pages">
-        <NavLink to="/" isActive={activeId === 'home'} isBold>Home</NavLink>
+        <NavLink to="/" isActive={activeId === 'home'} isBold onNavigate={closeMenu}>Home</NavLink>
         {puppyGroups.map((group) => (
           <Fragment key={group.id}>
             <p className="site-nav-section">{group.label}</p>
@@ -71,7 +73,7 @@ function SiteNav({ siteName, tagline, puppyGroups, activeId, showContact = false
               const isActive = activeId === puppy.slug;
               const pawColor = isActive ? 'white' : (ACCENTS[puppy.sex] ?? ACCENTS.neutral).light;
               return (
-                <NavLink key={puppy.slug} to={`/${puppy.slug}`} isActive={isActive}>
+                <NavLink key={puppy.slug} to={`/${puppy.slug}`} isActive={isActive} onNavigate={closeMenu}>
                   <PawSvg className="site-nav-paw" fill={pawColor} aria-hidden="true" />
                   <span className="site-nav-name">{puppy.name}</span>
                   <StatusChip status={puppy.status} readyDate={puppy.readyDate} />
@@ -82,7 +84,7 @@ function SiteNav({ siteName, tagline, puppyGroups, activeId, showContact = false
         ))}
         {showContact && (
           <div className="site-nav-contact">
-            <NavLink to="/contact" isActive={activeId === 'contact'}>Contact Us</NavLink>
+            <NavLink to="/contact" isActive={activeId === 'contact'} onNavigate={closeMenu}>Contact Us</NavLink>
           </div>
         )}
       </nav>

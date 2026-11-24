@@ -257,17 +257,10 @@
   color: #4a90d9;
 }
 
-/* Desktop — the gallery beside the litter card, the puppies in a row beneath */
+/* Tablet and up — beside the sidebar: the gallery, then the litter card, then the puppies */
 @media (min-width: 768px) {
   .home {
     padding: 14px 28px 8px;
-  }
-
-  .home-top {
-    display: grid;
-    grid-template-columns: minmax(0, 560px) minmax(0, 1fr);
-    gap: 24px;
-    align-items: start;
   }
 
   .hero {
@@ -301,5 +294,17 @@
 
   .home-older .litter-strip {
     margin: 0 0 12px;
+  }
+}
+
+/* Desktop — the gallery beside the litter card. Below 1100 px the card's column would
+   drop under the 360 px its tiles need, so the two stack instead. The card's minimum is
+   claimed first; the gallery takes what's left, up to 560 px (HomePage.jsx HERO_SIZES). */
+@media (min-width: 1100px) {
+  .home-top {
+    display: grid;
+    grid-template-columns: minmax(0, 560px) minmax(360px, 1fr);
+    gap: 24px;
+    align-items: start;
   }
 }

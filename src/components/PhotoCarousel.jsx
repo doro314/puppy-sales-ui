@@ -70,8 +70,8 @@ function Lightbox({ photos, index, label, onIndexChange, onClose }) {
 }
 
 // Photos you swipe through (native scroll-snap), with an optional fullscreen view.
-// A photo is fetched once it's shown or the one before it has finished loading, so a
-// 27-photo gallery starts with one photo, and the next is ready before a swipe needs it.
+// A photo is fetched once it's shown or the one on screen before it has finished loading,
+// so a 27-photo gallery starts with two photos, and the next is ready before a swipe needs it.
 function PhotoCarousel({
   photos, label, sizes = '100vw', className = '', isAutoplay = false,
   showCount = false, showDots = false, showThumbnails = false, onIndexChange, children,
@@ -79,33 +79,45 @@ function PhotoCarousel({
   const trackRef = useRef(null);
   const expandRef = useRef(null);
   const [index, setIndex] = useState(0);
-  const [loadedUpTo, setLoadedUpTo] = useState(0);
+  const [wanted, setWanted] = useState(() => new Set([0]));
   const [isPaused, setIsPaused] = useState(false);
   const [isLightboxOpen, setIsLightboxOpen] = useState(false);
   const prefersReducedMotion = usePrefersReducedMotion();
   const count = photos.length;
   const isPlaying = isAutoplay && count > 1 && !isPaused && !isLightboxOpen && !prefersReducedMotion;
 
-  // Only the photo on screen fetches the next one; otherwise each load would chain into
-  // the next and the whole gallery would download in a row.
+  // A set, not "everything up to": stepping back from the first photo to the last must
+  // fetch the last one, not the whole gallery. Only the photo on screen fetches the next
+  // one; otherwise each load would chain into the next and everything would download.
   const loadedRef = useRef(new Set());
-  const fetchThrough = (i) => setLoadedUpTo((upTo) => Math.max(upTo, Math.min(i, count - 1)));
+  const want = useCallback((indexes) => {
+    setWanted((current) => {
+      const missing = indexes.filter((i) => i < count && !current.has(i));
+      return missing.length === 0 ? current : new Set([...current, ...missing]);
+    });
+  }, [count]);
 
   const showIndex = useCallback((i) => {
     setIndex(i);
-    setLoadedUpTo((upTo) => Math.max(upTo, Math.min(loadedRef.current.has(i) ? i + 1 : i, count - 1)));
+    want(loadedRef.current.has(i) ? [i, i + 1] : [i]);
     onIndexChange?.(i);
-  }, [onIndexChange, count]);
+  }, [onIndexChange, want]);
 
   const handlePhotoLoaded = (i) => {
     loadedRef.current.add(i);
-    if (i === index) fetchThrough(i + 1);
+    if (i === index) want([i + 1]);
   };
 
   const scrollToIndex = useCallback((i, behavior = 'smooth') => {
     const track = trackRef.current;
     if (track) track.scrollTo({ left: i * track.clientWidth, behavior });
   }, []);
+
+  // A jump of more than one photo (the wrap from last to first, a thumbnail) is instant:
+  // a smooth scroll would pass every photo in between, and each one it passes is fetched.
+  const goTo = useCallback((i) => {
+    scrollToIndex(i, Math.abs(i - index) > 1 ? 'instant' : 'smooth');
+  }, [index, scrollToIndex]);
 
   const handleScroll = () => {
     const track = trackRef.current;
@@ -116,9 +128,9 @@ function PhotoCarousel({
 
   useEffect(() => {
     if (!isPlaying) return undefined;
-    const timer = setTimeout(() => scrollToIndex((index + 1) % count), AUTOPLAY_INTERVAL_MS);
+    const timer = setTimeout(() => goTo((index + 1) % count), AUTOPLAY_INTERVAL_MS);
     return () => clearTimeout(timer);
-  }, [isPlaying, index, count, scrollToIndex]);
+  }, [isPlaying, index, count, goTo]);
 
   const handleLightboxIndex = useCallback((i) => {
     showIndex(i);
@@ -148,7 +160,7 @@ function PhotoCarousel({
         >
           {photos.map((photo, i) => (
             <div className="carousel-slide" key={photo.src}>
-              {i <= loadedUpTo && (
+              {wanted.has(i) && (
                 <img
                   src={photo.src}
                   srcSet={photo.srcSet}
@@ -171,8 +183,8 @@ function PhotoCarousel({
         </button>
         {count > 1 && (
           <>
-            <button type="button" className="carousel-step carousel-step--prev" onClick={() => scrollToIndex((index - 1 + count) % count)} aria-label="Previous photo">‹</button>
-            <button type="button" className="carousel-step carousel-step--next" onClick={() => scrollToIndex((index + 1) % count)} aria-label="Next photo">›</button>
+            <button type="button" className="carousel-step carousel-step--prev" onClick={() => goTo((index - 1 + count) % count)} aria-label="Previous photo">‹</button>
+            <button type="button" className="carousel-step carousel-step--next" onClick={() => goTo((index + 1) % count)} aria-label="Next photo">›</button>
           </>
         )}
         {showDots && count > 1 && count <= MAX_DOTS && (
@@ -195,7 +207,7 @@ function PhotoCarousel({
               key={photo.src}
               type="button"
               className={`carousel-thumb${i === index ? ' carousel-thumb--on' : ''}`}
-              onClick={() => scrollToIndex(i)}
+              onClick={() => goTo(i)}
               aria-label={`Show photo ${i + 1} of ${count}`}
               aria-pressed={i === index}
             >

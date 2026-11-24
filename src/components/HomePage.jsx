@@ -13,13 +13,20 @@ import { DEPOSIT_AMOUNT, formatDay, formatMonthYear } from '../utils';
 
 import './HomePage.css';
 
+// Matches HomePage.css: beside the card from 1100 px, full width beside the sidebar below that.
+const HERO_SIZES = '(min-width: 1100px) 560px, (min-width: 768px) calc(100vw - 336px), 100vw';
+
 function litterTitle(litter) {
   return litter.born ? `${litter.mom.name} & ${litter.dad.name}'s litter` : `${litter.mom.name} is expecting`;
 }
 
 // The line under the title: when (expecting), how many are left, or that they're all home.
 function litterSubtitle(litter, hasPhotos) {
-  if (!litter.born) return { text: `Due ${formatDay(litter.due)} · ${litter.mom.name} × ${litter.dad.name}`, isOpen: false };
+  if (!litter.born) {
+    // The checker only warns when "due" is missing, so a fresh litter can go live without one.
+    const parents = `${litter.mom.name} × ${litter.dad.name}`;
+    return { text: litter.due ? `Due ${formatDay(litter.due)} · ${parents}` : parents, isOpen: false };
+  }
   if (isSpokenFor(litter)) return { text: 'Every puppy has a home', isOpen: false };
   const total = litter.puppies.length;
   if (!hasPhotos) return { text: `${total} ${total === 1 ? 'puppy' : 'puppies'} · photos coming soon`, isOpen: false };
@@ -46,7 +53,7 @@ function LitterHero({ litter }) {
     );
   }
   return (
-    <PhotoCarousel className="hero" photos={photos} label={title} sizes="(min-width: 768px) 560px, 100vw" isAutoplay showCount>
+    <PhotoCarousel className="hero" photos={photos} label={title} sizes={HERO_SIZES} isAutoplay showCount>
       <div className="hero-shade" />
       {text}
     </PhotoCarousel>

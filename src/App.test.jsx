@@ -90,6 +90,14 @@ describe('Site chrome', () => {
     expect(within(nav).getByRole('link', { name: /PupAdopted/ })).toHaveTextContent('Adopted');
     expect(within(nav).getByRole('link', { name: /PupAvailable/ })).toHaveTextContent('Available');
   });
+
+  test('a tap on the page you are already on still closes the menu', () => {
+    renderAt();
+    fireEvent.click(screen.getByRole('button', { name: 'Menu' }));
+    expect(screen.getByRole('button', { name: 'Close menu' })).toHaveAttribute('aria-expanded', 'true');
+    fireEvent.click(within(screen.getByRole('navigation')).getByRole('link', { name: 'Home' }));
+    expect(screen.getByRole('button', { name: 'Menu' })).toHaveAttribute('aria-expanded', 'false');
+  });
 });
 
 describe('Home (HOME-8)', () => {
@@ -262,6 +270,15 @@ describe('Every season (PLUS-5)', () => {
     expect(screen.getByRole('link', { name: 'Join the waitlist' })).toHaveAttribute('href', '/contact?about=waitlist');
     expect(screen.getByRole('heading', { level: 3, name: "Mamma & Pappa's June 2026 litter" })).toBeInTheDocument();
     expect(screen.getAllByText('PupAvailable').length).toBeGreaterThan(0);
+  });
+
+  test('expecting with no due date yet (the checker only warns): the parents, not a crash', () => {
+    addNewerLitter({});
+    renderAt();
+    expect(screen.getByRole('heading', { level: 2, name: 'Mamma is expecting' })).toBeInTheDocument();
+    expect(document.querySelector('.hero-sub')).toHaveTextContent(/^Mamma × Pappa$/);
+    expect(document.querySelector('.litter-tiles')).toBeNull();
+    expect(screen.getByRole('link', { name: 'Join the waitlist' })).toBeInTheDocument();
   });
 
   test('born, no photos yet: a count instead of a gallery, and placeholders', () => {
