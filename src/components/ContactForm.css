@@ -13,31 +13,31 @@
   margin-bottom: 12px;
   font-size: 0.85rem;
   font-weight: 600;
-  color: #9bafc4;
+  color: #5d718a;
   cursor: pointer;
   letter-spacing: 0.02em;
   transition: color 0.15s ease;
 }
 
 .contact-back-btn:hover {
-  color: var(--contact-color, #8a9bb0);
+  color: var(--contact-strong, #5d718a);
 }
 
 .contact-title {
   margin: 0 0 6px;
   font-size: 2rem;
   font-weight: 700;
-  color: var(--contact-color, #8a9bb0);
+  color: var(--contact-strong, #5d718a);
 }
 
 .contact-title-prefix {
-  color: #8a9bb0;
+  color: #5d718a;
   font-weight: 400;
 }
 
 .contact-subtitle {
   margin: 0 0 10px;
-  color: #8a9bb0;
+  color: #5d718a;
   font-size: 0.92rem;
   line-height: 1.6;
 }
@@ -100,7 +100,7 @@
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.07em;
-  color: #9bafc4;
+  color: #5d718a;
 }
 
 .contact-field input,
@@ -137,7 +137,7 @@
 }
 
 .contact-required {
-  color: #e74c3c;
+  color: #c0392b;
   margin-left: 1px;
 }
 
@@ -156,7 +156,7 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  background: var(--contact-color, #8a9bb0);
+  background: var(--contact-strong, #5d718a);
   color: white;
   border: none;
   border-radius: 10px;
@@ -195,7 +195,7 @@
   align-items: center;
   gap: 5px;
   font-size: 0.78rem;
-  color: #9bafc4;
+  color: #5d718a;
   font-weight: 500;
   letter-spacing: 0.02em;
 }
@@ -224,7 +224,7 @@
   border: 1.5px solid #a9dfbf;
   border-radius: 10px;
   padding: 22px 24px;
-  color: #1e8449;
+  color: #1d8047;
   margin: 24px 0 0;
 }
 
@@ -237,7 +237,7 @@
 .contact-reset {
   background: none;
   border: 1.5px solid #a9dfbf;
-  color: #1e8449;
+  color: #1d8047;
   border-radius: 8px;
   padding: 7px 18px;
   font-size: 0.88rem;

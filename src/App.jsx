@@ -100,7 +100,7 @@ function ContactRoute({ today }) {
     };
     message = `Hi! I'm interested in ${puppy.name} and would love to learn more. Please let me know about availability and next steps.`;
   }
-  const accentColor = (ACCENTS[found?.puppy.sex] ?? ACCENTS.neutral).light;
+  const accent = ACCENTS[found?.puppy.sex] ?? ACCENTS.neutral;
 
   // A visit that starts on this page has nothing to go back to: Back goes Home instead of leaving the site.
   const handleBack = () => (location.key === 'default' ? navigate('/') : navigate(-1));
@@ -110,7 +110,8 @@ function ContactRoute({ today }) {
       key={about ?? 'general'}
       topic={topic}
       initialMessage={message}
-      accentColor={accentColor}
+      accentColor={accent.light}
+      accentStrongColor={accent.strong}
       onBack={handleBack}
     />
   );

@@ -58,7 +58,7 @@ function TopicChip({ topic, onDismiss }) {
 // topic: what the inquiry is about — { kind: "puppy", slug, name, detail, photo },
 // { kind: "waitlist" }, or null. A new topic remounts the form (App keys it), so the
 // prefilled message always matches.
-function ContactForm({ topic = null, initialMessage = "", accentColor = "#8a9bb0", onBack }) {
+function ContactForm({ topic = null, initialMessage = "", accentColor = "#8a9bb0", accentStrongColor = "#5d718a", onBack }) {
   const [fields, setFields] = useState({ ...EMPTY_FIELDS, message: initialMessage });
   const [touched, setTouched] = useState(UNTOUCHED);
   const [submitAttempted, setSubmitAttempted] = useState(false);
@@ -135,7 +135,7 @@ function ContactForm({ topic = null, initialMessage = "", accentColor = "#8a9bb0
   );
 
   return (
-    <div className="contact-container" style={{ "--contact-color": accentColor }}>
+    <div className="contact-container" style={{ "--contact-color": accentColor, "--contact-strong": accentStrongColor }}>
       {onBack && (
         <button className="contact-back-btn" onClick={onBack} aria-label="Go back">
           &#8592; Back

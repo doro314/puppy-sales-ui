@@ -154,7 +154,7 @@
   font-weight: 700;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.4);
+  color: rgba(255, 255, 255, 0.62);
 }
 
 .site-nav-section::after {
@@ -224,6 +224,13 @@
     padding: 14px 16px;
     font-size: 15px;
     color: rgba(255, 255, 255, 0.7);
+  }
+
+  /* Full white on the lighter highlight: 70% white there is 3.55:1. */
+  .site-nav-link--bold,
+  .site-nav-link--active,
+  .site-nav-link--active:hover {
+    color: white;
   }
 
   .site-nav-contact {

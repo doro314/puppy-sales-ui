@@ -1,18 +1,23 @@
 /* Phones — the photo edge to edge, then who, can I, how, and her facts */
+/* --acc: bars and paws. --acc-strong: button fills under white text. --acc-text: small
+   accent-colored text on the page's grey, a shade darker so it still reads at 4.5:1. */
 .pup {
   --acc: #8a9bb0;
   --acc-strong: #5d718a;
+  --acc-text: #5d718a;
   padding-bottom: 8px;
 }
 
 .pup--female {
   --acc: #e91e8c;
   --acc-strong: #df1683;
+  --acc-text: #d4157c;
 }
 
 .pup--male {
   --acc: #4a90d9;
   --acc-strong: #2a78c8;
+  --acc-text: #2770ba;
 }
 
 .pup-back {
@@ -97,7 +102,7 @@
 }
 
 .pup-sub b {
-  color: var(--acc-strong);
+  color: var(--acc-text);
 }
 
 .pup-button {
