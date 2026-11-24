@@ -1,350 +1,96 @@
-# Getting Started with Create React App
+# Doro Family Puppies — owner's manual
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Everything about the litters lives in one file, **`src/data/litters.json`**. Photos live in folders under **`src/images/`**. Edit them, push to `main`, and the site updates itself.
 
-## Available Scripts
-
-In the project directory, you can run:
-
-### `npm start`
-
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
-
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
-
-### `npm test`
-
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
-
-### `npm run build`
-
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
-
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
-
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
-
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+New to this? Start with the step-by-step tutorial, **[docs/data-tutorial.html](docs/data-tutorial.html)**. Open it in a browser; it has a practice editor that checks what you type exactly the way the real build does.
 
 ---
 
-## TODO: Migrate to Supabase (database-driven)
+## Edit in VS Code
 
-Currently all puppy data is hardcoded in `src/data/puppies.jsx` and images are bundled at build time via `import.meta.glob`. Below is a step-by-step plan to migrate to Supabase (free tier).
+Open `litters.json` in VS Code. It reads `litters.schema.json` (the list of every field and allowed value) on its own, with nothing to install:
 
-### 1. Create a Supabase project
+- **Suggestions:** press **⌃ Space** (Control-Space) inside quotes to see the allowed values, each explained.
+- **Templates:** press **⌃ Space** inside a list to insert a whole **New litter** or **New puppy**.
+- **Mistakes:** a value that isn't allowed is underlined the moment you type it. Hover for the reason.
 
-- Go to https://supabase.com and sign up (free)
-- Create a new project — note your **Project URL** and **anon public API key**
+## Add a litter
 
-### 2. Create the database tables
+1. In `"litters": [ … ]`, put the cursor right after the opening `[` and press **⌃ Space → New litter**. Newest goes first: Home leads with the first listed litter.
+2. Fill in the id (`2027-01-coco-leo`: year, month, mom, dad), the breed, the parents and the `due` date.
+3. Make its photo folder, `src/images/2027-01-coco-leo/`. The litter's own photos go straight in it; each puppy gets a subfolder later.
 
-Run this SQL in the Supabase SQL editor:
+Until it has puppies, Home says *"Coco is expecting · Due Jan 12"* and offers the waitlist.
 
-```sql
--- Litter / "all" entry
-create table litters (
-  id uuid primary key default gen_random_uuid(),
-  name text not null,
-  breed text,
-  mom text,
-  dad text,
-  birth_date date,
-  litter_size int,
-  ready_to_adopt_date date,
-  vaccinations text,
-  deworming_date date,
-  vet_checked boolean,
-  litter_description text
-);
+## When the puppies arrive
 
--- Individual puppies
-create table puppies (
-  id uuid primary key default gen_random_uuid(),
-  litter_id uuid references litters(id),
-  name text not null,
-  icon text,          -- 'paw-blue' | 'paw-pink' | null
-  folder text,        -- kept for reference; images come from storage
-  sex text,
-  color text,
-  pattern text,
-  weight_value text,
-  weight_as_of date,
-  personality text,
-  available boolean
-);
-```
+1. Add `"born"` and `"readyDate"` to the litter.
+2. Inside the litter's `"puppies": [ ]`, press **⌃ Space → New puppy** for each one. `slug` is the puppy's web address and folder name: lowercase, no spaces (`bella`, `mr-pickles`).
+3. Make a folder per puppy, `src/images/2027-01-coco-leo/bella/`, and drop in photos. An empty folder shows "Photos coming soon".
 
-### 3. Set up Supabase Storage for images
+## Every week
 
-- In the Supabase dashboard go to **Storage → New bucket**
-- Name it `puppy-images`, set it to **Public**
-- Upload each puppy's photos into a folder matching their name (e.g. `honda/photo1.jpg`)
-- Image URLs will follow the pattern:
-  `https://<project-ref>.supabase.co/storage/v1/object/public/puppy-images/<folder>/<filename>`
+- **Weight:** add a line to the puppy's `"weights"` list: `{ "date": "2027-02-14", "oz": 31.5 }`. The page shows the latest as *"31.5 oz at 5 weeks"*.
+- **Care:** add to the litter's `"care"` list: `{ "type": "dewormed", "date": "2027-02-07" }`. Each kind of step gets its own tile on Home the day it's added. The kinds are `vet-check`, `dewormed`, `vaccinated` (add a `"note"`, e.g. `"First DHPP"`) and `microchipped`.
+- **Photos:** drop them in the puppy's folder.
 
-### 4. Install the Supabase JS client
+## Reserved, adopted
 
-```bash
-npm install @supabase/supabase-js
-```
+Change the puppy's `"status"` to one of:
 
-### 5. Add environment variables
+- `available`: shows the Inquire button. Before the litter's `readyDate`, the badge says *"Ready Jul 28"* by itself.
+- `reserved`: the deposit is paid. The page points visitors to the littermates still available.
+- `adopted`: gone home.
 
-Create a `.env` file at the project root (never commit this):
+Once every puppy is reserved or adopted, Home says *"Every puppy has a home"* and offers the list for the next litter. The $100 deposit banner hides on its own.
 
-```
-VITE_SUPABASE_URL=https://<your-project-ref>.supabase.co
-VITE_SUPABASE_ANON_KEY=<your-anon-public-key>
-```
+## Retire a litter
 
-Create `src/lib/supabase.js`:
+Set `"listed": false`. It disappears from the site, but nothing is deleted. Old links to its puppies say they've gone home. At least one litter must stay listed, so keep a sold-out litter listed until the next one is in.
 
-```js
-import { createClient } from '@supabase/supabase-js';
+## Photos
 
-export const supabase = createClient(
-  import.meta.env.VITE_SUPABASE_URL,
-  import.meta.env.VITE_SUPABASE_ANON_KEY
-);
-```
+- **Formats:** JPEG, PNG, GIF, WebP and AVIF. iPhone **HEIC** photos can't be shown in browsers. Export them as JPEG, or set *Settings → Camera → Formats → Most Compatible*.
+- **Order:** photos show in file-name order, so the first file leads.
+- **Choosing the lead photo:** to lead with another photo without renaming files, set `"cover": "IMG_1876.jpeg"` on the puppy (or the litter). The name must match exactly, capitals included.
+- **Sizes:** the build makes small copies of every photo, and the originals stay untouched.
+- **Parents:** their photos go in `src/images/parents/` and only ever show as small round icons.
 
-### 6. Replace `src/data/puppies.jsx`
+## When the build says no
 
-Replace the hardcoded `categories` export with a fetch function:
+Every push is checked first. If something in `litters.json` is wrong, the build stops, **the live site stays as it was**, and the message says where and what to type. The most common ones:
 
-```js
-import { supabase } from '../lib/supabase';
+| Message | What to do |
+|---|---|
+| `"Available" isn't an allowed value … Did you mean "available"?` | Values are lowercase. Use the suggestion. |
+| `"2027-2-7" doesn't fit. Write dates as YYYY-MM-DD` | Two-digit months and days: `2027-02-07`. |
+| `Should be a plain number, like 31.5 — not "31.5 oz"` | Weights are numbers in ounces, no quotes. |
+| `The slug "bella" is already used in 2026-06-coco-leo` | Slugs are unique across every litter. Try `bella-2`. |
+| `"IMG_1876.jpg" isn't in src/images/…  The file there is "IMG_1876.JPEG"` | Copy the file name exactly. |
+| `This isn't valid JSON … missing or extra comma` | Check the line it names for a missing or extra comma or quote. |
+| `No litter has "listed": true` | Keep at least one litter listed. |
 
-export async function fetchCategories() {
-  const { data: litter } = await supabase.from('litters').select('*').single();
-  const { data: puppies } = await supabase.from('puppies').select('*').order('name');
+Warnings (a puppy without photos yet, a HEIC file) don't stop anything.
 
-  // Build the "all" entry
-  const all = {
-    id: 'all',
-    name: 'Our Litter',
-    icon: null,
-    folder: null,
-    details: {
-      breed: litter.breed,
-      mom: litter.mom,
-      dad: litter.dad,
-      birthDate: litter.birth_date,
-      litterSize: litter.litter_size,
-      readyToAdoptDate: litter.ready_to_adopt_date,
-      vaccinations: litter.vaccinations,
-      dewormingDate: litter.deworming_date,
-      vetChecked: litter.vet_checked,
-      litterDescription: litter.litter_description,
-    },
-  };
+## Going live
 
-  const puppyCategories = puppies.map((p) => ({
-    id: p.name,
-    name: p.name,
-    icon: p.icon,
-    folder: p.folder,
-    details: {
-      sex: p.sex,
-      color: p.color,
-      pattern: p.pattern,
-      weightAsOf: { value: p.weight_value, asOf: p.weight_as_of },
-      personality: p.personality,
-      available: p.available,
-    },
-  }));
+Push to `main`. Cloudflare builds the site and publishes it in a minute or two. A push that fails the check isn't published. Check the result on GitHub, on the commit's status check.
 
-  return [all, ...puppyCategories];
-}
-```
-
-### 7. Replace `src/data/imageLoader.jsx`
-
-Instead of `import.meta.glob`, fetch image URLs from Supabase Storage:
-
-```js
-import { supabase } from '../lib/supabase';
-
-export async function getImagesByFolder() {
-  const { data: files } = await supabase.storage.from('puppy-images').list('', {
-    limit: 200,
-    offset: 0,
-  });
-
-  const folders = {};
-
-  // List each puppy subfolder
-  for (const folder of files.filter((f) => !f.metadata)) {
-    const { data: images } = await supabase.storage
-      .from('puppy-images')
-      .list(folder.name);
-
-    folders[folder.name] = images.map(
-      (img) =>
-        supabase.storage
-          .from('puppy-images')
-          .getPublicUrl(`${folder.name}/${img.name}`).data.publicUrl
-    );
-  }
-
-  return folders;
-}
-```
-
-### 8. Update `App.jsx` (or wherever data is consumed)
-
-Anywhere `categories` or `getImagesByFolder()` are imported synchronously, wrap them in `useEffect` + `useState`:
-
-```js
-const [categories, setCategories] = useState([]);
-
-useEffect(() => {
-  fetchCategories().then(setCategories);
-}, []);
-```
-
-### 9. Contact Form
-
-The contact form in `src/components/ContactForm.jsx` currently submits to **Formspree**. You have two options:
+To see changes before pushing, run `npm run dev` and open http://localhost:5173. Any data problem shows in the terminal and as a red overlay in the browser.
 
 ---
 
-#### Option A — Keep Formspree (easiest, no code changes)
+## For developers
 
-Formspree handles email delivery for you. Free tier allows 50 submissions/month.
+| Command | |
+|---|---|
+| `npm run dev` | Dev server, with the data check on save |
+| `npm run build` | Production build (stops on bad data) |
+| `npm test` | The test suite, including a check of the real `litters.json` and photos |
 
-1. Sign up at https://formspree.io
-2. Click **New Form**, name it (e.g. "Puppy Inquiry")
-3. Copy the form ID from the endpoint URL — e.g. `https://formspree.io/f/abcd1234` → ID is `abcd1234`
-4. Open `src/components/ContactForm.jsx` and replace:
-   ```js
-   const FORMSPREE_ID = "YOUR_FORM_ID";
-   ```
-   with your actual ID:
-   ```js
-   const FORMSPREE_ID = "abcd1234";
-   ```
-5. Verify your email in Formspree so submissions are delivered
-6. (Optional) Enable spam filtering / reCAPTCHA in the Formspree dashboard
-
-That's it — no other changes needed.
-
----
-
-#### Option B — Route submissions through Supabase (no third-party dependency)
-
-Use this if you want all data (puppies + inquiries) in one place, or if you exceed Formspree's free limit.
-
-**Step 1 — Create an `inquiries` table in Supabase:**
-
-```sql
-create table inquiries (
-  id uuid primary key default gen_random_uuid(),
-  name text not null,
-  email text not null,
-  message text not null,
-  submitted_at timestamptz default now()
-);
-
--- Allow anonymous inserts (public form), block reads from the client
-alter table inquiries enable row level security;
-create policy "Allow anonymous insert" on inquiries for insert with check (true);
-```
-
-**Step 2 — Update `ContactForm.jsx`:**
-
-Replace the `handleSubmit` fetch block:
-
-```js
-// Before (Formspree)
-const res = await fetch(`https://formspree.io/f/${FORMSPREE_ID}`, {
-  method: "POST",
-  headers: { "Content-Type": "application/json", Accept: "application/json" },
-  body: JSON.stringify(fields),
-});
-if (res.ok) { ... }
-```
-
-With a Supabase insert:
-
-```js
-import { supabase } from '../lib/supabase'; // add this import at the top
-
-// Inside handleSubmit, replace the fetch block:
-const { error } = await supabase.from('inquiries').insert([fields]);
-if (!error) {
-  setStatus("success");
-  setFields({ name: "", email: "", message: "" });
-} else {
-  setStatus("error");
-}
-```
-
-You can also remove the `FORMSPREE_ID` constant and the `Accept` / fetch import if nothing else uses them.
-
-**Step 3 — Set up email notifications (optional but recommended):**
-
-Supabase doesn't send emails on its own. Add a free notification layer:
-
-- **Supabase Edge Function + Resend**: Create an edge function triggered on new `inquiries` rows, then send email via https://resend.com (free tier: 3,000 emails/month)
-- **Zapier / Make (free tier)**: Watch the `inquiries` table via webhook and send a Gmail/email notification — no code required
-
----
-
-### 10. Checklist
-
-- [ ] Supabase project created
-- [ ] SQL tables created and seeded with current puppy data
-- [ ] Storage bucket created and images uploaded
-- [ ] `.env` file created with Supabase URL + anon key
-- [ ] `.env` added to `.gitignore`
-- [ ] `src/lib/supabase.js` created
-- [ ] `src/data/puppies.jsx` replaced with async fetch version
-- [ ] `src/data/imageLoader.jsx` replaced with storage fetch version
-- [ ] `App.jsx` updated to use `useEffect` for async data loading
-- [ ] Test locally with `npm run dev`
-- [ ] Deploy (Vercel / Netlify — add env vars in their dashboard)
+- **Data layer:** components read the data only through the query functions in `src/data/puppies.jsx`. `src/data/checkLitters.js` is the checker (pure). `scripts/puppyDataPlugin.js` runs it in the build and dev server.
+- **Addresses:** `/` is Home, `/bella` is a puppy, `/contact?about=bella` or `?about=waitlist` is the form.
+- **Hidden switches:** `?parents=true` shows the parents' photos large on Home. `?count` shows the visit counter in the footer.
+- **Settings:** the deposit amount is `DEPOSIT_AMOUNT` in `src/utils.js`. Inquiries go to the Formspree form whose ID is in `src/components/ContactForm.jsx`.
+- **Why it's built this way:** the decisions and their alternatives are in `docs/puppy-data-options.html` and `docs/site-design-options.html`.
+- **Measuring:** `scripts/measure/measure.mjs` measures layouts in headless Chrome against a production build (it blocks the live visit counter).
