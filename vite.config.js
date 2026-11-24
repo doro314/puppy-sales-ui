@@ -1,6 +1,7 @@
 import { fileURLToPath } from 'node:url'
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
+import { imagetools } from 'vite-imagetools'
 import { ViteImageOptimizer } from 'vite-plugin-image-optimizer'
 
 import { puppyDataPlugin } from './scripts/puppyDataPlugin.js'
@@ -15,15 +16,12 @@ export default defineConfig({
       schemaFile: fromRoot('./src/data/litters.schema.json'),
       imagesDir: fromRoot('./src/images'),
     }),
-    // Compresses image assets during `vite build` (not in dev). Puppy photos
-    // come straight from a phone camera, so this keeps the production bundle
-    // a fraction of the source size without a manual export step.
-    ViteImageOptimizer({
-      jpg: { quality: 75, mozjpeg: true },
-      jpeg: { quality: 75, mozjpeg: true },
-      png: { quality: 75 },
-      webp: { lossless: false, quality: 75 },
-    }),
+    // Makes the photo sizes src/data/imageLoader.jsx asks for (320, 1280, 1920 px WebP).
+    // The originals stay untouched in the repo.
+    imagetools(),
+    // SVGs only: the photos are already sized and compressed by imagetools, and a
+    // second lossy pass would only cost quality and build time.
+    ViteImageOptimizer({ test: /\.svg$/i }),
   ],
   test: {
     environment: 'happy-dom',

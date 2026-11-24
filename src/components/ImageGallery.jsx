@@ -12,6 +12,8 @@ const GENDER_COLORS = {
 };
 
 const AUTOPLAY_INTERVAL_MS = 8000;
+// The gallery column is at most 836 px wide (900 minus padding); phones use the full width.
+const MAIN_IMAGE_SIZES = "(min-width: 768px) 836px, 100vw";
 
 function DepositBanner({ onNavigate }) {
   return (
@@ -187,10 +189,10 @@ function ImageGallery({ activeCategory, onInquire, onNavigate, categories = [], 
 
   const imageList = useMemo(() => {
     if (activeCategory === "home") {
-      return (allImagesByFolder[litterInfo?.photoFolder] ?? []).map(src => ({ src, puppyName: null }));
+      return (allImagesByFolder[litterInfo?.photoFolder] ?? []).map(photo => ({ ...photo, puppyName: null }));
     }
     if (categoryFolder && allImagesByFolder[categoryFolder]) {
-      return allImagesByFolder[categoryFolder].map(src => ({ src, puppyName: null }));
+      return allImagesByFolder[categoryFolder].map(photo => ({ ...photo, puppyName: null }));
     }
     return [];
   }, [activeCategory, categoryFolder, litterInfo?.photoFolder]);
@@ -352,10 +354,12 @@ function ImageGallery({ activeCategory, onInquire, onNavigate, categories = [], 
       <PuppyDetails details={categoryInfo?.details} genderColor={accentColor} isAvailableSoon={isAvailableSoon} />
 
       <div className="main-image-container" ref={containerRef}>
-        <img className="main-image-blur-bg" src={bigImage?.src} alt="" aria-hidden="true" />
+        <img className="main-image-blur-bg" src={bigImage?.thumb} alt="" aria-hidden="true" />
         <img
           className="main-image"
           src={bigImage?.src}
+          srcSet={bigImage?.srcSet}
+          sizes={MAIN_IMAGE_SIZES}
           alt={categoryName}
           ref={imgRef}
           onLoad={calcStripWidth}
@@ -407,7 +411,7 @@ function ImageGallery({ activeCategory, onInquire, onNavigate, categories = [], 
               aria-label={`View photo ${index + 1} of ${imageList.length}`}
               aria-pressed={index === currentIndex}
             >
-              <img className="thumbnail" src={image.src} alt="" loading="lazy" decoding="async" />
+              <img className="thumbnail" src={image.thumb} alt="" loading="lazy" decoding="async" />
               {image.puppyName && (
                 <span className="thumbnail-puppy-label">
                   <PawSvg className="thumbnail-paw-icon" fill={GENDER_COLORS[image.puppyIcon] ?? "#8a9bb0"} />
@@ -447,7 +451,7 @@ function ImageGallery({ activeCategory, onInquire, onNavigate, categories = [], 
           >
             <IconClose className="lightbox-close-icon" />
           </button>
-          <img className="lightbox-img" src={bigImage?.src} alt={categoryName} />
+          <img className="lightbox-img" src={bigImage?.src} srcSet={bigImage?.srcSet} sizes="100vw" alt={categoryName} />
         </div>
       )}
     </div>
