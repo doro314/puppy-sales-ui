@@ -80,10 +80,6 @@
   transform: rotate(18deg);
 }
 
-#about-the-litter {
-  scroll-margin-top: 68px;
-}
-
 .home-deposit {
   display: flex;
   align-items: center;
@@ -271,10 +267,6 @@
 
   .hero--empty {
     height: 360px;
-  }
-
-  #about-the-litter {
-    scroll-margin-top: 16px;
   }
 
   .home-deposit,

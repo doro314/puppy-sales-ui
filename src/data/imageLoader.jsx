@@ -37,19 +37,3 @@ export function getFolderPhotos(folder) {
 export function getPhoto(folder, fileName) {
   return getFolderPhotos(folder).find((photo) => photo.name === fileName) ?? null;
 }
-
-// ── Transitional: today's gallery looks photos up by the last folder name ──
-
-// { "2026-06-coco-leo": [...], bella: [...], parents: [...] }
-export function getImagesByFolder() {
-  const folders = {};
-  for (const [folder, photos] of Object.entries(photosByFolder)) {
-    folders[folder.split("/").pop()] = photos;
-  }
-  return folders;
-}
-
-// getPhotoSrc("parents", "coco.jpg") → the 1280 px URL, or null if there's no such file
-export function getPhotoSrc(folder, fileName) {
-  return getPhoto(folder, fileName)?.src ?? null;
-}

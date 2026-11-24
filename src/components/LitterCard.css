@@ -1,5 +1,7 @@
+/* A link to the card (/#litter-…) stops it just below the sticky bar. */
 .litter-card {
   margin: 0 16px;
+  scroll-margin-top: 68px;
 }
 
 .litter-card-panel {
@@ -191,6 +193,7 @@
 @media (min-width: 768px) {
   .litter-card {
     margin: 0;
+    scroll-margin-top: 16px;
   }
 
   .litter-card-panel {

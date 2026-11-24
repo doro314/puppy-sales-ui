@@ -1,8 +1,10 @@
-export const GENDER_COLORS = {
-  "paw-blue": "#4a90d9",
-  "paw-pink": "#e91e8c",
+// light: bars, paws and borders. strong: text and button fills — dark enough for
+// white text and small type to pass WCAG AA (4.5:1).
+export const ACCENTS = {
+  female: { light: "#e91e8c", strong: "#df1683" },
+  male: { light: "#4a90d9", strong: "#2a78c8" },
+  neutral: { light: "#8a9bb0", strong: "#5d718a" },
 };
-export const NEUTRAL_ACCENT = "#8a9bb0";
 export const DEPOSIT_AMOUNT = 100;
 
 const DAY_MS = 24 * 60 * 60 * 1000;
@@ -106,24 +108,4 @@ export function withCoverFirst(photos, cover) {
 export function isLikelyBot() {
   if (navigator.webdriver) return true;
   return /bot|crawl|spider|scrape|headless|phantom|selenium|puppeteer/i.test(navigator.userAgent);
-}
-
-export function formatKey(key) {
-  return key
-    .replace(/([A-Z])/g, " $1")
-    .replace(/^./, (s) => s.toUpperCase());
-}
-
-export function formatValue(key, value) {
-  if (value === null || value === undefined || value === "") return "——";
-  if (typeof value === "boolean") return value ? "Yes" : "No";
-  if (key === "weightAsOf" && typeof value === "object") {
-    if (!value.value && !value.asOf) return "——";
-    return `${value.value ?? "——"} · ${value.asOf ? new Date(value.asOf + "T00:00:00").toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }) : "——"}`;
-  }
-  if ((key.toLowerCase().includes("date") || key === "readyToAdoptDate") && typeof value === "string") {
-    const d = new Date(value + "T00:00:00");
-    return isNaN(d) ? "——" : d.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
-  }
-  return String(value);
 }

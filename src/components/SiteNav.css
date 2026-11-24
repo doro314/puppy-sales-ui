@@ -136,6 +136,14 @@
   flex-shrink: 0;
 }
 
+.site-nav-name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .site-nav-section {
   display: flex;
   align-items: center;

@@ -47,18 +47,6 @@ export function IconCheck({ className }) {
   );
 }
 
-export function IconPaw() {
-  return <PawSvg className="cta-icon" />;
-}
-
-export function IconChevronDown({ className }) {
-  return (
-    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-      <polyline points="6 9 12 15 18 9" />
-    </svg>
-  );
-}
-
 export function IconHamburger({ className }) {
   return (
     <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -86,14 +74,5 @@ export function IconExpand({ className }) {
       <line x1="21" y1="3" x2="14" y2="10" />
       <line x1="3" y1="21" x2="10" y2="14" />
     </svg>
-  );
-}
-
-export function PawPlaceholder({ color = "#c8d6e5" }) {
-  return (
-    <div className="paw-placeholder">
-      <PawSvg fill={color} className="paw-placeholder-icon" />
-      <p className="paw-placeholder-text">Photos coming soon</p>
-    </div>
   );
 }

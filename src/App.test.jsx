@@ -37,8 +37,6 @@ vi.mock('./data/imageLoader', () => {
   return {
     getFolderPhotos: (folder) => folders[folder] ?? [],
     getPhoto: () => null,
-    getImagesByFolder: () => ({}),
-    getPhotoSrc: () => null,
   };
 });
 
@@ -67,6 +65,14 @@ describe('Site chrome', () => {
     for (const name of ['Home', 'PupAvailable', 'PupAdopted', 'PupReserved', 'Contact Us']) {
       expect(nav).toHaveTextContent(name);
     }
+  });
+
+  test('every puppy in the nav carries its status (PLUS-2)', () => {
+    renderAt();
+    const nav = screen.getByRole('navigation');
+    expect(within(nav).getByRole('link', { name: /PupReserved/ })).toHaveTextContent('Reserved');
+    expect(within(nav).getByRole('link', { name: /PupAdopted/ })).toHaveTextContent('Adopted');
+    expect(within(nav).getByRole('link', { name: /PupAvailable/ })).toHaveTextContent('Available');
   });
 });
 
@@ -157,7 +163,7 @@ describe('Navigation and links', () => {
 
   test('Inquire opens the form with the puppy named in the message', () => {
     renderAt('/pup-available');
-    fireEvent.click(screen.getByRole('button', { name: /Inquire About PupAvailable/i }));
+    fireEvent.click(screen.getByRole('link', { name: /Inquire about PupAvailable/ }));
     expect(screen.getByRole('textbox', { name: /message/i }).value).toMatch(/PupAvailable/);
   });
 
@@ -165,24 +171,67 @@ describe('Navigation and links', () => {
     renderAt('/contact?about=pup-available');
     expect(screen.getByRole('textbox', { name: /message/i }).value).toMatch(/PupAvailable/);
   });
+
+  test('the waitlist link opens the form ready to join the list', () => {
+    renderAt('/contact?about=waitlist');
+    expect(screen.getByRole('textbox', { name: /message/i }).value).toMatch(/next litter/);
+  });
 });
 
-describe('Puppy pages', () => {
-  test('each status shows its badge', () => {
+describe('Puppy pages (PUP-2)', () => {
+  const idBlock = () => document.querySelector('.pup-id');
+
+  test('an available puppy: status, a ready line and Inquire right under the name', () => {
     renderAt('/pup-available');
-    expect(screen.getByText('Available')).toBeInTheDocument();
+    expect(within(idBlock()).getByText('Available')).toBeInTheDocument();
+    expect(idBlock()).toHaveTextContent('Male · ready to go home now');
+    expect(screen.getByRole('link', { name: /Inquire about PupAvailable/ })).toHaveAttribute('href', '/contact?about=pup-available');
+    expect(screen.getByText('Reserve today — $100 holds him')).toBeInTheDocument();
   });
 
-  test('a reserved puppy is never offered as Available Soon', () => {
+  test('facts read in words, and empty ones are skipped', () => {
+    renderAt('/pup-available');
+    const facts = document.querySelector('.pup-facts');
+    expect(facts).toHaveTextContent('ColorSolid black');
+    expect(facts).toHaveTextContent('Weight27.8 oz at 3 weeks');
+    expect(facts).toHaveTextContent('PersonalityPlayful');
+    expect(facts).not.toHaveTextContent('Markings');
+  });
+
+  test('a puppy with no facts has no About section and never prints undefined or null', () => {
+    renderAt('/pup-partial');
+    expect(document.querySelector('.pup-facts')).toBeNull();
+    expect(screen.queryByText(/undefined|null/)).not.toBeInTheDocument();
+  });
+
+  test('before the ready date: the date, her age, and Get in line', () => {
+    vi.setSystemTime(new Date(2026, 6, 10));
+    renderAt('/pup-partial');
+    expect(idBlock()).toHaveTextContent('Ready Jul 28');
+    expect(idBlock()).toHaveTextContent('Female · 5 weeks old');
+    expect(screen.getByRole('link', { name: /Get in line for PupPartial/ })).toBeInTheDocument();
+  });
+
+  test('a reserved puppy points to the littermates still available, not a dead-end button', () => {
     vi.setSystemTime(new Date(2026, 6, 10));
     renderAt('/pup-reserved');
-    expect(screen.getByText('Reserved')).toBeInTheDocument();
-    expect(screen.queryByText('Available Soon')).not.toBeInTheDocument();
+    expect(within(idBlock()).getByText('Reserved')).toBeInTheDocument();
+    const stillLooking = screen.getByText('Still looking for homes').closest('section');
+    expect(within(stillLooking).getByRole('link', { name: /PupAvailable/ })).toBeInTheDocument();
+    expect(within(stillLooking).getByRole('link', { name: /PupPartial/ })).toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: /Inquire about|Get in line/ })).not.toBeInTheDocument();
   });
 
-  test('missing facts never print as undefined or null', () => {
-    renderAt('/pup-partial');
-    expect(screen.queryByText(/undefined/)).not.toBeInTheDocument();
-    expect(screen.queryByText(/null/)).not.toBeInTheDocument();
+  test('once every puppy has a home, the page offers the list for the next litter', () => {
+    litter.puppies.forEach((p) => { if (p.status === 'available') p.status = 'adopted'; });
+    renderAt('/pup-reserved');
+    expect(screen.getByRole('link', { name: 'Join the list for the next litter' })).toHaveAttribute('href', '/contact?about=waitlist');
+  });
+
+  test('littermates and the litter strip close an available puppy page', () => {
+    renderAt('/pup-available');
+    expect(screen.getByText('His littermates')).toBeInTheDocument();
+    expect(screen.getByText("From Mamma × Pappa's litter")).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'About the litter ›' })).toHaveAttribute('href', '/#litter-2026-06-test-litter');
   });
 });

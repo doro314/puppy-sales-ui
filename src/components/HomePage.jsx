@@ -12,8 +12,6 @@ import { DEPOSIT_AMOUNT, formatDay } from '../utils';
 
 import './HomePage.css';
 
-const LITTER_DETAILS_HASH = '#about-the-litter';
-
 function litterTitle(litter) {
   return litter.born ? `${litter.mom.name} & ${litter.dad.name}'s litter` : `${litter.mom.name} is expecting`;
 }
@@ -132,12 +130,14 @@ function ParentsSection({ litter }) {
 
 function HomePage({ today, showParents = false }) {
   const location = useLocation();
-  const isDetailsLink = location.hash === LITTER_DETAILS_HASH;
   const [litter] = getListedLitters();
+  const detailsId = `litter-${litter.id}`;
+  const isDetailsLink = location.hash === `#${detailsId}`;
 
+  // A puppy page's "About the litter" lands here with the litter's details open.
   useEffect(() => {
-    if (isDetailsLink) document.getElementById(LITTER_DETAILS_HASH.slice(1))?.scrollIntoView();
-  }, [isDetailsLink]);
+    if (isDetailsLink) document.getElementById(detailsId)?.scrollIntoView();
+  }, [isDetailsLink, detailsId]);
 
   return (
     <div className="home">

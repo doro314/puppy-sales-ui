@@ -79,7 +79,7 @@ function LitterCard({ litter, today, defaultOpen = false }) {
   const hasDetails = Boolean(litter.description || litter.facts?.length || litter.care?.length);
 
   return (
-    <section className="litter-card" id="about-the-litter" aria-label="About the litter">
+    <section className="litter-card" id={`litter-${litter.id}`} aria-label="About the litter">
       <div className="litter-card-panel">
         <div className="litter-card-bar" />
         <div className="litter-story">
