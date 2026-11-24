@@ -3,8 +3,9 @@ import { MemoryRouter } from 'react-router-dom';
 import { vi } from 'vitest';
 import App from './App';
 
-// App uses useSearchParams(), which requires a Router context
+// App reads the address, so it needs a Router context
 const renderApp = () => render(<App />, { wrapper: MemoryRouter });
+const renderAt = (path) => render(<MemoryRouter initialEntries={[path]}><App /></MemoryRouter>);
 
 // ── Mock data modules — tests never touch real puppies.jsx or images ───────
 
@@ -127,6 +128,24 @@ describe('Navigation', () => {
       fireEvent.click(inquireBtn);
       expect(screen.getByRole('textbox', { name: /message/i }).value).toMatch(/PupAvailable/i);
     }
+  });
+});
+
+describe('Puppy links', () => {
+  test('a puppy has its own address', () => {
+    renderAt('/PupAdopted');
+    expect(screen.getByRole('heading', { level: 2, name: /PupAdopted/i })).toBeInTheDocument();
+    expect(document.title).toBe('PupAdopted · Doro Family Puppies');
+  });
+
+  test('an unknown address goes Home', () => {
+    renderAt('/nobody-by-that-name');
+    expect(screen.getByText('Test Breed')).toBeInTheDocument();
+  });
+
+  test('a contact link names the puppy in the message', () => {
+    renderAt('/contact?about=PupAvailable');
+    expect(screen.getByRole('textbox', { name: /message/i }).value).toMatch(/PupAvailable/);
   });
 });
 

@@ -3,13 +3,9 @@ import { getCategoryById } from "../data/puppies";
 import { getImagesByFolder } from "../data/imageLoader";
 import PuppyDetails from "./PuppyDetails";
 import { IconClock, IconClose, IconExpand, IconHome, IconPaw, PawPlaceholder, PawSvg } from "./Icons";
+import { GENDER_COLORS } from "../utils";
 
 const allImagesByFolder = getImagesByFolder();
-
-const GENDER_COLORS = {
-  "paw-blue": "#4a90d9",
-  "paw-pink": "#e91e8c",
-};
 
 const AUTOPLAY_INTERVAL_MS = 8000;
 // The gallery column is at most 836 px wide (900 minus padding); phones use the full width.
@@ -64,7 +60,7 @@ function ParentsSection({ dadName, momName, dadPhoto, momPhoto }) {
   );
 }
 
-function CtaSection({ categoryFolder, categoryName, isAvailableSoon, available, accentColor, availablePuppies, browsablePuppies, onInquire, onNavigate }) {
+function CtaSection({ categoryId, categoryFolder, categoryName, isAvailableSoon, available, accentColor, availablePuppies, browsablePuppies, onInquire, onNavigate }) {
   if (!categoryFolder) return null;
 
   const goToRandom = (pool) => {
@@ -110,7 +106,7 @@ function CtaSection({ categoryFolder, categoryName, isAvailableSoon, available, 
                 <p className="cta-card-sub">But you can reach out to get first in line.</p>
               </div>
             </div>
-            <button className="cta-button" onClick={() => onInquire(categoryName, accentColor)}>Express Interest</button>
+            <button className="cta-button" onClick={() => onInquire(categoryId)}>Express Interest</button>
           </div>
         </div>
       </>
@@ -152,7 +148,7 @@ function CtaSection({ categoryFolder, categoryName, isAvailableSoon, available, 
                 <p className="cta-card-sub">Reach out and we'll guide you through the next steps.</p>
               </div>
             </div>
-            <button className="cta-button" onClick={() => onInquire(categoryName, accentColor)}>Inquire About {categoryName}</button>
+            <button className="cta-button" onClick={() => onInquire(categoryId)}>Inquire About {categoryName}</button>
           </div>
         </div>
       </>
@@ -319,6 +315,7 @@ function ImageGallery({ activeCategory, onInquire, onNavigate, categories = [], 
           <PawPlaceholder color={accentColor} />
         </div>
         <CtaSection
+          categoryId={activeCategory}
           categoryFolder={categoryFolder}
           categoryName={categoryName}
           isAvailableSoon={isAvailableSoon}
@@ -424,6 +421,7 @@ function ImageGallery({ activeCategory, onInquire, onNavigate, categories = [], 
       )}
 
       <CtaSection
+        categoryId={activeCategory}
         categoryFolder={categoryFolder}
         categoryName={categoryName}
         isAvailableSoon={isAvailableSoon}

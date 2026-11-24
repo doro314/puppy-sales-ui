@@ -1,3 +1,9 @@
+export const GENDER_COLORS = {
+  "paw-blue": "#4a90d9",
+  "paw-pink": "#e91e8c",
+};
+export const NEUTRAL_ACCENT = "#8a9bb0";
+
 export function isLikelyBot() {
   if (navigator.webdriver) return true;
   return /bot|crawl|spider|scrape|headless|phantom|selenium|puppeteer/i.test(navigator.userAgent);
