@@ -1,59 +1,28 @@
+/* Phones — the header bar, then the page; the document scrolls */
 .app-wrapper {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: auto 1fr;
+  grid-template-areas: "header" "main";
   min-height: 100vh;
 }
 
-.site-header {
-  background: linear-gradient(135deg, #1a2a3a 0%, #2c3e50 60%, #34495e 100%);
-  padding: 18px 32px;
-  border-bottom: 3px solid #4a90d9;
-  flex-shrink: 0;
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.25);
-}
-
-.site-header-icon {
-  font-size: 2rem;
-  line-height: 1;
-  flex-shrink: 0;
-}
-
-.site-header-text {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.site-title {
-  margin: 0;
-  color: white;
-  font-size: 1.6rem;
-  font-weight: 700;
-  letter-spacing: 0.03em;
-  line-height: 1.1;
-}
-
-.site-tagline {
-  margin: 0;
-  color: rgba(255, 255, 255, 0.55);
-  font-size: 0.78rem;
-  font-weight: 400;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
-
-.app-layout {
-  display: flex;
-  flex: 1;
-}
-
 .main-content {
-  flex: 1;
-  padding: 20px;
-  overflow-y: auto;
+  grid-area: main;
+  min-width: 0;
+  padding: 12px;
+}
+
+/* Desktop — the header across the top, the page list beside the page */
+@media (min-width: 768px) {
+  .app-wrapper {
+    grid-template-columns: 240px minmax(0, 1fr);
+    grid-template-areas: "header header" "nav main";
+  }
+
+  .main-content {
+    padding: 20px;
+  }
 }
 
 .gallery-container {
@@ -907,47 +876,6 @@
 
   .deposit-banner-text {
     font-size: 0.875rem;
-  }
-
-  /* Lock the viewport so header+accordion stay fixed and only main-content scrolls */
-  .app-wrapper {
-    height: 100dvh;
-    min-height: unset;
-    overflow: hidden;
-  }
-
-  /* Stack sidebar above content */
-  .app-layout {
-    flex-direction: column;
-    min-height: 0;
-    overflow: hidden;
-  }
-
-  .main-content {
-    min-height: 0;
-  }
-
-  /* Header */
-  .site-header {
-    padding: 16px 16px;
-    gap: 10px;
-  }
-
-  .site-header-icon {
-    font-size: 1.5rem;
-  }
-
-  .site-title {
-    font-size: 1.2rem;
-  }
-
-  .site-tagline {
-    font-size: 0.7rem;
-  }
-
-  /* Main content area */
-  .main-content {
-    padding: 12px;
   }
 
   .gallery-container {

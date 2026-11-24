@@ -3,7 +3,7 @@ import { Navigate, Route, Routes, useLocation, useNavigate, useNavigationType, u
 
 import ContactForm from './components/ContactForm';
 import ImageGallery from './components/ImageGallery';
-import Sidebar from './components/Sidebar';
+import SiteNav from './components/SiteNav';
 import { getCategories, getCategoryById } from './data/puppies';
 import { GENDER_COLORS, NEUTRAL_ACCENT, isLikelyBot } from './utils';
 
@@ -11,6 +11,7 @@ import './App.css';
 
 const SHOW_CONTACT = true;
 const SITE_NAME = 'Doro Family Puppies';
+const TAGLINE = 'Lovingly raised, family bred';
 const COUNTER_BASE = 'https://api.counterapi.dev/v1/doro-family-puppies';
 
 let counterFired = false;
@@ -119,29 +120,22 @@ function App() {
 
   return (
     <div className="app-wrapper">
-      <header className="site-header">
-        <span className="site-header-icon">🐾</span>
-        <div className="site-header-text">
-          <h1 className="site-title">{SITE_NAME}</h1>
-          <p className="site-tagline">Lovingly raised, family bred</p>
-        </div>
-      </header>
-      <div className="app-layout">
-        <Sidebar
-          categories={categories}
-          activeCategory={activeCategory}
-          onCategoryChange={goTo}
-          showContact={SHOW_CONTACT}
-        />
-        <main className="main-content">
-          <Routes>
-            <Route path="/" element={<HomeRoute galleryProps={galleryProps} />} />
-            {SHOW_CONTACT && <Route path="/contact" element={<ContactRoute />} />}
-            <Route path="/:slug" element={<PuppyRoute galleryProps={galleryProps} />} />
-            <Route path="*" element={<Navigate to="/" replace />} />
-          </Routes>
-        </main>
-      </div>
+      <SiteNav
+        siteName={SITE_NAME}
+        tagline={TAGLINE}
+        homeLabel={categories.find((c) => !c.folder)?.name}
+        puppies={categories.filter((c) => c.folder)}
+        activeId={activeCategory}
+        showContact={SHOW_CONTACT}
+      />
+      <main className="main-content">
+        <Routes>
+          <Route path="/" element={<HomeRoute galleryProps={galleryProps} />} />
+          {SHOW_CONTACT && <Route path="/contact" element={<ContactRoute />} />}
+          <Route path="/:slug" element={<PuppyRoute galleryProps={galleryProps} />} />
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </main>
     </div>
   );
 }
