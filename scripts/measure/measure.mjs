@@ -2,18 +2,15 @@
 // reports the y-coordinate and height of every block on a page, plus counts of
 // things a screenshot won't surface and the image bytes the page pulled.
 //
-//   node scripts/measure/measure.mjs [--tab Olive] [--query ?parents=true]
+//   node scripts/measure/measure.mjs [--path /bella] [--query ?parents=true]
 //                                    [--w 390] [--h 844] [--date 2026-11-24]
 //                                    [--shot out.png] [--full]
 //                                    [--origin http://localhost:4173]
 //
-// --tab clicks the sidebar tab with that label before measuring. Navigation is
-//   React state, not URLs, so there is no other way to reach a puppy page.
-// --full resizes the viewport to the content height before the screenshot.
-//   Mobile locks .app-wrapper to 100dvh and scrolls .main-content instead of
-//   the document, so captureBeyondViewport alone only ever returns one screen.
-// --date moves "today". readyToAdoptDate flips every puppy to Available Soon,
-//   so a run is only comparable to another run pinned to the same side of it.
+// --path is the page: / for Home, /bella for a puppy, /contact?about=bella.
+// --date moves "today". A litter's readyDate turns its available puppies into
+//   "Ready Jul 28", so a run is only comparable to another pinned to the same side.
+// --full makes the screenshot the whole page rather than the first screen.
 //
 // Measure the production build, not the dev server — dev serves the original
 // 2–4 MB phone photos, so image weights from it are meaningless:
@@ -27,29 +24,34 @@ import { writeFileSync } from 'node:fs'
 
 // ── ADAPT ────────────────────────────────────────────────────────────────────
 const TARGETS = {
-  header:      '.site-header',
-  navTrigger:  '.mobile-nav-trigger',
-  sidebar:     '.sidebar',
-  title:       '.gallery-title, .contact-title',
-  deposit:     '.deposit-banner',
-  details:     '.puppy-details',
-  statusBadge: '.status-badge',
-  litterInfo:  '.litter-info',
-  photo:       '.main-image-container, .paw-placeholder-container',
-  photoFooter: '.image-card-footer',
-  thumbs:      '.thumbnail-strip',
-  cta:         '.cta-card',
-  ctaButton:   '.cta-button',
-  copyright:   '.gallery-copyright',
+  header:       '.site-header',
+  gallery:      '.hero .carousel-frame, .hero--empty',
+  litterCard:   '.litter-card-panel',
+  tiles:        '.litter-tiles',
+  deposit:      '.home-deposit',
+  nextStep:     '.home-button',
+  puppiesHead:  '.home-sechead',
+  firstCard:    '.puppy-card',
+  firstChip:    '.puppy-card .status-chip',
+  puppyPhoto:   '.pup-photos .carousel-frame, .pup-photos-empty',
+  puppyTitle:   '.pup-title',
+  puppyStatus:  '.pup-id .status-chip',
+  inquire:      '.pup-button',
+  facts:        '.pup-facts',
+  litterStrip:  '.litter-strip',
+  littermates:  '.pup > .pup-mates',
+  contactTitle: '.contact-title',
+  footer:       '.site-footer',
 }
 
 const COUNTS = {
-  navTabs:      '.sidebar-tab',
-  statCells:    '.details-stat, .details-grid-item',
-  thumbnails:   '.thumbnail-btn',
-  ctaCards:     '.cta-card',
+  navPuppies:   '.site-nav-name',
+  statusChips:  '.status-chip',
+  puppyCards:   '.puppy-card',
+  tiles:        '.litter-tile',
+  facts:        '.pup-fact',
   buttons:      'button',
-  inquiryPaths: '.cta-button, .deposit-banner-btn, .contact-tab',
+  inquiryPaths: '.pup-button, .home-deposit, .home-button',
 }
 
 // counterapi.dev is the live visit counter. A measurement run must never count
@@ -67,7 +69,7 @@ const flag = (name) => argv.includes(`--${name}`)
 const ORIGIN = arg('origin', 'http://localhost:4173')
 const W = Number(arg('w', 390))
 const H = Number(arg('h', 844))
-const TAB = arg('tab', null)
+const PATH = arg('path', '/')
 const QUERY = arg('query', '')
 const SHOT = arg('shot', null)
 const FULL = flag('full')
@@ -124,8 +126,8 @@ await send('Network.setCacheDisabled', { cacheDisabled: true })
 const metrics = { width: W, height: H, deviceScaleFactor: 2, mobile: W < 768 }
 await send('Emulation.setDeviceMetricsOverride', metrics)
 
-// Pin the clock before any app code runs: isAvailableSoon and the copyright
-// year both read it.
+// Pin the clock before any app code runs: the ready-date badges and the
+// copyright year both read it.
 await send('Page.addScriptToEvaluateOnNewDocument', {
   source: `(() => {
     const Real = Date
@@ -142,47 +144,28 @@ await send('Page.addScriptToEvaluateOnNewDocument', {
   })()`,
 })
 
-await navigate(`${ORIGIN}/${QUERY}`)
-await wait(600)
-
-if (TAB) {
-  const clicked = await evaluate(`(() => {
-    const want = ${JSON.stringify(TAB)}.toLowerCase()
-    const tab = [...document.querySelectorAll('.sidebar-tab')]
-      .find((b) => b.textContent.trim().toLowerCase() === want)
-    if (!tab) return false
-    tab.click()
-    return true
-  })()`)
-  if (!clicked) { console.error(`no sidebar tab labelled "${TAB}"`); process.exit(1) }
-}
+await navigate(`${ORIGIN}${PATH}${QUERY}`)
 await wait(SETTLE)
 
 const report = await evaluate(`
   (async () => {
     // The hidden breakpoint's copy of an element has a zero rect. Take the
-    // first match that occupies space. Positions are page positions: the
-    // mobile scroller is .main-content, so add its scrollTop as well.
-    const scroller = document.querySelector('.main-content')
-    const sTop = scroller ? scroller.scrollTop : 0
+    // first match that occupies space.
     const y = (sel) => {
       for (const el of document.querySelectorAll(sel)) {
         const r = el.getBoundingClientRect()
         if (r.height > 0) return {
-          top: Math.round(r.top + scrollY + sTop),
-          bottom: Math.round(r.bottom + scrollY + sTop),
+          top: Math.round(r.top + scrollY),
+          bottom: Math.round(r.bottom + scrollY),
           h: Math.round(r.height),
         }
       }
       return null
     }
-    const isLocked = getComputedStyle(document.querySelector('.app-wrapper')).overflow === 'hidden'
     const out = {
       vw: innerWidth, vh: innerHeight,
-      scroller: isLocked ? '.main-content (document locked)' : 'document',
-      pageHeight: isLocked
-        ? Math.round(scroller.getBoundingClientRect().top + scroller.scrollHeight)
-        : Math.round(document.documentElement.scrollHeight),
+      path: location.pathname + location.search,
+      pageHeight: Math.round(document.documentElement.scrollHeight),
     }
     const t = ${JSON.stringify(TARGETS)}
     out.blocks = {}
@@ -190,30 +173,30 @@ const report = await evaluate(`
     const c = ${JSON.stringify(COUNTS)}
     out.counts = {}
     for (const k in c) out.counts[k] = document.querySelectorAll(c[k]).length
-    out.counts.emptyValues = [...document.querySelectorAll('.details-stat-value')]
-      .filter((el) => el.textContent.trim() === '\\u2014\\u2014').length
+    out.counts.emptyValues = [...document.querySelectorAll('main *')]
+      .filter((el) => !el.children.length && /^(——|undefined|null)$/.test(el.textContent.trim())).length
     out.text = {
-      title: document.querySelector('.gallery-title, .contact-title')?.textContent.trim() ?? null,
-      badge: document.querySelector('.status-badge')?.textContent.trim() ?? null,
-      cta: document.querySelector('.cta-card-heading')?.textContent.trim() ?? null,
-      ctaButton: document.querySelector('.cta-button')?.textContent.trim() ?? null,
+      title: document.querySelector('main h2')?.textContent.trim() ?? null,
+      subtitle: document.querySelector('.hero-sub, .pup-sub')?.textContent.trim() ?? null,
+      status: document.querySelector('.pup-id .status-chip')?.textContent.trim() ?? null,
+      nextStep: document.querySelector('.pup-button, .home-deposit, .home-button')?.textContent.trim() ?? null,
     }
     const imgs = performance.getEntriesByType('resource').filter((e) => e.initiatorType === 'img')
     out.images = {
       requests: imgs.length,
       kb: Math.round(imgs.reduce((s, e) => s + (e.encodedBodySize || 0), 0) / 1024),
     }
-    const main = document.querySelector('.main-image')
+    const main = document.querySelector('.carousel-slide img')
     if (main && main.naturalWidth) {
       const r = main.getBoundingClientRect()
       out.images.mainNatural = main.naturalWidth + 'x' + main.naturalHeight
       out.images.mainShown = Math.round(r.width) + 'x' + Math.round(r.height)
     }
-    const thumb = document.querySelector('.thumbnail')
-    if (thumb && thumb.naturalWidth) {
-      const r = thumb.getBoundingClientRect()
-      out.images.thumbNatural = thumb.naturalWidth + 'x' + thumb.naturalHeight
-      out.images.thumbShown = Math.round(r.width) + 'x' + Math.round(r.height)
+    const card = document.querySelector('.puppy-card-photo, .carousel-thumb img, .pup-mate-photo')
+    if (card && card.naturalWidth) {
+      const r = card.getBoundingClientRect()
+      out.images.cardNatural = card.naturalWidth + 'x' + card.naturalHeight
+      out.images.cardShown = Math.round(r.width) + 'x' + Math.round(r.height)
     }
     return out
   })()
@@ -221,13 +204,12 @@ const report = await evaluate(`
 console.log(JSON.stringify(report, null, 2))
 
 if (SHOT) {
-  if (FULL) {
-    await send('Emulation.setDeviceMetricsOverride', { ...metrics, height: Math.max(H, report.pageHeight + 24) })
-    await wait(500)
-  }
-  const { data } = await send('Page.captureScreenshot', { format: 'png', captureBeyondViewport: !FULL })
+  const { data } = await send('Page.captureScreenshot', {
+    format: 'png',
+    captureBeyondViewport: FULL,
+    ...(FULL ? { clip: { x: 0, y: 0, width: W, height: report.pageHeight, scale: 1 } } : {}),
+  })
   writeFileSync(SHOT, Buffer.from(data, 'base64'))
-  if (FULL) await send('Emulation.setDeviceMetricsOverride', metrics)
 }
 
 ws.close()

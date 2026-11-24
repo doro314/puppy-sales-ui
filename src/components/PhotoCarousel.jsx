@@ -70,8 +70,8 @@ function Lightbox({ photos, index, label, onIndexChange, onClose }) {
 }
 
 // Photos you swipe through (native scroll-snap), with an optional fullscreen view.
-// Only the photos up to one past the furthest reached are fetched, so a 27-photo
-// gallery costs two photos on arrival — the first and the one a swipe shows next.
+// A photo is fetched once it's shown or the one before it has finished loading, so a
+// 27-photo gallery starts with one photo, and the next is ready before a swipe needs it.
 function PhotoCarousel({
   photos, label, sizes = '100vw', className = '', isAutoplay = false,
   showCount = false, showDots = false, showThumbnails = false, onIndexChange, children,
@@ -79,18 +79,28 @@ function PhotoCarousel({
   const trackRef = useRef(null);
   const expandRef = useRef(null);
   const [index, setIndex] = useState(0);
-  const [loadedUpTo, setLoadedUpTo] = useState(1);
+  const [loadedUpTo, setLoadedUpTo] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
   const [isLightboxOpen, setIsLightboxOpen] = useState(false);
   const prefersReducedMotion = usePrefersReducedMotion();
   const count = photos.length;
   const isPlaying = isAutoplay && count > 1 && !isPaused && !isLightboxOpen && !prefersReducedMotion;
 
+  // Only the photo on screen fetches the next one; otherwise each load would chain into
+  // the next and the whole gallery would download in a row.
+  const loadedRef = useRef(new Set());
+  const fetchThrough = (i) => setLoadedUpTo((upTo) => Math.max(upTo, Math.min(i, count - 1)));
+
   const showIndex = useCallback((i) => {
     setIndex(i);
-    setLoadedUpTo((upTo) => Math.max(upTo, i + 1));
+    setLoadedUpTo((upTo) => Math.max(upTo, Math.min(loadedRef.current.has(i) ? i + 1 : i, count - 1)));
     onIndexChange?.(i);
-  }, [onIndexChange]);
+  }, [onIndexChange, count]);
+
+  const handlePhotoLoaded = (i) => {
+    loadedRef.current.add(i);
+    if (i === index) fetchThrough(i + 1);
+  };
 
   const scrollToIndex = useCallback((i, behavior = 'smooth') => {
     const track = trackRef.current;
@@ -144,10 +154,10 @@ function PhotoCarousel({
                   srcSet={photo.srcSet}
                   sizes={sizes}
                   alt={`${label}, photo ${i + 1} of ${count}`}
-                  loading={i === 0 ? 'eager' : 'lazy'}
                   fetchPriority={i === 0 ? 'high' : undefined}
                   decoding="async"
                   draggable={false}
+                  onLoad={() => handlePhotoLoaded(i)}
                   onClick={() => setIsLightboxOpen(true)}
                 />
               )}
