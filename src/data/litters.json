@@ -1,0 +1,58 @@
+{
+  "$schema": "./litters.schema.json",
+  "litters": [
+    {
+      "id": "2026-06-coco-leo",
+      "listed": true,
+      "breed": "Havapoo",
+      "mom": { "name": "Coco", "breed": "Havapoo", "photo": "coco.jpg" },
+      "dad": { "name": "Leo", "breed": "Havapoo", "photo": "leo.jpg" },
+      "born": "2026-06-02",
+      "readyDate": "2026-07-28",
+      "care": [
+        { "type": "dewormed", "date": "2026-06-29" },
+        { "type": "vet-check" }
+      ],
+      "description": "Raised in a loving home with children and other pets, making them well-socialized and ready to settle into family life from day one.",
+      "facts": [
+        "Typically range from 7 to 20 lbs",
+        "Hypoallergenic, making them a good match for those with mild pet allergies",
+        "Highly trainable and eager to please"
+      ],
+      "puppies": [
+        {
+          "slug": "bella", "name": "Bella", "sex": "female", "status": "available",
+          "color": ["white", "black"], "pattern": "parti",
+          "markings": "Black face mask and side spot", "personality": "Curiously energetic",
+          "weights": [{ "date": "2026-06-28", "oz": 27.8 }]
+        },
+        {
+          "slug": "brownie", "name": "Brownie", "sex": "male", "status": "reserved",
+          "color": ["brown"], "pattern": "abstract",
+          "markings": "White toes", "personality": "Cautious explorer",
+          "weights": [{ "date": "2026-06-28", "oz": 29.6 }],
+          "cover": "IMG_1876.jpeg"
+        },
+        {
+          "slug": "jasper", "name": "Jasper", "sex": "male", "status": "reserved",
+          "color": ["brown"], "pattern": "abstract",
+          "markings": "White back paws and tip of tail", "personality": "Chill explorer",
+          "weights": [{ "date": "2026-06-28", "oz": 26.5 }],
+          "cover": "IMG_1892.jpeg"
+        },
+        {
+          "slug": "olive", "name": "Olive", "sex": "female", "status": "available",
+          "color": ["white", "black"], "pattern": "parti",
+          "markings": "Black spot on left eye", "personality": "Chill cuddler",
+          "weights": [{ "date": "2026-06-28", "oz": 28.5 }]
+        },
+        {
+          "slug": "pepper", "name": "Pepper", "sex": "male", "status": "available",
+          "color": ["white", "brown"], "pattern": "parti",
+          "markings": "Brown face mask and rear spot", "personality": "Outgoingly brave",
+          "weights": [{ "date": "2026-06-28", "oz": 29.7 }]
+        }
+      ]
+    }
+  ]
+}

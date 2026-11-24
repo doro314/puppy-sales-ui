@@ -1,0 +1,183 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Doro Family Puppies — litters",
+  "description": "Every litter and puppy on the site. Edit litters.json; this file lists what each field may hold.",
+  "type": "object",
+  "required": ["litters"],
+  "additionalProperties": false,
+  "properties": {
+    "$schema": { "type": "string" },
+    "litters": {
+      "description": "Newest first. The site shows every litter whose listed is true.",
+      "type": "array",
+      "items": { "$ref": "#/definitions/litter" }
+    }
+  },
+  "definitions": {
+    "date": {
+      "type": "string",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$",
+      "patternErrorMessage": "Write dates as YYYY-MM-DD, e.g. 2026-07-04."
+    },
+    "slug": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+      "patternErrorMessage": "Lowercase letters, numbers and dashes only, e.g. bella or mr-pickles."
+    },
+    "text": { "type": "string", "minLength": 1 },
+    "parent": {
+      "type": "object",
+      "required": ["name", "breed"],
+      "additionalProperties": false,
+      "properties": {
+        "name": { "$ref": "#/definitions/text", "description": "The parent's name, e.g. Coco." },
+        "breed": { "$ref": "#/definitions/text", "description": "e.g. Havapoo." },
+        "photo": { "type": "string", "description": "A file in src/images/parents/, shown only as a small round icon on the litter card." }
+      }
+    },
+    "sex": {
+      "description": "Sets the pink or blue accent and paw.",
+      "enum": ["female", "male"],
+      "enumDescriptions": ["Pink accent. Shows Female.", "Blue accent. Shows Male."]
+    },
+    "status": {
+      "description": "What a visitor can do. The Ready (date) badge is never typed: it comes from the litter's readyDate.",
+      "enum": ["available", "reserved", "adopted"],
+      "enumDescriptions": [
+        "Shows the Inquire button. Before the litter's readyDate the badge reads Ready and the date, e.g. Ready Jul 28.",
+        "Deposit paid. Amber badge; the page points to littermates still available.",
+        "Gone home. The page points to littermates still available, or the waitlist."
+      ]
+    },
+    "color": {
+      "enum": ["white", "cream", "apricot", "gold", "red", "brown", "black", "silver"],
+      "enumDescriptions": [
+        "White.",
+        "Pale, off-white.",
+        "Light orange-gold.",
+        "Deeper yellow-gold.",
+        "Deep red-orange.",
+        "Brown. Breed clubs call it chocolate.",
+        "Black.",
+        "Born dark, clears to grey-silver."
+      ]
+    },
+    "pattern": {
+      "description": "Joins the color on the page: White and black parti.",
+      "enum": ["solid", "parti", "tuxedo", "phantom", "abstract", "sable", "brindle", "merle"],
+      "enumDescriptions": [
+        "One color all over.",
+        "Mostly white with patches of a second color.",
+        "Solid, with a white chest, belly and feet.",
+        "Two colors, with tan or cream points on face, chest and legs.",
+        "Solid, with small white marks.",
+        "Darker tips on lighter hair; often lightens with age.",
+        "Striped, like a tiger.",
+        "Marbled patches of a diluted color."
+      ]
+    },
+    "careType": {
+      "enum": ["vet-check", "dewormed", "vaccinated", "microchipped"],
+      "enumDescriptions": ["Shows Vet checked.", "Shows Dewormed and the date.", "Shows Vaccinated, the date and the note.", "Shows Microchipped."]
+    },
+    "careEvent": {
+      "type": "object",
+      "required": ["type"],
+      "additionalProperties": false,
+      "properties": {
+        "type": { "$ref": "#/definitions/careType" },
+        "date": { "$ref": "#/definitions/date" },
+        "note": { "type": "string", "description": "e.g. First DHPP." }
+      }
+    },
+    "weight": {
+      "type": "object",
+      "required": ["date", "oz"],
+      "additionalProperties": false,
+      "properties": {
+        "date": { "$ref": "#/definitions/date" },
+        "oz": { "type": "number", "exclusiveMinimum": 0, "description": "Ounces as a number: 27.8, not \"27.8 oz\"." }
+      }
+    },
+    "puppy": {
+      "type": "object",
+      "required": ["slug", "name", "sex", "status"],
+      "additionalProperties": false,
+      "properties": {
+        "slug": { "$ref": "#/definitions/slug", "description": "Unique across all litters. Also the photo folder: src/images/(litter id)/(slug)/." },
+        "name": { "$ref": "#/definitions/text" },
+        "sex": { "$ref": "#/definitions/sex" },
+        "status": { "$ref": "#/definitions/status" },
+        "color": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 3,
+          "uniqueItems": true,
+          "items": { "$ref": "#/definitions/color" },
+          "description": "Main color first, e.g. [\"white\", \"black\"]."
+        },
+        "pattern": { "$ref": "#/definitions/pattern" },
+        "markings": { "$ref": "#/definitions/text", "description": "A short phrase starting with a capital, e.g. Black spot on left eye." },
+        "personality": { "$ref": "#/definitions/text", "description": "One to three words, e.g. Chill cuddler." },
+        "weights": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/weight" },
+          "description": "Append one entry per weigh-in. The page shows the latest with the puppy's age."
+        },
+        "cover": { "type": "string", "description": "A file in this puppy's folder to show first. Default: the first file alphabetically." }
+      },
+      "defaultSnippets": [
+        {
+          "label": "New puppy",
+          "description": "Then make the folder src/images/(litter id)/(slug)/",
+          "body": {
+            "slug": "${1:name}",
+            "name": "${2:Name}",
+            "sex": "${3|female,male|}",
+            "status": "available",
+            "color": ["${4|white,cream,apricot,gold,red,brown,black,silver|}"],
+            "markings": "$5",
+            "personality": "$6",
+            "weights": []
+          }
+        }
+      ]
+    },
+    "litter": {
+      "type": "object",
+      "required": ["id", "listed", "breed", "mom", "dad", "puppies"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "$ref": "#/definitions/slug", "description": "Year-month-mom-dad, e.g. 2026-06-coco-leo. Never rename once photos exist: it is the folder name." },
+        "listed": { "type": "boolean", "description": "false hides this litter from the site without deleting anything." },
+        "breed": { "$ref": "#/definitions/text" },
+        "mom": { "$ref": "#/definitions/parent" },
+        "dad": { "$ref": "#/definitions/parent" },
+        "due": { "$ref": "#/definitions/date", "description": "While expecting. The site shows Due (date) until born is set." },
+        "born": { "$ref": "#/definitions/date" },
+        "readyDate": { "$ref": "#/definitions/date", "description": "Ready to go home. Until then, available puppies' badges read Ready and this date." },
+        "litterSize": { "type": "integer", "minimum": 1, "description": "Only if not every puppy is listed. Otherwise the puppies are counted." },
+        "care": { "type": "array", "items": { "$ref": "#/definitions/careEvent" } },
+        "description": { "$ref": "#/definitions/text" },
+        "facts": { "type": "array", "items": { "$ref": "#/definitions/text" }, "description": "Key breed facts, one short sentence each." },
+        "cover": { "type": "string", "description": "A file in src/images/(litter id)/ to lead Home's gallery. Default: the first file alphabetically." },
+        "puppies": { "type": "array", "items": { "$ref": "#/definitions/puppy" } }
+      },
+      "defaultSnippets": [
+        {
+          "label": "New litter",
+          "description": "An expecting litter. Add born, readyDate and puppies when they arrive.",
+          "body": {
+            "id": "${1:2027-01-coco-leo}",
+            "listed": true,
+            "breed": "${2:Havapoo}",
+            "mom": { "name": "${3:Coco}", "breed": "${2:Havapoo}", "photo": "${4:coco.jpg}" },
+            "dad": { "name": "${5:Leo}", "breed": "${2:Havapoo}", "photo": "${6:leo.jpg}" },
+            "due": "${7:2027-01-12}",
+            "puppies": []
+          }
+        }
+      ]
+    }
+  }
+}
