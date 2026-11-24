@@ -1,0 +1,37 @@
+.status-chip {
+  display: inline-block;
+  flex-shrink: 0;
+  padding: 3px 7px;
+  border: 1.5px solid;
+  border-radius: 5px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  line-height: 1.3;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.status-chip--available {
+  color: #1d8047;
+  background: #e8f8f0;
+  border-color: #a9dfbf;
+}
+
+.status-chip--soon {
+  color: #5a6a7a;
+  background: #f0f2f5;
+  border-color: #c4cdd6;
+}
+
+.status-chip--reserved {
+  color: #7a4f00;
+  background: #fff8e1;
+  border-color: #ffd666;
+}
+
+.status-chip--adopted {
+  color: #c0392b;
+  background: #fdf0f0;
+  border-color: #f5b7b1;
+}

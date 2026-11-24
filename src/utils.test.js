@@ -1,5 +1,6 @@
 import {
-  daysBetween, formatAge, formatCoat, formatDay, formatOunces, formatWeight, todayString, withCoverFirst,
+  daysBetween, firstClause, formatAge, formatCoat, formatDay, formatOunces, formatWeight, pluralize, todayString,
+  withCoverFirst,
 } from './utils';
 
 describe('dates', () => {
@@ -54,6 +55,19 @@ describe('coats', () => {
     expect(formatCoat(['black', 'white', 'tan'], 'tuxedo')).toBe('Black, white & tan tuxedo');
     expect(formatCoat(['cream'])).toBe('Cream');
     expect(formatCoat([])).toBeNull();
+  });
+});
+
+describe('wording', () => {
+  test('breeds pluralize', () => {
+    expect(pluralize('Havapoo')).toBe('Havapoos');
+    expect(pluralize('Poodle mix')).toBe('Poodle mixes');
+  });
+
+  test('a card shows the opening of the description', () => {
+    const description = 'Raised in a loving home with children and other pets, making them well-socialized and ready to settle into family life from day one.';
+    expect(firstClause(description)).toBe('Raised in a loving home with children and other pets.');
+    expect(firstClause('Born in our kitchen. Raised with two kids.')).toBe('Born in our kitchen.');
   });
 });
 

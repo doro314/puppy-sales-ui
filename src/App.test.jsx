@@ -1,226 +1,188 @@
-import { render, screen, fireEvent } from '@testing-library/react';
+import { fireEvent, render, screen, within } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { vi } from 'vitest';
+
 import App from './App';
 
-// App reads the address, so it needs a Router context
-const renderApp = () => render(<App />, { wrapper: MemoryRouter });
-const renderAt = (path) => render(<MemoryRouter initialEntries={[path]}><App /></MemoryRouter>);
+// ── A fixture litter stands in for litters.json; the real data layer runs on it ──
 
-// ── Mock data modules — tests never touch real puppies.jsx or images ───────
+const fixture = vi.hoisted(() => ({
+  litters: [
+    {
+      id: '2026-06-test-litter',
+      listed: true,
+      breed: 'Test Breed',
+      mom: { name: 'Mamma', breed: 'Test Breed', photo: 'mamma.jpg' },
+      dad: { name: 'Pappa', breed: 'Test Breed', photo: 'pappa.jpg' },
+      born: '2026-06-02',
+      readyDate: '2026-07-28',
+      care: [{ type: 'dewormed', date: '2026-06-29' }, { type: 'vet-check' }],
+      description: 'Raised with kids and cats, so they settle in fast.',
+      facts: ['Small and friendly'],
+      puppies: [
+        { slug: 'pup-available', name: 'PupAvailable', sex: 'male', status: 'available', color: ['black'], pattern: 'solid', personality: 'Playful', weights: [{ date: '2026-06-28', oz: 27.8 }] },
+        { slug: 'pup-adopted', name: 'PupAdopted', sex: 'female', status: 'adopted', color: ['white'], personality: 'Calm' },
+        { slug: 'pup-reserved', name: 'PupReserved', sex: 'male', status: 'reserved', color: ['brown'], personality: 'Bold' },
+        { slug: 'pup-partial', name: 'PupPartial', sex: 'female', status: 'available' },
+      ],
+    },
+  ],
+}));
 
-vi.mock('./data/puppies', () => {
-  const categories = [
-    {
-      id: 'home',
-      name: 'Our Litter',
-      icon: null,
-      folder: null,
-      details: {
-        breed: 'Test Breed',
-        mom: 'Test Mom',
-        birthDate: '2025-01-01',
-        litterSize: 2,
-        readyToAdoptDate: '2025-03-01', // past date → isAvailableSoon = false
-        litterDescription: 'Test litter description.',
-      },
-    },
-    {
-      id: 'PupAvailable',
-      name: 'PupAvailable',
-      icon: 'paw-blue',
-      folder: 'pupavailable',
-      details: { sex: 'Male', color: 'Black', personality: 'Playful', available: 'available' },
-    },
-    {
-      id: 'PupAdopted',
-      name: 'PupAdopted',
-      icon: 'paw-pink',
-      folder: 'pupadopted',
-      details: { sex: 'Female', color: 'White', personality: 'Calm', available: 'adopted' },
-    },
-    {
-      id: 'PupReserved',
-      name: 'PupReserved',
-      icon: 'paw-blue',
-      folder: 'pupreserved',
-      details: { sex: 'Male', color: 'Brown', personality: 'Bold', available: 'reserved' },
-    },
-    {
-      id: 'PupPartial',
-      name: 'PupPartial',
-      icon: 'paw-blue',
-      folder: 'puppartial',
-      details: {
-        sex: null,
-        color: undefined,
-        weightAsOf: { value: null, asOf: null },
-        personality: 'Shy',
-        available: null,
-      },
-    },
-    {
-      id: 'PupEdge',
-      name: 'PupEdge',
-      icon: 'unknown-icon',          // not in GENDER_COLORS
-      folder: 'pupedge',
-      details: {
-        vetChecked: true,             // boolean → should show "Yes"
-        microchipped: false,          // boolean → should show "No"
-        birthDate: 'not-a-date',      // malformed date → should show ——
-        available: 'available',
-      },
-    },
-  ];
+vi.mock('./data/litters.json', () => ({ default: fixture }));
+
+vi.mock('./data/imageLoader', () => {
+  const photo = { name: 'a.jpg', src: '/a-1280.webp', srcSet: '/a-1280.webp 1280w', thumb: '/a-320.webp' };
+  const folders = { '2026-06-test-litter': [photo] };
   return {
-    getCategories: () => categories,
-    getCategoryById: (id) => categories.find((c) => c.id === id) ?? null,
-    default: {},
+    getFolderPhotos: (folder) => folders[folder] ?? [],
+    getPhoto: () => null,
+    getImagesByFolder: () => ({}),
+    getPhotoSrc: () => null,
   };
 });
 
-vi.mock('./data/imageLoader', () => ({
-  getImagesByFolder: () => ({}),
-}));
+const litter = fixture.litters[0];
+const originalStatuses = litter.puppies.map((p) => p.status);
+
+const renderAt = (path = '/') => render(<MemoryRouter initialEntries={[path]}><App /></MemoryRouter>);
+
+beforeEach(() => {
+  vi.useFakeTimers({ toFake: ['Date'] });
+  vi.setSystemTime(new Date(2026, 7, 1));
+});
+
+afterEach(() => {
+  vi.useRealTimers();
+  litter.puppies.forEach((p, i) => { p.status = originalStatuses[i]; });
+});
 
 // ── Tests ──────────────────────────────────────────────────────────────────
 
-describe('App layout', () => {
-  test('renders site header', () => {
-    renderApp();
+describe('Site chrome', () => {
+  test('the bar names the site and the nav lists every page', () => {
+    renderAt();
     expect(screen.getByText('Doro Family Puppies')).toBeInTheDocument();
-    expect(screen.getByText(/Lovingly raised/i)).toBeInTheDocument();
-  });
-
-  test('renders sidebar tabs for all categories', () => {
-    renderApp();
     const nav = screen.getByRole('navigation');
-    expect(nav).toHaveTextContent('Our Litter');
-    expect(nav).toHaveTextContent('PupAvailable');
-    expect(nav).toHaveTextContent('PupAdopted');
-    expect(nav).toHaveTextContent('PupReserved');
-  });
-
-  test('renders contact tab', () => {
-    renderApp();
-    expect(screen.getByText('Contact Us')).toBeInTheDocument();
-  });
-});
-
-describe('Navigation', () => {
-  test('clicking a puppy tab updates the gallery heading', () => {
-    renderApp();
-    fireEvent.click(screen.getByText('PupAvailable'));
-    expect(screen.getByRole('heading', { level: 2, name: /PupAvailable/i })).toBeInTheDocument();
-  });
-
-  test('clicking Contact Us shows the contact form', () => {
-    renderApp();
-    fireEvent.click(screen.getByText('Contact Us'));
-    expect(screen.getByText(/Interested in one of our puppies/i)).toBeInTheDocument();
-  });
-
-  test('contact form is prefilled after clicking Inquire', () => {
-    renderApp();
-    fireEvent.click(screen.getByText('PupAvailable'));
-    const inquireBtn = screen.queryByRole('button', { name: /Inquire About PupAvailable/i });
-    if (inquireBtn) {
-      fireEvent.click(inquireBtn);
-      expect(screen.getByRole('textbox', { name: /message/i }).value).toMatch(/PupAvailable/i);
+    for (const name of ['Home', 'PupAvailable', 'PupAdopted', 'PupReserved', 'Contact Us']) {
+      expect(nav).toHaveTextContent(name);
     }
   });
 });
 
-describe('Puppy links', () => {
+describe('Home (HOME-8)', () => {
+  test('the gallery names the litter and how many are still looking', () => {
+    renderAt();
+    expect(screen.getByRole('heading', { level: 2, name: "Mamma & Pappa's litter" })).toBeInTheDocument();
+    expect(screen.getByText('2 of 4 still looking for a home')).toBeInTheDocument();
+  });
+
+  test('the litter card shows the parents and opens more about the litter in place', () => {
+    renderAt();
+    expect(screen.getByText('Mamma × Pappa')).toBeInTheDocument();
+    expect(screen.getByText(/Mom & dad · Test Breeds/)).toBeInTheDocument();
+    expect(screen.queryByText('Small and friendly')).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: /More about the litter/ }));
+    expect(screen.getByText('Care so far')).toBeInTheDocument();
+    expect(screen.getByText('Small and friendly')).toBeInTheDocument();
+  });
+
+  test('a tile for each major detail, care steps only once done', () => {
+    renderAt();
+    const tiles = document.querySelector('.litter-tiles');
+    expect(tiles).toHaveTextContent('BornJun 2');
+    expect(tiles).toHaveTextContent('Goes homeNow');
+    expect(tiles).toHaveTextContent('Vet checkedYes');
+    expect(tiles).toHaveTextContent('DewormedJun 29');
+    expect(tiles).not.toHaveTextContent('Vaccinated');
+  });
+
+  test('the reserve banner sits under the tiles while a puppy is available', () => {
+    renderAt();
+    expect(screen.getByRole('link', { name: /Reserve today — \$100 holds your pup/ })).toHaveAttribute('href', '/contact');
+  });
+
+  test('every puppy card carries its status', () => {
+    renderAt();
+    const grid = document.querySelector('.puppy-grid');
+    expect(within(grid).getByRole('link', { name: /PupReserved/ })).toHaveTextContent('Reserved');
+    expect(within(grid).getByRole('link', { name: /PupAdopted/ })).toHaveTextContent('Adopted');
+    expect(within(grid).getAllByText('Available')).toHaveLength(2);
+  });
+
+  test('before the ready date, available puppies show when they can go home', () => {
+    vi.setSystemTime(new Date(2026, 6, 10));
+    renderAt();
+    expect(within(document.querySelector('.puppy-grid')).getAllByText('Ready Jul 28')).toHaveLength(2);
+    expect(document.querySelector('.litter-tiles')).toHaveTextContent('Goes homeJul 28');
+  });
+
+  test('once every puppy is spoken for, the banner gives way to the next-litter list', () => {
+    litter.puppies.forEach((p) => { if (p.status === 'available') p.status = 'reserved'; });
+    renderAt();
+    expect(screen.getByText('Every puppy has a home')).toBeInTheDocument();
+    expect(screen.queryByText(/Reserve today/)).not.toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Join the list for the next litter' })).toHaveAttribute('href', '/contact?about=waitlist');
+  });
+
+  test('?parents=true still shows the parents section', () => {
+    renderAt('/?parents=true');
+    expect(screen.getByText('Meet the Parents')).toBeInTheDocument();
+  });
+});
+
+describe('Navigation and links', () => {
+  test('a puppy card opens that puppy', () => {
+    renderAt();
+    fireEvent.click(within(document.querySelector('.puppy-grid')).getByRole('link', { name: /PupReserved/ }));
+    expect(screen.getByRole('heading', { level: 2, name: /PupReserved/ })).toBeInTheDocument();
+  });
+
   test('a puppy has its own address', () => {
-    renderAt('/PupAdopted');
-    expect(screen.getByRole('heading', { level: 2, name: /PupAdopted/i })).toBeInTheDocument();
+    renderAt('/pup-adopted');
+    expect(screen.getByRole('heading', { level: 2, name: /PupAdopted/ })).toBeInTheDocument();
     expect(document.title).toBe('PupAdopted · Doro Family Puppies');
   });
 
   test('an unknown address goes Home', () => {
     renderAt('/nobody-by-that-name');
-    expect(screen.getByText('Test Breed')).toBeInTheDocument();
+    expect(screen.getByRole('heading', { level: 2, name: "Mamma & Pappa's litter" })).toBeInTheDocument();
+  });
+
+  test('Contact Us opens the form', () => {
+    renderAt();
+    fireEvent.click(screen.getByText('Contact Us'));
+    expect(screen.getByText(/Interested in one of our puppies/i)).toBeInTheDocument();
+  });
+
+  test('Inquire opens the form with the puppy named in the message', () => {
+    renderAt('/pup-available');
+    fireEvent.click(screen.getByRole('button', { name: /Inquire About PupAvailable/i }));
+    expect(screen.getByRole('textbox', { name: /message/i }).value).toMatch(/PupAvailable/);
   });
 
   test('a contact link names the puppy in the message', () => {
-    renderAt('/contact?about=PupAvailable');
+    renderAt('/contact?about=pup-available');
     expect(screen.getByRole('textbox', { name: /message/i }).value).toMatch(/PupAvailable/);
   });
 });
 
-describe('Puppy details', () => {
-  test('Our Litter shows mocked breed data', () => {
-    renderApp();
-    expect(screen.getByText('Test Breed')).toBeInTheDocument();
-  });
-
-  test('available puppy shows Available badge', () => {
-    renderApp();
-    fireEvent.click(screen.getByText('PupAvailable'));
+describe('Puppy pages', () => {
+  test('each status shows its badge', () => {
+    renderAt('/pup-available');
     expect(screen.getByText('Available')).toBeInTheDocument();
   });
 
-  test('adopted puppy shows Adopted badge', () => {
-    renderApp();
-    fireEvent.click(screen.getByText('PupAdopted'));
-    expect(screen.getByText('Adopted')).toBeInTheDocument();
-  });
-
-  test('reserved puppy shows Reserved badge and not Available Soon', () => {
-    renderApp();
-    fireEvent.click(screen.getByText('PupReserved'));
+  test('a reserved puppy is never offered as Available Soon', () => {
+    vi.setSystemTime(new Date(2026, 6, 10));
+    renderAt('/pup-reserved');
     expect(screen.getByText('Reserved')).toBeInTheDocument();
     expect(screen.queryByText('Available Soon')).not.toBeInTheDocument();
   });
-});
 
-describe('Missing data handling', () => {
-  test('null/undefined/empty fields render as -- not raw undefined or N/A', () => {
-    renderApp();
-    fireEvent.click(screen.getByText('PupPartial'));
-    const dashes = screen.getAllByText('\u2014\u2014');  // em-dash placeholder
-    expect(dashes.length).toBeGreaterThanOrEqual(3);
-    expect(screen.queryByText('undefined')).not.toBeInTheDocument();
-    expect(screen.queryByText('null')).not.toBeInTheDocument();
-    expect(screen.queryByText('N/A')).not.toBeInTheDocument();
-    expect(screen.getByText('Shy')).toBeInTheDocument();
-  });
-
-  test('null available hides the status badge entirely', () => {
-    renderApp();
-    fireEvent.click(screen.getByText('PupPartial'));
-    expect(screen.queryByText('Available')).not.toBeInTheDocument();
-    expect(screen.queryByText('Adopted')).not.toBeInTheDocument();
-    expect(screen.queryByText('Available Soon')).not.toBeInTheDocument();
-  });
-
-  test('null sex falls back to -- instead of rendering a pill', () => {
-    renderApp();
-    fireEvent.click(screen.getByText('PupPartial'));
-    // The sex-pill should not exist — value falls through to formatValue → "--"
-    expect(document.querySelector('.sex-pill')).not.toBeInTheDocument();
-  });
-});
-
-describe('Edge case data formatting', () => {
-  test('boolean true renders as Yes, false as No', () => {
-    renderApp();
-    fireEvent.click(screen.getByText('PupEdge'));
-    expect(screen.getByText('Yes')).toBeInTheDocument();
-    expect(screen.getByText('No')).toBeInTheDocument();
-  });
-
-  test('malformed date string renders as —— not "Invalid Date"', () => {
-    renderApp();
-    fireEvent.click(screen.getByText('PupEdge'));
-    expect(screen.queryByText('Invalid Date')).not.toBeInTheDocument();
-  });
-
-  test('unknown icon value falls back to neutral grey accent without crash', () => {
-    renderApp();
-    fireEvent.click(screen.getByText('PupEdge'));
-    const heading = screen.getByRole('heading', { level: 2, name: /PupEdge/i });
-    expect(heading.style.color).toBeTruthy();
+  test('missing facts never print as undefined or null', () => {
+    renderAt('/pup-partial');
+    expect(screen.queryByText(/undefined/)).not.toBeInTheDocument();
+    expect(screen.queryByText(/null/)).not.toBeInTheDocument();
   });
 });

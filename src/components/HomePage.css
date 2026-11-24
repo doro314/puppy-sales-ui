@@ -1,0 +1,294 @@
+/* Phones — gallery edge to edge, then the litter card, tiles, next step and puppies */
+.home {
+  padding-bottom: 8px;
+}
+
+.hero {
+  --carousel-height: 288px;
+  position: relative;
+}
+
+.hero-shade {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 2;
+  height: 130px;
+  background: linear-gradient(rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.72));
+  pointer-events: none;
+}
+
+.hero-text {
+  position: absolute;
+  left: 16px;
+  right: 16px;
+  bottom: 16px;
+  z-index: 3;
+  pointer-events: none;
+}
+
+.hero-title {
+  margin: 0;
+  color: white;
+  font-size: 23px;
+  font-weight: 700;
+  line-height: 1.2;
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.35);
+}
+
+.hero-sub {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin: 4px 0 0;
+  color: #c9f5da;
+  font-size: 13.5px;
+  font-weight: 600;
+}
+
+.hero-sub::before {
+  content: '';
+  width: 8px;
+  height: 8px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: #2fa866;
+}
+
+.hero-sub--off {
+  color: rgba(255, 255, 255, 0.88);
+}
+
+.hero-sub--off::before {
+  background: #a7b3c0;
+}
+
+.hero--empty {
+  height: 230px;
+  overflow: hidden;
+  background: radial-gradient(120% 90% at 85% 10%, #3d556c 0%, #2c3e50 55%, #1f3040 100%);
+}
+
+.hero-paw {
+  position: absolute;
+  top: -22px;
+  right: -26px;
+  width: 230px;
+  height: 230px;
+  color: rgba(255, 255, 255, 0.07);
+  transform: rotate(18deg);
+}
+
+#about-the-litter {
+  scroll-margin-top: 68px;
+}
+
+.home-deposit {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  height: 56px;
+  box-sizing: border-box;
+  margin: 16px 16px 0;
+  padding: 0 14px;
+  border-left: 4px solid #e07b1a;
+  border-radius: 10px;
+  background: #fff4e6;
+  color: #9a4a0b;
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: transform 0.18s ease, box-shadow 0.18s ease, filter 0.18s ease;
+}
+
+.home-deposit b {
+  font-weight: 800;
+}
+
+.home-deposit-go {
+  font-weight: 700;
+}
+
+.home-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 48px;
+  margin: 12px 16px 0;
+  border-radius: 12px;
+  background: #2c3e50;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
+  color: white;
+  font-size: 16px;
+  font-weight: 700;
+  text-decoration: none;
+  transition: transform 0.18s ease, box-shadow 0.18s ease, filter 0.18s ease;
+}
+
+.home-deposit:hover,
+.home-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+  filter: brightness(1.08);
+}
+
+.home-sechead {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin: 16px 16px 8px;
+}
+
+.home-sechead h3 {
+  margin: 0;
+  color: #2c3e50;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.home-sechead-note {
+  color: #1d8047;
+  font-size: 12.5px;
+  font-weight: 700;
+}
+
+.home-sechead-note--off {
+  color: #5d718a;
+}
+
+.puppy-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  padding: 0 16px;
+}
+
+.puppy-card {
+  display: block;
+  overflow: hidden;
+  border-radius: 12px;
+  background: white;
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.08);
+  color: inherit;
+  text-decoration: none;
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+
+.puppy-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.14);
+}
+
+.puppy-card-photo {
+  display: block;
+  width: 100%;
+  aspect-ratio: 1;
+  object-fit: cover;
+}
+
+.puppy-card-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  aspect-ratio: 1;
+  background: #f4f8fd;
+  color: #5d718a;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.puppy-card-empty-paw {
+  width: 54px;
+  height: 54px;
+  opacity: 0.45;
+}
+
+/* A long name pushes the chip onto its own line rather than being cut off. */
+.puppy-card-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px 6px;
+  min-height: 46px;
+  box-sizing: border-box;
+  padding: 6px 9px 6px 11px;
+}
+
+.puppy-card-name {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  min-width: 0;
+  overflow: hidden;
+  color: #2c3e50;
+  font-size: 14px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.puppy-card-paw {
+  width: 13px;
+  height: 13px;
+  flex-shrink: 0;
+}
+
+.puppy-card--female .puppy-card-paw,
+.puppy-card--female .puppy-card-empty-paw {
+  color: #e91e8c;
+}
+
+.puppy-card--male .puppy-card-paw,
+.puppy-card--male .puppy-card-empty-paw {
+  color: #4a90d9;
+}
+
+/* Desktop — the gallery beside the litter card, the puppies in a row beneath */
+@media (min-width: 768px) {
+  .home {
+    padding: 14px 28px 8px;
+  }
+
+  .home-top {
+    display: grid;
+    grid-template-columns: minmax(0, 560px) minmax(0, 1fr);
+    gap: 24px;
+    align-items: start;
+  }
+
+  .hero {
+    --carousel-height: 360px;
+    overflow: hidden;
+    border-radius: 14px;
+  }
+
+  .hero--empty {
+    height: 360px;
+  }
+
+  #about-the-litter {
+    scroll-margin-top: 16px;
+  }
+
+  .home-deposit,
+  .home-button {
+    margin: 12px 0 0;
+  }
+
+  .home-sechead {
+    margin: 28px 0 10px;
+  }
+
+  .puppy-grid {
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 16px;
+    padding: 0;
+  }
+}

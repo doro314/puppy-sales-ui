@@ -1,0 +1,199 @@
+.litter-card {
+  margin: 0 16px;
+}
+
+.litter-card-panel {
+  margin-top: 12px;
+  overflow: hidden;
+  border-radius: 12px;
+  background: white;
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.08);
+}
+
+.litter-card-bar {
+  height: 4px;
+  background: linear-gradient(to right, #4a90d9 0 50%, #e91e8c 50% 100%);
+}
+
+.litter-story {
+  padding: 11px 14px 12px;
+}
+
+.litter-story-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.litter-story-head p {
+  margin: 0;
+  color: #5d718a;
+  font-size: 13px;
+  line-height: 1.35;
+}
+
+.litter-story-head b {
+  color: #2c3e50;
+  font-size: 15px;
+}
+
+.litter-story-text {
+  margin: 8px 0 0;
+  color: #4a5d70;
+  font-size: 13.5px;
+  line-height: 1.5;
+}
+
+.litter-more {
+  padding: 0;
+  border: none;
+  background: none;
+  color: #2a78c8;
+  font: inherit;
+  font-weight: 700;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.litter-more:hover {
+  text-decoration: underline;
+}
+
+.litter-details {
+  padding: 2px 14px 12px;
+  border-top: 1px solid #f0f4f8;
+}
+
+.litter-details-heading {
+  margin: 12px 0 4px;
+  color: #5d718a;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.litter-details-care {
+  margin: 0;
+}
+
+.litter-details-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 7px 0;
+  border-bottom: 1px solid #f0f4f8;
+}
+
+.litter-details-row:last-child {
+  border-bottom: 0;
+}
+
+.litter-details-row dt {
+  flex-shrink: 0;
+  color: #5d718a;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+.litter-details-row dd {
+  margin: 0;
+  color: #2c3e50;
+  font-size: 14px;
+  font-weight: 600;
+  text-align: right;
+}
+
+.litter-details-text {
+  margin: 0;
+  color: #4a5d70;
+  font-size: 13.5px;
+  line-height: 1.6;
+}
+
+.litter-details-facts {
+  margin: 0;
+  padding-left: 18px;
+  color: #4a5d70;
+  font-size: 13.5px;
+  line-height: 1.65;
+}
+
+.litter-tiles {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.litter-tile {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  min-width: 0;
+  padding: 8px 10px;
+  border-radius: 10px;
+  background: white;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.07);
+}
+
+.litter-tile--span {
+  grid-column: 1 / -1;
+}
+
+.litter-tile-badge {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: #eef3f8;
+  color: #2c3e50;
+}
+
+.litter-tile-badge--done {
+  background: #e8f8f0;
+  color: #1d8047;
+}
+
+.litter-tile-icon {
+  width: 16px;
+  height: 16px;
+}
+
+.litter-tile-text {
+  min-width: 0;
+}
+
+.litter-tile-text small {
+  display: block;
+  color: #5d718a;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.litter-tile-text b {
+  display: block;
+  overflow: hidden;
+  color: #2c3e50;
+  font-size: 14px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@media (min-width: 768px) {
+  .litter-card {
+    margin: 0;
+  }
+
+  .litter-card-panel {
+    margin-top: 0;
+  }
+}

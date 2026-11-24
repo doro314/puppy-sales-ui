@@ -2,10 +2,11 @@ import { useEffect, useState } from 'react';
 import { Navigate, Route, Routes, useLocation, useNavigate, useNavigationType, useParams, useSearchParams } from 'react-router-dom';
 
 import ContactForm from './components/ContactForm';
+import HomePage from './components/HomePage';
 import ImageGallery from './components/ImageGallery';
 import SiteNav from './components/SiteNav';
 import { getCategories, getCategoryById } from './data/puppies';
-import { GENDER_COLORS, NEUTRAL_ACCENT, isLikelyBot } from './utils';
+import { GENDER_COLORS, NEUTRAL_ACCENT, isLikelyBot, todayString } from './utils';
 
 import './App.css';
 
@@ -58,9 +59,9 @@ function useVisitCounter() {
   return { visitorCount, uniqueCount };
 }
 
-function HomeRoute({ galleryProps }) {
+function HomeRoute({ today, showParents }) {
   usePageTitle(SITE_NAME);
-  return <ImageGallery activeCategory="home" {...galleryProps} />;
+  return <HomePage today={today} showParents={showParents} />;
 }
 
 function PuppyRoute({ galleryProps }) {
@@ -97,11 +98,15 @@ function App() {
   const navigationType = useNavigationType();
   const { visitorCount, uniqueCount } = useVisitCounter();
 
-  // A new page starts at the top; Back and Forward keep the position the browser restores.
+  // A new page starts at the top; Back and Forward keep the position the browser restores,
+  // and a link to a spot on the page (#about-the-litter) is scrolled there by that page.
   useEffect(() => {
-    if (navigationType === 'PUSH') window.scrollTo(0, 0);
-  }, [location.pathname, navigationType]);
+    if (navigationType === 'PUSH' && !location.hash) window.scrollTo(0, 0);
+  }, [location.pathname, location.hash, navigationType]);
 
+  const today = todayString();
+  const showParents = searchParams.get('parents') === 'true';
+  const showCount = searchParams.has('count');
   const categories = getCategories();
   const activeCategory = location.pathname.slice(1) || 'home';
 
@@ -112,10 +117,6 @@ function App() {
     categories,
     onInquire: handleInquire,
     onNavigate: goTo,
-    showParents: searchParams.get('parents') === 'true',
-    showCount: searchParams.has('count'),
-    visitorCount,
-    uniqueCount,
   };
 
   return (
@@ -130,11 +131,20 @@ function App() {
       />
       <main className="main-content">
         <Routes>
-          <Route path="/" element={<HomeRoute galleryProps={galleryProps} />} />
+          <Route path="/" element={<HomeRoute today={today} showParents={showParents} />} />
           {SHOW_CONTACT && <Route path="/contact" element={<ContactRoute />} />}
           <Route path="/:slug" element={<PuppyRoute galleryProps={galleryProps} />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
+        <footer className="site-footer">
+          <p className="site-footer-copy">&copy; {new Date().getFullYear()} All rights reserved.</p>
+          {showCount && (
+            <p className="site-footer-count">
+              {visitorCount === null ? '…' : `${visitorCount.toLocaleString()} visits`}
+              {uniqueCount !== null && ` · ${uniqueCount.toLocaleString()} unique`}
+            </p>
+          )}
+        </footer>
       </main>
     </div>
   );

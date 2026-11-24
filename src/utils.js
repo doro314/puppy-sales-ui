@@ -3,6 +3,7 @@ export const GENDER_COLORS = {
   "paw-pink": "#e91e8c",
 };
 export const NEUTRAL_ACCENT = "#8a9bb0";
+export const DEPOSIT_AMOUNT = 100;
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 const OZ_PER_LB = 16;
@@ -10,6 +11,20 @@ const POUNDS_FROM_OZ = 32;
 
 export function capitalize(text) {
   return text.charAt(0).toUpperCase() + text.slice(1);
+}
+
+// "Havapoo" → "Havapoos", "Poodle mix" → "Poodle mixes"
+export function pluralize(word) {
+  return /(s|x|z|ch|sh)$/i.test(word) ? `${word}es` : `${word}s`;
+}
+
+// The opening of a description, short enough for a card: its first sentence, or —
+// when that runs long — the words up to its first comma.
+export function firstClause(text, maxLength = 90) {
+  const sentence = text.split(/(?<=[.!?])\s/)[0];
+  if (sentence.length <= maxLength) return sentence;
+  const clause = sentence.split(",")[0].trim();
+  return clause.length < sentence.length ? `${clause}.` : sentence;
 }
 
 // Today's local calendar date as YYYY-MM-DD. Compare these strings, never timestamps:

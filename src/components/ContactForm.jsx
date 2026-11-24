@@ -216,7 +216,6 @@ function ContactForm({ initialMessage = "", accentColor = "#8a9bb0", onBack }) {
         </form>
         )}
       </div>
-      <p className="gallery-copyright">&copy; {new Date().getFullYear()} All rights reserved.</p>
     </div>
   );
 }

@@ -7,10 +7,30 @@
   min-height: 100vh;
 }
 
+/* Pages set their own side spacing: Home's gallery runs edge to edge on phones. */
 .main-content {
   grid-area: main;
   min-width: 0;
-  padding: 12px;
+}
+
+.site-footer {
+  padding: 20px 16px 24px;
+  color: #5d718a;
+  text-align: center;
+}
+
+.site-footer-copy {
+  margin: 0;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.site-footer-count {
+  margin: 6px 0 0;
+  font-size: 0.72rem;
+  letter-spacing: 0.04em;
 }
 
 /* Desktop — the header across the top, the page list beside the page */
@@ -269,24 +289,6 @@
   border: none;
   border-top: 1px solid #e2e8f0;
   margin: 20px 0 0;
-}
-
-.gallery-copyright {
-  margin: 20px 0 0;
-  text-align: center;
-  font-size: 0.72rem;
-  font-weight: 600;
-  color: #9bafc4;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-}
-
-.gallery-visit-count {
-  margin: 6px 0 0;
-  text-align: center;
-  font-size: 0.72rem;
-  color: #9bafc4;
-  letter-spacing: 0.04em;
 }
 
 .cta-card {

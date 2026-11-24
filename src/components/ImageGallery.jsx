@@ -158,7 +158,7 @@ function CtaSection({ categoryId, categoryFolder, categoryName, isAvailableSoon,
   return null;
 }
 
-function ImageGallery({ activeCategory, onInquire, onNavigate, categories = [], showParents = false, showCount = false, visitorCount = null, uniqueCount = null }) {
+function ImageGallery({ activeCategory, onInquire, onNavigate, categories = [], showParents = false }) {
   const availablePuppies = categories.filter(
     (c) => c.folder && c.details?.available === "available" && c.id !== activeCategory
   );
@@ -326,13 +326,6 @@ function ImageGallery({ activeCategory, onInquire, onNavigate, categories = [], 
           onInquire={onInquire}
           onNavigate={onNavigate}
         />
-        <p className="gallery-copyright">&copy; {new Date().getFullYear()} All rights reserved.</p>
-        {showCount && (
-          <p className="gallery-visit-count">
-            {visitorCount === null ? '…' : `${visitorCount.toLocaleString()} visits`}
-            {uniqueCount !== null && ` · ${uniqueCount.toLocaleString()} unique`}
-          </p>
-        )}
       </div>
     );
   }
@@ -432,13 +425,6 @@ function ImageGallery({ activeCategory, onInquire, onNavigate, categories = [], 
         onInquire={onInquire}
         onNavigate={onNavigate}
       />
-      <p className="gallery-copyright">&copy; {new Date().getFullYear()} All rights reserved.</p>
-      {showCount && (
-        <p className="gallery-visit-count">
-          {visitorCount === null ? '…' : `${visitorCount.toLocaleString()} visits`}
-          {uniqueCount !== null && ` · ${uniqueCount.toLocaleString()} unique`}
-        </p>
-      )}
 
       {lightboxOpen && (
         <div className="lightbox-overlay" onClick={() => setLightboxOpen(false)}>
