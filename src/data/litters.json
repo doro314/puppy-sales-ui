@@ -21,13 +21,13 @@
       ],
       "puppies": [
         {
-          "slug": "bella", "name": "Bella", "sex": "female", "status": "available",
+          "slug": "bella", "name": "Bella", "sex": "female", "status": "adopted",
           "color": ["white", "black"], "pattern": "parti",
           "markings": "Black face mask and side spot", "personality": "Curiously energetic",
           "weights": [{ "date": "2026-06-28", "oz": 27.8 }]
         },
         {
-          "slug": "brownie", "name": "Brownie", "sex": "male", "status": "reserved",
+          "slug": "brownie", "name": "Brownie", "sex": "male", "status": "adopted",
           "color": ["brown"], "pattern": "abstract",
           "markings": "White toes", "personality": "Cautious explorer",
           "weights": [{ "date": "2026-06-28", "oz": 29.6 }],
