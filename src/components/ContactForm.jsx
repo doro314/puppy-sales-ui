@@ -1,17 +1,14 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
+
+import { IconClock, IconClose, PawSvg } from "./Icons";
+
 import "./ContactForm.css";
-import { PawSvg, IconClock } from "./Icons";
 
-// TODO: Formspree setup checklist
-// 1. Sign up at https://formspree.io
-// 2. Click "New Form", give it a name (e.g. "Puppy Inquiry")
-// 3. Copy the form ID from the endpoint URL (e.g. https://formspree.io/f/abcd1234 → ID is "abcd1234")
-// 4. Replace "YOUR_FORM_ID" below with that ID
-// 5. Verify your email address in Formspree so submissions are delivered
-// 6. (Optional) Enable Formspree's spam filter / reCAPTCHA in the form settings dashboard
-
-// Replace with your Formspree form ID after signing up at https://formspree.io
+// Submissions go to the Formspree form with this ID, which emails them on.
 const FORMSPREE_ID = "xdavvdak";
+const MIN_PHONE_DIGITS = 7;
+const EMPTY_FIELDS = { name: "", email: "", phone: "", message: "" };
+const UNTOUCHED = { name: false, email: false, phone: false, message: false };
 
 function validate(fields) {
   const errors = {};
@@ -21,27 +18,57 @@ function validate(fields) {
   } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(fields.email)) {
     errors.email = "Please enter a valid email address.";
   }
+  if (fields.phone.trim() && fields.phone.replace(/\D/g, "").length < MIN_PHONE_DIGITS) {
+    errors.phone = "Please enter a number we can text, or leave it blank.";
+  }
   if (!fields.message.trim()) errors.message = "Message is required.";
   return errors;
 }
 
-function ContactForm({ initialMessage = "", accentColor = "#8a9bb0", onBack }) {
-  const [fields, setFields] = useState({ name: "", email: "", message: initialMessage });
-  const [touched, setTouched] = useState({ name: false, email: false, message: false });
+// The email's subject names the puppy, so the inbox sorts itself even if the message is rewritten.
+function subjectFor(topic) {
+  if (topic?.kind === "puppy") return `Puppy inquiry — ${topic.name}`;
+  if (topic?.kind === "waitlist") return "Waitlist — next litter";
+  return "Puppy inquiry";
+}
+
+function TopicChip({ topic, onDismiss }) {
+  const isPuppy = topic.kind === "puppy";
+  return (
+    <div className="contact-topic">
+      {isPuppy && topic.photo
+        ? <img className="contact-topic-photo" src={topic.photo} alt="" />
+        : <span className="contact-topic-photo contact-topic-photo--paw"><PawSvg className="contact-topic-paw" aria-hidden="true" /></span>}
+      <span className="contact-topic-text">
+        <b>{isPuppy ? `About ${topic.name}` : "The list for the next litter"}</b>
+        <small>{isPuppy ? topic.detail : "We'll write when puppies are on the way"}</small>
+      </span>
+      <button
+        type="button"
+        className="contact-topic-dismiss"
+        onClick={onDismiss}
+        aria-label={isPuppy ? `Not about ${topic.name}` : "Not about the next litter"}
+      >
+        <IconClose className="contact-topic-dismiss-icon" />
+      </button>
+    </div>
+  );
+}
+
+// topic: what the inquiry is about — { kind: "puppy", slug, name, detail, photo },
+// { kind: "waitlist" }, or null. A new topic remounts the form (App keys it), so the
+// prefilled message always matches.
+function ContactForm({ topic = null, initialMessage = "", accentColor = "#8a9bb0", onBack }) {
+  const [fields, setFields] = useState({ ...EMPTY_FIELDS, message: initialMessage });
+  const [touched, setTouched] = useState(UNTOUCHED);
   const [submitAttempted, setSubmitAttempted] = useState(false);
   const [honeypot, setHoneypot] = useState("");
   const [status, setStatus] = useState("idle"); // idle | sending | success | error
+  const [isTopicDismissed, setIsTopicDismissed] = useState(false);
 
+  const activeTopic = isTopicDismissed ? null : topic;
   const errors = validate(fields);
   const hasErrors = Object.keys(errors).length > 0;
-
-  // Sync if parent changes prefill (e.g. navigating from different puppy)
-  useEffect(() => {
-    setFields((prev) => ({ ...prev, message: initialMessage }));
-    setStatus("idle");
-    setSubmitAttempted(false);
-    setTouched({ name: false, email: false, message: false });
-  }, [initialMessage]);
 
   const handleChange = (e) => {
     setFields((prev) => ({ ...prev, [e.target.name]: e.target.value }));
@@ -70,13 +97,17 @@ function ContactForm({ initialMessage = "", accentColor = "#8a9bb0", onBack }) {
       const res = await fetch(`https://formspree.io/f/${FORMSPREE_ID}`, {
         method: "POST",
         headers: { "Content-Type": "application/json", Accept: "application/json" },
-        body: JSON.stringify(fields),
+        body: JSON.stringify({
+          ...fields,
+          puppy: activeTopic?.kind === "puppy" ? activeTopic.slug : activeTopic?.kind ?? "",
+          subject: subjectFor(activeTopic),
+        }),
       });
 
       if (res.ok) {
         setStatus("success");
-        setFields({ name: "", email: "", message: "" });
-        setTouched({ name: false, email: false, message: false });
+        setFields(EMPTY_FIELDS);
+        setTouched(UNTOUCHED);
         setSubmitAttempted(false);
       } else {
         setStatus("error");
@@ -86,6 +117,23 @@ function ContactForm({ initialMessage = "", accentColor = "#8a9bb0", onBack }) {
     }
   };
 
+  const fieldProps = (name) => ({
+    id: name,
+    name,
+    value: fields[name],
+    onChange: handleChange,
+    onBlur: handleBlur,
+    "aria-invalid": !!showError(name),
+    "aria-describedby": showError(name) ? `${name}-error` : undefined,
+    className: showError(name) ? "invalid" : "",
+  });
+
+  const fieldError = (name) => showError(name) && (
+    <span id={`${name}-error`} className="contact-field-error" role="alert">
+      <span aria-hidden="true">⚠</span> {errors[name]}
+    </span>
+  );
+
   return (
     <div className="contact-container" style={{ "--contact-color": accentColor }}>
       {onBack && (
@@ -94,7 +142,7 @@ function ContactForm({ initialMessage = "", accentColor = "#8a9bb0", onBack }) {
         </button>
       )}
       <h2 className="contact-title">
-        <span className="contact-title-prefix">Get in Touch | </span>Contact Us
+        <span className="contact-title-prefix">Get in Touch | </span>Contact Us
       </h2>
       <p className="contact-subtitle">
         Interested in one of our puppies? Send us a message and we'll get back to you soon.
@@ -114,106 +162,62 @@ function ContactForm({ initialMessage = "", accentColor = "#8a9bb0", onBack }) {
           </div>
         ) : (
           <form className="contact-form" onSubmit={handleSubmit} noValidate>
-          {/* Honeypot — hidden from real users, bots fill it in */}
-          <input
-            type="text"
-            name="_gotcha"
-            value={honeypot}
-            onChange={(e) => setHoneypot(e.target.value)}
-            tabIndex={-1}
-            aria-hidden="true"
-            className="contact-honeypot"
-          />
-
-          <div className="contact-field">
-            <label htmlFor="name">Name <span className="contact-required" aria-hidden="true">*</span></label>
+            {/* Honeypot — hidden from real users, bots fill it in */}
             <input
-              id="name"
-              name="name"
               type="text"
-              value={fields.name}
-              onChange={handleChange}
-              onBlur={handleBlur}
-              required
-              placeholder="Your name"
-              aria-invalid={!!showError("name")}
-              aria-describedby={showError("name") ? "name-error" : undefined}
-              className={showError("name") ? "invalid" : ""}
+              name="_gotcha"
+              value={honeypot}
+              onChange={(e) => setHoneypot(e.target.value)}
+              tabIndex={-1}
+              aria-hidden="true"
+              className="contact-honeypot"
             />
-            {showError("name") && (
-              <span id="name-error" className="contact-field-error" role="alert">
-                <span aria-hidden="true">⚠</span> {errors.name}
-              </span>
+
+            {activeTopic && <TopicChip topic={activeTopic} onDismiss={() => setIsTopicDismissed(true)} />}
+
+            <div className="contact-field">
+              <label htmlFor="name">Name <span className="contact-required" aria-hidden="true">*</span></label>
+              <input type="text" required placeholder="Your name" autoComplete="name" {...fieldProps("name")} />
+              {fieldError("name")}
+            </div>
+
+            <div className="contact-field">
+              <label htmlFor="email">Email <span className="contact-required" aria-hidden="true">*</span></label>
+              <input type="email" required placeholder="you@example.com" autoComplete="email" {...fieldProps("email")} />
+              {fieldError("email")}
+            </div>
+
+            <div className="contact-field">
+              <label htmlFor="phone">Phone <span className="contact-optional">— optional, if you'd rather text</span></label>
+              <input type="tel" placeholder="(555) 555-0123" autoComplete="tel" {...fieldProps("phone")} />
+              {fieldError("phone")}
+            </div>
+
+            <div className="contact-field">
+              <label htmlFor="message">Message <span className="contact-required" aria-hidden="true">*</span></label>
+              <textarea required rows={5} placeholder="Tell us which puppy you're interested in..." {...fieldProps("message")} />
+              {fieldError("message")}
+            </div>
+
+            {submitAttempted && hasErrors && (
+              <p className="contact-error">Please complete the highlighted fields before sending.</p>
             )}
-          </div>
 
-          <div className="contact-field">
-            <label htmlFor="email">Email <span className="contact-required" aria-hidden="true">*</span></label>
-            <input
-              id="email"
-              name="email"
-              type="email"
-              value={fields.email}
-              onChange={handleChange}
-              onBlur={handleBlur}
-              required
-              placeholder="you@example.com"
-              aria-invalid={!!showError("email")}
-              aria-describedby={showError("email") ? "email-error" : undefined}
-              className={showError("email") ? "invalid" : ""}
-            />
-            {showError("email") && (
-              <span id="email-error" className="contact-field-error" role="alert">
-                <span aria-hidden="true">⚠</span> {errors.email}
-              </span>
+            {status === "error" && (
+              <p className="contact-error">Something went wrong. Please try again.</p>
             )}
-          </div>
 
-          <div className="contact-field">
-            <label htmlFor="message">Message <span className="contact-required" aria-hidden="true">*</span></label>
-            <textarea
-              id="message"
-              name="message"
-              value={fields.message}
-              onChange={handleChange}
-              onBlur={handleBlur}
-              required
-              rows={5}
-              placeholder="Tell us which puppy you're interested in..."
-              aria-invalid={!!showError("message")}
-              aria-describedby={showError("message") ? "message-error" : undefined}
-              className={showError("message") ? "invalid" : ""}
-            />
-            {showError("message") && (
-              <span id="message-error" className="contact-field-error" role="alert">
-                <span aria-hidden="true">⚠</span> {errors.message}
+            <div className="contact-submit-row">
+              <button type="submit" className="contact-submit" disabled={status === "sending"}>
+                <PawSvg className="contact-submit-icon" />
+                {status === "sending" ? "Sending…" : "Send Message"}
+              </button>
+              <span className="contact-response-note">
+                <IconClock className="contact-clock-icon" />
+                We’ll respond within 24 hours
               </span>
-            )}
-          </div>
-
-          {submitAttempted && hasErrors && (
-            <p className="contact-error">Please complete the highlighted fields before sending.</p>
-          )}
-
-          {status === "error" && (
-            <p className="contact-error">Something went wrong. Please try again.</p>
-          )}
-
-          <div className="contact-submit-row">
-            <button
-              type="submit"
-              className="contact-submit"
-              disabled={status === "sending"}
-            >
-              <PawSvg className="contact-submit-icon" />
-              {status === "sending" ? "Sending…" : "Send Message"}
-            </button>
-            <span className="contact-response-note">
-              <IconClock className="contact-clock-icon" />
-              We’ll respond within 24 hours
-            </span>
-          </div>
-        </form>
+            </div>
+          </form>
         )}
       </div>
     </div>

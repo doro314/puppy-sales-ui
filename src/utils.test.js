@@ -1,6 +1,6 @@
 import {
-  daysBetween, firstClause, formatAge, formatCoat, formatDay, formatOunces, formatWeight, pluralize, todayString,
-  withCoverFirst,
+  daysBetween, firstClause, formatAge, formatCoat, formatDay, formatMonthYear, formatOunces, formatWeight, pluralize,
+  todayString, withCoverFirst,
 } from './utils';
 
 describe('dates', () => {
@@ -16,6 +16,7 @@ describe('dates', () => {
   test('dates read like the site writes them', () => {
     expect(formatDay('2026-06-02')).toBe('Jun 2');
     expect(formatDay('2026-07-28', { withYear: true })).toBe('Jul 28, 2026');
+    expect(formatMonthYear('2026-06-02')).toBe('June 2026');
   });
 
   test('age in days, then weeks', () => {

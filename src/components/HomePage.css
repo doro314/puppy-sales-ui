@@ -162,6 +162,17 @@
   padding: 0 16px;
 }
 
+.home-older {
+  margin-top: 28px;
+  padding-top: 4px;
+  border-top: 1px solid #e2e8f0;
+  scroll-margin-top: 68px;
+}
+
+.home-older .litter-strip {
+  margin: 0 16px 12px;
+}
+
 .puppy-card {
   display: block;
   overflow: hidden;
@@ -282,5 +293,13 @@
     grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
     gap: 16px;
     padding: 0;
+  }
+
+  .home-older {
+    scroll-margin-top: 16px;
+  }
+
+  .home-older .litter-strip {
+    margin: 0 0 12px;
   }
 }

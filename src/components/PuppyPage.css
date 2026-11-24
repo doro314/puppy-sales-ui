@@ -189,44 +189,6 @@
   text-align: right;
 }
 
-.pup-litter {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin: 16px 16px 0;
-  padding: 10px 12px;
-  border-radius: 12px;
-  background: white;
-  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.07);
-}
-
-.pup-litter p {
-  margin: 0;
-  color: #4a5d70;
-  font-size: 12.5px;
-  line-height: 1.5;
-}
-
-.pup-litter b {
-  color: #2c3e50;
-}
-
-.pup-litter-check {
-  color: #1d6b3e;
-  font-weight: 700;
-}
-
-.pup-litter-link {
-  color: #2a78c8;
-  font-weight: 700;
-  text-decoration: none;
-  white-space: nowrap;
-}
-
-.pup-litter-link:hover {
-  text-decoration: underline;
-}
-
 .pup-mates {
   padding-top: 20px;
 }
@@ -368,8 +330,7 @@
     margin: 22px 0 8px;
   }
 
-  .pup-facts,
-  .pup-litter {
+  .pup-facts {
     margin-left: 0;
     margin-right: 0;
   }

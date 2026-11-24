@@ -269,3 +269,79 @@
   background: rgba(30, 132, 73, 0.08);
 }
 
+
+/* What the inquiry is about (a puppy, or the next litter's list); × clears it */
+.contact-topic {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border: 1px solid color-mix(in srgb, var(--contact-color, #8a9bb0) 30%, white);
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--contact-color, #8a9bb0) 7%, white);
+}
+
+.contact-topic-photo {
+  width: 38px;
+  height: 38px;
+  flex-shrink: 0;
+  border-radius: 8px;
+  object-fit: cover;
+}
+
+.contact-topic-photo--paw {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: white;
+  color: var(--contact-color, #8a9bb0);
+}
+
+.contact-topic-paw {
+  width: 20px;
+  height: 20px;
+}
+
+.contact-topic-text {
+  flex: 1;
+  min-width: 0;
+  color: #2c3e50;
+  font-size: 13.5px;
+  line-height: 1.35;
+}
+
+.contact-topic-text small {
+  display: block;
+  color: #5d718a;
+  font-size: 11.5px;
+}
+
+.contact-topic-dismiss {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+  padding: 0;
+  border: none;
+  border-radius: 8px;
+  background: none;
+  color: #5d718a;
+  cursor: pointer;
+}
+
+.contact-topic-dismiss:hover {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.contact-topic-dismiss-icon {
+  width: 16px;
+  height: 16px;
+}
+
+.contact-optional {
+  font-weight: 600;
+  letter-spacing: 0;
+  text-transform: none;
+}

@@ -1,0 +1,44 @@
+.litter-strip {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 16px 16px 0;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: white;
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.07);
+}
+
+.litter-strip p {
+  margin: 0;
+  color: #4a5d70;
+  font-size: 12.5px;
+  line-height: 1.5;
+}
+
+.litter-strip b {
+  color: #2c3e50;
+}
+
+.litter-strip-check {
+  color: #1d6b3e;
+  font-weight: 700;
+}
+
+.litter-strip-link {
+  color: #2a78c8;
+  font-weight: 700;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.litter-strip-link:hover {
+  text-decoration: underline;
+}
+
+@media (min-width: 768px) {
+  .litter-strip {
+    margin-left: 0;
+    margin-right: 0;
+  }
+}

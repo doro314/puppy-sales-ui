@@ -52,8 +52,24 @@ beforeEach(() => {
 
 afterEach(() => {
   vi.useRealTimers();
+  vi.unstubAllGlobals();
   litter.puppies.forEach((p, i) => { p.status = originalStatuses[i]; });
+  litter.listed = true;
+  fixture.litters.splice(0, fixture.litters.length, litter);
 });
+
+// A newer litter, listed above the fixture one — what the next litter will look like.
+function addNewerLitter(fields) {
+  fixture.litters.unshift({
+    id: '2027-01-test-litter',
+    listed: true,
+    breed: 'Test Breed',
+    mom: { name: 'Mamma', breed: 'Test Breed' },
+    dad: { name: 'Pappa', breed: 'Test Breed' },
+    puppies: [],
+    ...fields,
+  });
+}
 
 // ── Tests ──────────────────────────────────────────────────────────────────
 
@@ -233,5 +249,113 @@ describe('Puppy pages (PUP-2)', () => {
     expect(screen.getByText('His littermates')).toBeInTheDocument();
     expect(screen.getByText("From Mamma × Pappa's litter")).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'About the litter ›' })).toHaveAttribute('href', '/#litter-2026-06-test-litter');
+  });
+});
+
+describe('Every season (PLUS-5)', () => {
+  test('expecting: the due date, the waitlist, and the older litter below', () => {
+    addNewerLitter({ due: '2027-01-12' });
+    renderAt();
+    expect(screen.getByRole('heading', { level: 2, name: 'Mamma is expecting' })).toBeInTheDocument();
+    expect(screen.getByText('Due Jan 12 · Mamma × Pappa')).toBeInTheDocument();
+    expect(document.querySelector('.litter-tiles')).toHaveTextContent('DueJan 12');
+    expect(screen.getByRole('link', { name: 'Join the waitlist' })).toHaveAttribute('href', '/contact?about=waitlist');
+    expect(screen.getByRole('heading', { level: 3, name: "Mamma & Pappa's June 2026 litter" })).toBeInTheDocument();
+    expect(screen.getAllByText('PupAvailable').length).toBeGreaterThan(0);
+  });
+
+  test('born, no photos yet: a count instead of a gallery, and placeholders', () => {
+    litter.listed = false;
+    addNewerLitter({
+      born: '2027-01-10',
+      readyDate: '2027-03-07',
+      puppies: [
+        { slug: 'maple', name: 'Maple', sex: 'female', status: 'available' },
+        { slug: 'rocky', name: 'Rocky', sex: 'male', status: 'available' },
+      ],
+    });
+    vi.setSystemTime(new Date(2027, 0, 20));
+    renderAt();
+    expect(screen.getByText('2 puppies · photos coming soon')).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /Reserve today/ })).toBeInTheDocument();
+    expect(screen.getAllByText('Photos soon')).toHaveLength(2);
+    expect(within(document.querySelector('.puppy-grid')).getAllByText('Ready Mar 7')).toHaveLength(2);
+  });
+
+  test('two litters with puppies: the nav groups them', () => {
+    addNewerLitter({ born: '2027-01-10', readyDate: '2027-03-07', puppies: [{ slug: 'maple', name: 'Maple', sex: 'female', status: 'available' }] });
+    renderAt();
+    const nav = screen.getByRole('navigation');
+    expect(nav).toHaveTextContent('January 2027 litter');
+    expect(nav).toHaveTextContent('June 2026 litter');
+  });
+
+  test('a puppy from a retired litter has gone home, and the next litter is open', () => {
+    litter.listed = false;
+    addNewerLitter({ due: '2027-01-12' });
+    renderAt('/pup-available');
+    expect(document.querySelector('.pup-id')).toHaveTextContent('Male · has gone home');
+    expect(within(document.querySelector('.pup-id')).getByText('Adopted')).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Join the list for the next litter' })).toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: /Inquire about/ })).not.toBeInTheDocument();
+  });
+});
+
+describe('The inquiry knows the puppy (PLUS-6)', () => {
+  function stubFormspree() {
+    const fetchMock = vi.fn(() => Promise.resolve({ ok: true }));
+    vi.stubGlobal('fetch', fetchMock);
+    return fetchMock;
+  }
+
+  function fillAndSend({ phone = '' } = {}) {
+    fireEvent.change(screen.getByLabelText(/^Name/), { target: { value: 'Ann' } });
+    fireEvent.change(screen.getByLabelText(/^Email/), { target: { value: 'ann@example.com' } });
+    if (phone) fireEvent.change(screen.getByLabelText(/^Phone/), { target: { value: phone } });
+    fireEvent.click(screen.getByRole('button', { name: /Send Message/ }));
+  }
+
+  const sentBody = (fetchMock) => JSON.parse(fetchMock.mock.calls[0][1].body);
+
+  test('the form shows which puppy, and sends it with a subject that names her', async () => {
+    const fetchMock = stubFormspree();
+    renderAt('/contact?about=pup-available');
+    expect(screen.getByText('About PupAvailable')).toBeInTheDocument();
+    expect(screen.getByText('Male · available')).toBeInTheDocument();
+    fillAndSend({ phone: '(555) 555-0123' });
+    expect(await screen.findByText(/Thanks for reaching out/)).toBeInTheDocument();
+    expect(sentBody(fetchMock)).toMatchObject({
+      name: 'Ann',
+      phone: '(555) 555-0123',
+      puppy: 'pup-available',
+      subject: 'Puppy inquiry — PupAvailable',
+    });
+  });
+
+  test('clearing the puppy sends a general inquiry', async () => {
+    const fetchMock = stubFormspree();
+    renderAt('/contact?about=pup-available');
+    fireEvent.click(screen.getByRole('button', { name: 'Not about PupAvailable' }));
+    expect(screen.queryByText('About PupAvailable')).not.toBeInTheDocument();
+    fillAndSend();
+    await screen.findByText(/Thanks for reaching out/);
+    expect(sentBody(fetchMock)).toMatchObject({ puppy: '', subject: 'Puppy inquiry' });
+  });
+
+  test('the waitlist sends its own subject', async () => {
+    const fetchMock = stubFormspree();
+    renderAt('/contact?about=waitlist');
+    expect(screen.getByText('The list for the next litter')).toBeInTheDocument();
+    fillAndSend();
+    await screen.findByText(/Thanks for reaching out/);
+    expect(sentBody(fetchMock)).toMatchObject({ puppy: 'waitlist', subject: 'Waitlist — next litter' });
+  });
+
+  test('the phone number is optional, but a short one gets a gentle note', () => {
+    renderAt('/contact');
+    const phone = screen.getByLabelText(/^Phone/);
+    fireEvent.change(phone, { target: { value: '123' } });
+    fireEvent.blur(phone);
+    expect(screen.getByText(/Please enter a number we can text, or leave it blank/)).toBeInTheDocument();
   });
 });

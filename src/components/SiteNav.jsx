@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { Fragment, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 
 import StatusChip from './StatusChip';
@@ -21,7 +21,8 @@ function NavLink({ to, isActive, isBold = false, children }) {
 // Phones: one sticky bar; its menu button opens the page list over the page.
 // From 768 px: the header spans the top and the page list is a sidebar.
 // Every puppy's status sits beside its name, so nobody opens a reserved puppy expecting to inquire.
-function SiteNav({ siteName, tagline, puppies, activeId, showContact = false }) {
+// puppyGroups: one group per listed litter with puppies — [{ id, label, puppies }].
+function SiteNav({ siteName, tagline, puppyGroups, activeId, showContact = false }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   // Any navigation closes the menu — a menu item, Back, or a link inside the page.
@@ -63,18 +64,22 @@ function SiteNav({ siteName, tagline, puppies, activeId, showContact = false }) 
 
       <nav id="site-nav" className={`site-nav${isMenuOpen ? ' site-nav--open' : ''}`} aria-label="Pages">
         <NavLink to="/" isActive={activeId === 'home'} isBold>Home</NavLink>
-        {puppies.length > 0 && <p className="site-nav-section">Puppies</p>}
-        {puppies.map((puppy) => {
-          const isActive = activeId === puppy.slug;
-          const pawColor = isActive ? 'white' : (ACCENTS[puppy.sex] ?? ACCENTS.neutral).light;
-          return (
-            <NavLink key={puppy.slug} to={`/${puppy.slug}`} isActive={isActive}>
-              <PawSvg className="site-nav-paw" fill={pawColor} aria-hidden="true" />
-              <span className="site-nav-name">{puppy.name}</span>
-              <StatusChip status={puppy.status} readyDate={puppy.readyDate} />
-            </NavLink>
-          );
-        })}
+        {puppyGroups.map((group) => (
+          <Fragment key={group.id}>
+            <p className="site-nav-section">{group.label}</p>
+            {group.puppies.map((puppy) => {
+              const isActive = activeId === puppy.slug;
+              const pawColor = isActive ? 'white' : (ACCENTS[puppy.sex] ?? ACCENTS.neutral).light;
+              return (
+                <NavLink key={puppy.slug} to={`/${puppy.slug}`} isActive={isActive}>
+                  <PawSvg className="site-nav-paw" fill={pawColor} aria-hidden="true" />
+                  <span className="site-nav-name">{puppy.name}</span>
+                  <StatusChip status={puppy.status} readyDate={puppy.readyDate} />
+                </NavLink>
+              );
+            })}
+          </Fragment>
+        ))}
         {showContact && (
           <div className="site-nav-contact">
             <NavLink to="/contact" isActive={activeId === 'contact'}>Contact Us</NavLink>

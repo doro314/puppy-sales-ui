@@ -2,13 +2,14 @@ import { useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 
 import LitterCard from './LitterCard';
+import LitterStrip from './LitterStrip';
 import PhotoCarousel from './PhotoCarousel';
 import StatusChip from './StatusChip';
 import { PawSvg } from './Icons';
 import {
   countAvailable, getLitterPhotos, getListedLitters, getParentPhoto, getPuppyPhotos, getPuppyStatus, isSpokenFor,
 } from '../data/puppies';
-import { DEPOSIT_AMOUNT, formatDay } from '../utils';
+import { DEPOSIT_AMOUNT, formatDay, formatMonthYear } from '../utils';
 
 import './HomePage.css';
 
@@ -80,23 +81,38 @@ function PuppyCard({ litter, puppy, today }) {
   );
 }
 
-function PuppyGrid({ litter, today }) {
+function PuppyGrid({ litter, today, heading = 'Meet the puppies', children }) {
   const available = countAvailable(litter);
   const hasPhotos = litter.puppies.some((puppy) => getPuppyPhotos(litter, puppy).length > 0);
   let note = `${available} available`;
   if (available === 0) note = 'all spoken for';
   else if (!hasPhotos) note = 'photos soon';
+  const headingId = `puppies-${litter.id}`;
 
   return (
-    <section className="home-puppies" aria-labelledby="meet-the-puppies">
+    <section className="home-puppies" aria-labelledby={headingId}>
       <div className="home-sechead">
-        <h3 id="meet-the-puppies">Meet the puppies</h3>
+        <h3 id={headingId}>{heading}</h3>
         <span className={available > 0 && hasPhotos ? 'home-sechead-note' : 'home-sechead-note home-sechead-note--off'}>{note}</span>
       </div>
+      {children}
       <div className="puppy-grid">
         {litter.puppies.map((puppy) => <PuppyCard key={puppy.slug} litter={litter} puppy={puppy} today={today} />)}
       </div>
     </section>
+  );
+}
+
+// A litter that's still listed under a newer one: its line and its puppies, no second
+// gallery. Happens when a puppy is still unsold as the next litter arrives.
+function OlderLitter({ litter, today }) {
+  const when = litter.born ? ` ${formatMonthYear(litter.born)}` : '';
+  return (
+    <div className="home-older" id={`litter-${litter.id}`}>
+      <PuppyGrid litter={litter} today={today} heading={`${litter.mom.name} & ${litter.dad.name}'s${when} litter`}>
+        <LitterStrip litter={litter} hasLink={false} />
+      </PuppyGrid>
+    </div>
   );
 }
 
@@ -128,16 +144,16 @@ function ParentsSection({ litter }) {
   );
 }
 
+// Every season leads with the newest listed litter; any older listed litter follows it.
 function HomePage({ today, showParents = false }) {
   const location = useLocation();
-  const [litter] = getListedLitters();
-  const detailsId = `litter-${litter.id}`;
-  const isDetailsLink = location.hash === `#${detailsId}`;
+  const [litter, ...olderLitters] = getListedLitters();
+  const isDetailsLink = location.hash === `#litter-${litter.id}`;
 
-  // A puppy page's "About the litter" lands here with the litter's details open.
+  // A puppy page's "About the litter" lands here, on that litter, with its details open.
   useEffect(() => {
-    if (isDetailsLink) document.getElementById(detailsId)?.scrollIntoView();
-  }, [isDetailsLink, detailsId]);
+    if (location.hash) document.getElementById(location.hash.slice(1))?.scrollIntoView();
+  }, [location.hash]);
 
   return (
     <div className="home">
@@ -150,6 +166,7 @@ function HomePage({ today, showParents = false }) {
         </div>
       </div>
       {litter.puppies.length > 0 && <PuppyGrid litter={litter} today={today} />}
+      {olderLitters.map((older) => <OlderLitter key={older.id} litter={older} today={today} />)}
     </div>
   );
 }

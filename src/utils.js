@@ -57,6 +57,12 @@ export function formatDay(value, { withYear = false } = {}) {
   });
 }
 
+// "2026-06-02" → "June 2026"
+export function formatMonthYear(value) {
+  const [y, m] = value.split("-").map(Number);
+  return new Date(Date.UTC(y, m - 1, 1)).toLocaleDateString("en-US", { timeZone: "UTC", month: "long", year: "numeric" });
+}
+
 function formatSpan(days) {
   if (days < 7) return `${days} day${days === 1 ? "" : "s"}`;
   const weeks = Math.floor(days / 7);

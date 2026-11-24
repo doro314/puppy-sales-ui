@@ -1,12 +1,12 @@
-import { Fragment, useState } from 'react';
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 
-import ParentAvatars from './ParentAvatars';
+import LitterStrip from './LitterStrip';
 import PhotoCarousel from './PhotoCarousel';
 import StatusChip from './StatusChip';
 import { PawSvg } from './Icons';
-import { getCareDone, getPuppyPhotos, getPuppyStatus, isSpokenFor } from '../data/puppies';
-import { DEPOSIT_AMOUNT, capitalize, formatAge, formatCoat, formatDay, formatWeight } from '../utils';
+import { getPuppyPhotos, getPuppyStatus, isSpokenFor } from '../data/puppies';
+import { DEPOSIT_AMOUNT, capitalize, formatAge, formatCoat, formatWeight } from '../utils';
 
 import './PuppyPage.css';
 
@@ -19,11 +19,10 @@ const PUPPY_FACTS = [
   ['Personality', (puppy) => puppy.personality],
 ];
 
-const CARE_CHECKS = { 'vet-check': 'Vet checked', dewormed: 'Dewormed', vaccinated: 'Vaccinated', microchipped: 'Microchipped' };
-
 const pronoun = (puppy) => (puppy.sex === 'female' ? { subject: 'her', possessive: 'Her' } : { subject: 'him', possessive: 'His' });
 
-function statusLine(puppy, litter, status, today) {
+function statusLine(litter, status, today, isRetired) {
+  if (isRetired) return 'has gone home';
   if (status === 'available') return 'ready to go home now';
   if (status === 'soon') return litter.born ? formatAge(litter.born, today) : 'coming soon';
   if (status === 'reserved') return 'has a family waiting';
@@ -54,25 +53,7 @@ function MateRow({ litter, puppies, today, heading }) {
   );
 }
 
-// What a visitor can do on this page: inquire, get in line, meet who's left, or join the list.
-function NextStep({ puppy, litter, status, today }) {
-  const { subject } = pronoun(puppy);
-  if (status === 'available' || status === 'soon') {
-    return (
-      <div className="pup-next">
-        <Link to={`/contact?about=${puppy.slug}`} className="pup-button">
-          <PawSvg className="pup-button-paw" aria-hidden="true" />
-          {status === 'soon' ? `Get in line for ${puppy.name}` : `Inquire about ${puppy.name}`}
-        </Link>
-        <p className="pup-note">Reserve today — ${DEPOSIT_AMOUNT} holds {subject}</p>
-      </div>
-    );
-  }
-
-  const stillLooking = litter.puppies.filter((mate) => mate.status === 'available');
-  if (stillLooking.length > 0) {
-    return <MateRow litter={litter} puppies={stillLooking} today={today} heading="Still looking for homes" />;
-  }
+function WaitlistStep() {
   return (
     <div className="pup-next">
       <Link to="/contact?about=waitlist" className="pup-button pup-button--navy">Join the list for the next litter</Link>
@@ -81,31 +62,35 @@ function NextStep({ puppy, litter, status, today }) {
   );
 }
 
-function LitterStrip({ litter }) {
-  const checks = getCareDone(litter).map((step) => CARE_CHECKS[step.type]);
-  return (
-    <div className="pup-litter">
-      <ParentAvatars litter={litter} size={34} />
-      <p>
-        <b>From {litter.mom.name} × {litter.dad.name}&apos;s litter</b>
-        {litter.born && ` · born ${formatDay(litter.born)}`}
-        <br />
-        {checks.map((check) => (
-          <Fragment key={check}>
-            <span className="pup-litter-check">✓ {check}</span>{' · '}
-          </Fragment>
-        ))}
-        <Link to={`/#litter-${litter.id}`} className="pup-litter-link">About the litter ›</Link>
-      </p>
-    </div>
-  );
+// What a visitor can do on this page: inquire, get in line, meet who's left, or join the list.
+function NextStep({ puppy, litter, status, today, isRetired }) {
+  if (isRetired) return <WaitlistStep />;
+  if (status === 'available' || status === 'soon') {
+    return (
+      <div className="pup-next">
+        <Link to={`/contact?about=${puppy.slug}`} className="pup-button">
+          <PawSvg className="pup-button-paw" aria-hidden="true" />
+          {status === 'soon' ? `Get in line for ${puppy.name}` : `Inquire about ${puppy.name}`}
+        </Link>
+        <p className="pup-note">Reserve today — ${DEPOSIT_AMOUNT} holds {pronoun(puppy).subject}</p>
+      </div>
+    );
+  }
+  const stillLooking = litter.puppies.filter((mate) => mate.status === 'available');
+  if (stillLooking.length > 0) {
+    return <MateRow litter={litter} puppies={stillLooking} today={today} heading="Still looking for homes" />;
+  }
+  return <WaitlistStep />;
 }
 
 // PUP-2: the photo first, then who she is and whether she can be yours, then how.
+// A puppy from a retired litter ("listed": false) keeps her page, so an old link still
+// lands somewhere true: she has gone home, and the list for the next litter is open.
 function PuppyPage({ puppy, litter, today }) {
   const [photoIndex, setPhotoIndex] = useState(0);
+  const isRetired = !litter.listed;
   const photos = getPuppyPhotos(litter, puppy);
-  const status = getPuppyStatus(puppy, litter, today);
+  const status = isRetired ? 'adopted' : getPuppyStatus(puppy, litter, today);
   const facts = PUPPY_FACTS
     .map(([label, read]) => [label, read(puppy, litter)])
     .filter(([, value]) => value);
@@ -129,10 +114,10 @@ function PuppyPage({ puppy, litter, today }) {
             <h2 className="pup-title"><span className="pup-title-prefix">Name | </span>{puppy.name}</h2>
             <StatusChip status={status} readyDate={litter.readyDate} />
           </div>
-          <p className="pup-sub"><b>{capitalize(puppy.sex)}</b> · {statusLine(puppy, litter, status, today)}</p>
+          <p className="pup-sub"><b>{capitalize(puppy.sex)}</b> · {statusLine(litter, status, today, isRetired)}</p>
         </div>
 
-        <NextStep puppy={puppy} litter={litter} status={status} today={today} />
+        <NextStep puppy={puppy} litter={litter} status={status} today={today} isRetired={isRetired} />
 
         {facts.length > 0 && (
           <section className="pup-about">
@@ -148,7 +133,7 @@ function PuppyPage({ puppy, litter, today }) {
           </section>
         )}
 
-        <LitterStrip litter={litter} />
+        <LitterStrip litter={litter} hasLink={!isRetired} />
       </div>
 
       {isOffered && mates.length > 0 && (

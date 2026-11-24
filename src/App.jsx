@@ -5,8 +5,8 @@ import ContactForm from './components/ContactForm';
 import HomePage from './components/HomePage';
 import PuppyPage from './components/PuppyPage';
 import SiteNav from './components/SiteNav';
-import { findPuppy, getListedLitters, getPuppyStatus } from './data/puppies';
-import { ACCENTS, isLikelyBot, todayString } from './utils';
+import { findPuppy, getListedLitters, getPuppyPhotos, getPuppyStatus } from './data/puppies';
+import { ACCENTS, capitalize, formatDay, formatMonthYear, isLikelyBot, todayString } from './utils';
 
 import './App.css';
 
@@ -65,27 +65,55 @@ function PuppyRoute({ today }) {
   const { slug } = useParams();
   const found = findPuppy(slug);
   usePageTitle(found ? `${found.puppy.name} · ${SITE_NAME}` : SITE_NAME);
-  if (!found?.litter.listed) return <Navigate to="/" replace />;
+  if (!found) return <Navigate to="/" replace />;
   return <PuppyPage key={slug} puppy={found.puppy} litter={found.litter} today={today} />;
 }
 
-function ContactRoute() {
+// "Female · available" — the line under the puppy's name on the form
+function topicDetail(puppy, litter, today) {
+  const status = litter.listed ? getPuppyStatus(puppy, litter, today) : 'adopted';
+  const word = status === 'soon' ? `ready ${formatDay(litter.readyDate)}` : status;
+  return `${capitalize(puppy.sex)} · ${word}`;
+}
+
+function ContactRoute({ today }) {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const location = useLocation();
   usePageTitle(`Contact · ${SITE_NAME}`);
 
   const about = searchParams.get('about');
-  const puppy = about && about !== WAITLIST ? findPuppy(about)?.puppy : null;
+  const found = about && about !== WAITLIST ? findPuppy(about) : null;
+  let topic = null;
   let message = '';
-  if (about === WAITLIST) message = WAITLIST_MESSAGE;
-  else if (puppy) message = `Hi! I'm interested in ${puppy.name} and would love to learn more. Please let me know about availability and next steps.`;
-  const accentColor = (ACCENTS[puppy?.sex] ?? ACCENTS.neutral).light;
+  if (about === WAITLIST) {
+    topic = { kind: WAITLIST };
+    message = WAITLIST_MESSAGE;
+  } else if (found) {
+    const { puppy, litter } = found;
+    topic = {
+      kind: 'puppy',
+      slug: puppy.slug,
+      name: puppy.name,
+      detail: topicDetail(puppy, litter, today),
+      photo: getPuppyPhotos(litter, puppy)[0]?.thumb,
+    };
+    message = `Hi! I'm interested in ${puppy.name} and would love to learn more. Please let me know about availability and next steps.`;
+  }
+  const accentColor = (ACCENTS[found?.puppy.sex] ?? ACCENTS.neutral).light;
 
   // A visit that starts on this page has nothing to go back to: Back goes Home instead of leaving the site.
   const handleBack = () => (location.key === 'default' ? navigate('/') : navigate(-1));
 
-  return <ContactForm initialMessage={message} accentColor={accentColor} onBack={handleBack} />;
+  return (
+    <ContactForm
+      key={about ?? 'general'}
+      topic={topic}
+      initialMessage={message}
+      accentColor={accentColor}
+      onBack={handleBack}
+    />
+  );
 }
 
 function App() {
@@ -102,27 +130,32 @@ function App() {
 
   const today = todayString();
   const showCount = searchParams.has('count');
-  const navPuppies = getListedLitters().flatMap((litter) => litter.puppies.map((puppy) => ({
-    slug: puppy.slug,
-    name: puppy.name,
-    sex: puppy.sex,
-    status: getPuppyStatus(puppy, litter, today),
-    readyDate: litter.readyDate,
-  })));
+  const littersWithPuppies = getListedLitters().filter((litter) => litter.puppies.length > 0);
+  const navGroups = littersWithPuppies.map((litter) => ({
+    id: litter.id,
+    label: littersWithPuppies.length > 1 && litter.born ? `${formatMonthYear(litter.born)} litter` : 'Puppies',
+    puppies: litter.puppies.map((puppy) => ({
+      slug: puppy.slug,
+      name: puppy.name,
+      sex: puppy.sex,
+      status: getPuppyStatus(puppy, litter, today),
+      readyDate: litter.readyDate,
+    })),
+  }));
 
   return (
     <div className="app-wrapper">
       <SiteNav
         siteName={SITE_NAME}
         tagline={TAGLINE}
-        puppies={navPuppies}
+        puppyGroups={navGroups}
         activeId={location.pathname.slice(1) || 'home'}
         showContact={SHOW_CONTACT}
       />
       <main className="main-content">
         <Routes>
           <Route path="/" element={<HomeRoute today={today} showParents={searchParams.get('parents') === 'true'} />} />
-          {SHOW_CONTACT && <Route path="/contact" element={<ContactRoute />} />}
+          {SHOW_CONTACT && <Route path="/contact" element={<ContactRoute today={today} />} />}
           <Route path="/:slug" element={<PuppyRoute today={today} />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
