@@ -4,6 +4,7 @@
 
 import data from "./litters.json";
 import { getPhotoSrc } from "./imageLoader";
+import { capitalize, formatCoat, formatWeight } from "../utils";
 
 const PAW_ICONS = { female: "paw-pink", male: "paw-blue" };
 
@@ -19,8 +20,6 @@ export function getLeadLitter() {
 }
 
 // ── Transitional: today's pages read one "home" record plus one per puppy ──
-
-const capitalize = (word) => word.charAt(0).toUpperCase() + word.slice(1);
 
 function latestCare(litter, type) {
   return (litter.care ?? []).filter((step) => step.type === type).at(-1);
@@ -58,8 +57,7 @@ function homeRecord(litter) {
   };
 }
 
-function puppyRecord(puppy) {
-  const latestWeight = puppy.weights?.at(-1);
+function puppyRecord(puppy, litter) {
   return {
     id: puppy.slug,
     name: puppy.name,
@@ -67,8 +65,8 @@ function puppyRecord(puppy) {
     folder: puppy.slug,
     details: {
       sex: capitalize(puppy.sex),
-      color: (puppy.color ?? []).map(capitalize).join("/"),
-      weightAsOf: { value: latestWeight ? `${latestWeight.oz} oz` : null, asOf: latestWeight?.date ?? null },
+      color: formatCoat(puppy.color, puppy.pattern),
+      weight: formatWeight(puppy.weights, litter.born),
       markings: puppy.markings,
       personality: puppy.personality,
       available: puppy.status,
@@ -78,7 +76,7 @@ function puppyRecord(puppy) {
 
 const categories = [
   homeRecord(getLeadLitter()),
-  ...getListedLitters().flatMap((litter) => litter.puppies.map(puppyRecord)),
+  ...getListedLitters().flatMap((litter) => litter.puppies.map((puppy) => puppyRecord(puppy, litter))),
 ];
 
 export function getCategories() {
