@@ -1,3 +1,6 @@
+import { readdirSync, readFileSync } from 'node:fs';
+import { join, resolve } from 'node:path';
+
 import {
   daysBetween, firstClause, formatAge, formatCoat, formatDay, formatMonthYear, formatOunces, formatWeight, pluralize,
   todayString, withCoverFirst,
@@ -69,7 +72,19 @@ describe('wording', () => {
     const description = 'Raised in a loving home with children and other pets, making them well-socialized and ready to settle into family life from day one.';
     expect(firstClause(description)).toBe('Raised in a loving home with children and other pets.');
     expect(firstClause('Born in our kitchen. Raised with two kids.')).toBe('Born in our kitchen.');
+    expect(firstClause('Born in our kitchen.')).toBe('Born in our kitchen.');
+    expect(firstClause('Version 2.0 of the kitchen! Then more.')).toBe('Version 2.0 of the kitchen!');
   });
+});
+
+// Safari before 16.4 can't read a lookbehind, and one regex it can't read blanks the
+// whole site for that visitor — so none may come back.
+test('no source file uses a regex lookbehind', () => {
+  const srcDir = resolve(process.cwd(), 'src');
+  const offenders = readdirSync(srcDir, { recursive: true })
+    .filter((file) => /\.jsx?$/.test(file) && !/\.test\.jsx?$/.test(file))
+    .filter((file) => /\(\?<[=!]/.test(readFileSync(join(srcDir, file), 'utf8')));
+  expect(offenders).toEqual([]);
 });
 
 describe('cover photo', () => {

@@ -41,7 +41,7 @@ vi.mock('./data/imageLoader', () => {
 });
 
 const litter = fixture.litters[0];
-const originalStatuses = litter.puppies.map((p) => p.status);
+const originalPuppies = structuredClone(litter.puppies);
 
 const renderAt = (path = '/') => render(<MemoryRouter initialEntries={[path]}><App /></MemoryRouter>);
 
@@ -53,7 +53,8 @@ beforeEach(() => {
 afterEach(() => {
   vi.useRealTimers();
   vi.unstubAllGlobals();
-  litter.puppies.forEach((p, i) => { p.status = originalStatuses[i]; });
+  vi.restoreAllMocks();
+  litter.puppies = structuredClone(originalPuppies);
   litter.listed = true;
   fixture.litters.splice(0, fixture.litters.length, litter);
 });
@@ -174,6 +175,20 @@ describe('Navigation and links', () => {
     expect(document.title).toBe('PupAdopted · Doro Family Puppies');
   });
 
+  test('a page that fails to draw offers a reload, and the menu still reaches the other pages', () => {
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+    litter.puppies[0].color = 'black'; // not a list: the build's checker would refuse this
+    renderAt('/pup-available');
+    expect(screen.getByRole('alert')).toHaveTextContent("Sorry — this page didn't load properly");
+    expect(screen.getByRole('button', { name: 'Reload the page' })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Go to the home page' })).toHaveAttribute('href', '/');
+    expect(screen.getByRole('alert').textContent, 'never an email or phone number').not.toMatch(/@|\d{3}[-.\s]?\d{4}/);
+
+    fireEvent.click(within(screen.getByRole('navigation')).getByRole('link', { name: /PupReserved/ }));
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+    expect(document.querySelector('.pup-title')).toHaveTextContent('PupReserved');
+  });
+
   test('an unknown address goes Home', () => {
     renderAt('/nobody-by-that-name');
     expect(screen.getByRole('heading', { level: 2, name: "Mamma & Pappa's litter" })).toBeInTheDocument();
@@ -279,6 +294,16 @@ describe('Every season (PLUS-5)', () => {
     expect(document.querySelector('.hero-sub')).toHaveTextContent(/^Mamma × Pappa$/);
     expect(document.querySelector('.litter-tiles')).toBeNull();
     expect(screen.getByRole('link', { name: 'Join the waitlist' })).toBeInTheDocument();
+  });
+
+  test('born, no puppies listed yet (the checker warns): coming soon and the waitlist, never "0 of 0"', () => {
+    litter.puppies = [];
+    renderAt();
+    expect(document.querySelector('.hero-sub')).toHaveTextContent(/^Puppies coming soon$/);
+    expect(screen.queryByText(/0 of 0/)).not.toBeInTheDocument();
+    expect(document.querySelector('.litter-tiles')).toHaveTextContent('Goes homeJul 28');
+    expect(screen.getByRole('link', { name: 'Join the waitlist' })).toHaveAttribute('href', '/contact?about=waitlist');
+    expect(screen.queryByRole('link', { name: /Reserve today/ })).not.toBeInTheDocument();
   });
 
   test('born, no photos yet: a count instead of a gallery, and placeholders', () => {

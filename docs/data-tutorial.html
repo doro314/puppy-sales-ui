@@ -544,6 +544,9 @@ function checkRules(data, ctx) {
       add(ctx, 'errors', [...lp, 'readyDate'], `readyDate (${formatDay(litter.readyDate)}) is before born (${formatDay(litter.born)}).`);
     }
     if (!litter.born && !litter.due) add(ctx, 'warnings', lp, 'Has neither "due" nor "born", so the site can\'t say when.');
+    if (litter.listed && litter.born && litter.puppies.length === 0) {
+      add(ctx, 'warnings', lp, 'Born, but no puppies are listed yet. Home says "Puppies coming soon" and offers the waitlist until you add them.');
+    }
     if (litter.litterSize !== undefined && litter.litterSize < litter.puppies.length) {
       add(ctx, 'warnings', [...lp, 'litterSize'], `litterSize is ${litter.litterSize}, but ${litter.puppies.length} puppies are listed.`);
     }
@@ -658,7 +661,9 @@ export function pluralize(word) {
 // The opening of a description, short enough for a card: its first sentence, or —
 // when that runs long — the words up to its first comma.
 export function firstClause(text, maxLength = 90) {
-  const sentence = text.split(/(?<=[.!?])\s/)[0];
+  // A lookahead, never a lookbehind: Safari before 16.4 can't read lookbehind, and one
+  // regex it can't read stops the whole site from loading.
+  const sentence = text.match(/^[\s\S]*?[.!?](?=\s)/)?.[0] ?? text;
   if (sentence.length <= maxLength) return sentence;
   const clause = sentence.split(",")[0].trim();
   return clause.length < sentence.length ? `${clause}.` : sentence;
@@ -1151,18 +1156,20 @@ function previewLitter(litter) {
   const title = litter.born ? `${litter.mom.name} & ${litter.dad.name}'s litter` : `${litter.mom.name} is expecting`;
   let sub = `${available} of ${litter.puppies.length} still looking for a home`;
   if (!litter.born) sub = litter.due ? `Due ${formatDay(litter.due)}` : 'Coming soon';
+  else if (litter.puppies.length === 0) sub = 'Puppies coming soon';
   else if (isSpokenFor) sub = 'Every puppy has a home';
 
   const tiles = [];
   if (!litter.born && litter.due) tiles.push(['Due', formatDay(litter.due)]);
   if (litter.born) tiles.push(['Born', formatDay(litter.born)]);
-  if (litter.born && litter.readyDate) tiles.push(['Goes home', TODAY >= litter.readyDate && !isSpokenFor ? 'Now' : formatDay(litter.readyDate)]);
+  if (litter.born && litter.readyDate) tiles.push(['Goes home', TODAY >= litter.readyDate && available > 0 ? 'Now' : formatDay(litter.readyDate)]);
   const care = {};
   for (const step of litter.care ?? []) if (!care[step.type] || (step.date ?? '') >= (care[step.type].date ?? '')) care[step.type] = step;
   for (const type of Object.keys(CARE_LABELS)) if (care[type]) tiles.push([CARE_LABELS[type], care[type].date ? formatDay(care[type].date) : 'Yes', true]);
 
   let next = '';
-  if (!litter.born || isSpokenFor) next = `<div class="pv-next pv-next--list">${!litter.born ? 'Join the waitlist' : 'Join the list for the next litter'}</div>`;
+  if (!litter.born || litter.puppies.length === 0) next = '<div class="pv-next pv-next--list">Join the waitlist</div>';
+  else if (isSpokenFor) next = '<div class="pv-next pv-next--list">Join the list for the next litter</div>';
   else if (available > 0) next = '<div class="pv-next pv-next--deposit">Reserve today — <b>$100</b> holds your pup · Inquire →</div>';
 
   const pups = litter.puppies.map((p) => {

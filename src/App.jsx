@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Navigate, Route, Routes, useLocation, useNavigate, useNavigationType, useParams, useSearchParams } from 'react-router-dom';
 
 import ContactForm from './components/ContactForm';
+import ErrorBoundary from './components/ErrorBoundary';
 import HomePage from './components/HomePage';
 import PuppyPage from './components/PuppyPage';
 import SiteNav from './components/SiteNav';
@@ -161,12 +162,15 @@ function App() {
         showContact={SHOW_CONTACT}
       />
       <main className="main-content">
-        <Routes>
-          <Route path="/" element={<HomeRoute today={today} showParents={searchParams.get('parents') === 'true'} />} />
-          {SHOW_CONTACT && <Route path="/contact" element={<ContactRoute today={today} />} />}
-          <Route path="/:slug" element={<PuppyRoute today={today} />} />
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
+        {/* Keyed by page: a page that fails leaves the menu working, and the next page starts fresh. */}
+        <ErrorBoundary key={location.pathname}>
+          <Routes>
+            <Route path="/" element={<HomeRoute today={today} showParents={searchParams.get('parents') === 'true'} />} />
+            {SHOW_CONTACT && <Route path="/contact" element={<ContactRoute today={today} />} />}
+            <Route path="/:slug" element={<PuppyRoute today={today} />} />
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+        </ErrorBoundary>
         <footer className="site-footer">
           <p className="site-footer-copy">&copy; {new Date().getFullYear()} All rights reserved.</p>
           {showCount && (

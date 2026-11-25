@@ -27,8 +27,10 @@ function litterSubtitle(litter, hasPhotos) {
     const parents = `${litter.mom.name} × ${litter.dad.name}`;
     return { text: litter.due ? `Due ${formatDay(litter.due)} · ${parents}` : parents, isOpen: false };
   }
-  if (isSpokenFor(litter)) return { text: 'Every puppy has a home', isOpen: false };
   const total = litter.puppies.length;
+  // Born, puppies not entered yet: the checker only warns, so this can go live.
+  if (total === 0) return { text: 'Puppies coming soon', isOpen: false };
+  if (isSpokenFor(litter)) return { text: 'Every puppy has a home', isOpen: false };
   if (!hasPhotos) return { text: `${total} ${total === 1 ? 'puppy' : 'puppies'} · photos coming soon`, isOpen: false };
   return { text: `${countAvailable(litter)} of ${total} still looking for a home`, isOpen: true };
 }
@@ -62,7 +64,7 @@ function LitterHero({ litter }) {
 
 // The one thing a visitor can do next, in the same place every season.
 function NextStep({ litter }) {
-  if (!litter.born) return <Link to="/contact?about=waitlist" className="home-button">Join the waitlist</Link>;
+  if (!litter.born || litter.puppies.length === 0) return <Link to="/contact?about=waitlist" className="home-button">Join the waitlist</Link>;
   if (isSpokenFor(litter)) return <Link to="/contact?about=waitlist" className="home-button">Join the list for the next litter</Link>;
   if (countAvailable(litter) === 0) return null;
   return (

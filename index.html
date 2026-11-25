@@ -5,9 +5,22 @@
     <link rel="icon" href="/paw.svg" type="image/svg+xml" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Doro Family Puppies</title>
+    <!-- Here, not in a CSS file: it has to work when the site's own code never runs. The
+         delay keeps it from flashing on every normal load. -->
+    <style>
+      .boot-fallback { visibility: hidden; animation: boot-fallback-show 0s 6s forwards; max-width: 440px; margin: 20vh auto 0; padding: 0 16px; color: #2c3e50; text-align: center; font: 17px/1.5 -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+      @keyframes boot-fallback-show { to { visibility: visible; } }
+    </style>
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root">
+      <!-- React replaces this as soon as the site draws. Visitors only see it if the
+           script fails: an old browser, a blocked script, a dropped connection. -->
+      <div class="boot-fallback">
+        <p><b>Doro Family Puppies</b></p>
+        <p>Still loading… If nothing appears, try reloading the page, or open it in an up-to-date browser.</p>
+      </div>
+    </div>
     <script type="module" src="/src/index.jsx"></script>
   </body>
 </html>

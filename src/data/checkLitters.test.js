@@ -121,6 +121,17 @@ describe('checkLitters — values', () => {
     ]);
   });
 
+  test('a born litter with no puppies listed yet is a warning, not an error', () => {
+    const data = validData();
+    data.litters[0].puppies = [];
+    const { errors, warnings } = checkLitters(data, schema);
+    expect(errors).toEqual([]);
+    expect(warnings).toEqual([{
+      where: '2027-01-coco-leo',
+      message: 'Born, but no puppies are listed yet. Home says "Puppies coming soon" and offers the waitlist until you add them.',
+    }]);
+  });
+
   test('broken JSON gets a plain-language message', () => {
     const { errors } = checkLittersText('{ "litters": [ }', schema);
     expect(errors[0].message).toMatch(/^This isn't valid JSON: .*missing or extra comma/);

@@ -217,6 +217,9 @@ function checkRules(data, ctx) {
       add(ctx, 'errors', [...lp, 'readyDate'], `readyDate (${formatDay(litter.readyDate)}) is before born (${formatDay(litter.born)}).`);
     }
     if (!litter.born && !litter.due) add(ctx, 'warnings', lp, 'Has neither "due" nor "born", so the site can\'t say when.');
+    if (litter.listed && litter.born && litter.puppies.length === 0) {
+      add(ctx, 'warnings', lp, 'Born, but no puppies are listed yet. Home says "Puppies coming soon" and offers the waitlist until you add them.');
+    }
     if (litter.litterSize !== undefined && litter.litterSize < litter.puppies.length) {
       add(ctx, 'warnings', [...lp, 'litterSize'], `litterSize is ${litter.litterSize}, but ${litter.puppies.length} puppies are listed.`);
     }

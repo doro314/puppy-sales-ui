@@ -2,7 +2,7 @@ import { useState } from 'react';
 
 import ParentAvatars from './ParentAvatars';
 import { IconCalendar, IconCheck, IconHome } from './Icons';
-import { getCareDone, getCareLog, isSpokenFor } from '../data/puppies';
+import { countAvailable, getCareDone, getCareLog } from '../data/puppies';
 import { firstClause, formatDay, pluralize } from '../utils';
 
 import './LitterCard.css';
@@ -27,7 +27,7 @@ function litterTiles(litter, today) {
   }
   const tiles = [{ key: 'born', icon: <IconCalendar className="litter-tile-icon" />, label: 'Born', value: formatDay(litter.born) }];
   if (litter.readyDate) {
-    const isHomeTime = today >= litter.readyDate && !isSpokenFor(litter);
+    const isHomeTime = today >= litter.readyDate && countAvailable(litter) > 0;
     tiles.push({ key: 'home', icon: <IconHome className="litter-tile-icon" />, label: 'Goes home', value: isHomeTime ? 'Now' : formatDay(litter.readyDate) });
   }
   for (const step of getCareDone(litter)) {

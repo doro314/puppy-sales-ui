@@ -23,7 +23,9 @@ export function pluralize(word) {
 // The opening of a description, short enough for a card: its first sentence, or —
 // when that runs long — the words up to its first comma.
 export function firstClause(text, maxLength = 90) {
-  const sentence = text.split(/(?<=[.!?])\s/)[0];
+  // A lookahead, never a lookbehind: Safari before 16.4 can't read lookbehind, and one
+  // regex it can't read stops the whole site from loading.
+  const sentence = text.match(/^[\s\S]*?[.!?](?=\s)/)?.[0] ?? text;
   if (sentence.length <= maxLength) return sentence;
   const clause = sentence.split(",")[0].trim();
   return clause.length < sentence.length ? `${clause}.` : sentence;

@@ -28,6 +28,8 @@ Until it has puppies, Home says *"Coco is expecting · Due Jan 12"* and offers t
 2. Inside the litter's `"puppies": [ ]`, press **⌃ Space → New puppy** for each one. `slug` is the puppy's web address and folder name: lowercase, no spaces (`bella`, `mr-pickles`).
 3. Make a folder per puppy, `src/images/2027-01-coco-leo/bella/`, and drop in photos. An empty folder shows "Photos coming soon".
 
+Between adding `born` and the first puppy, Home says *"Puppies coming soon"* and offers the waitlist.
+
 ## Every week
 
 - **Weight:** add a line to the puppy's `"weights"` list: `{ "date": "2027-02-14", "oz": 31.5 }`. The page shows the latest as *"31.5 oz at 5 weeks"*.
@@ -94,4 +96,6 @@ To see changes before pushing, run `npm run dev` and open http://localhost:5173.
 - **Hidden switches:** `?parents=true` shows the parents' photos large on Home. `?count` shows the visit counter in the footer.
 - **Settings:** the deposit amount is `DEPOSIT_AMOUNT` in `src/utils.js`. Inquiries go to the Formspree form whose ID is in `src/components/ContactForm.jsx`.
 - **Why it's built this way:** the decisions and their alternatives are in `docs/puppy-data-options.html` and `docs/site-design-options.html`.
+- **When something fails:** a page that fails to draw shows "Sorry — this page didn't load properly" with Reload and Home (`src/components/ErrorBoundary.jsx`); the menu keeps working. If the script never runs at all, `index.html` shows a short note after 6 seconds. Neither ever shows an email or phone number: a faked failure mustn't reveal one.
+- **Old browsers:** no regex lookbehind (`(?<=`, `(?<!`): Safari before 16.4 can't read it, and the whole site fails to load. A test enforces this.
 - **Measuring:** `scripts/measure/measure.mjs` measures layouts in headless Chrome against a production build (it blocks the live visit counter).
