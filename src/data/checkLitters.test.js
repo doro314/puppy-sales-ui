@@ -84,6 +84,15 @@ describe('checkLitters — values', () => {
     expect(messages).toContain('This weigh-in (Jan 5, 2027) is before the litter was born (Jan 10, 2027).');
   });
 
+  test('a care step cannot come before born', () => {
+    const data = validData();
+    data.litters[0].care[0].date = '2026-12-07';
+    expect(checkLitters(data, schema).errors).toEqual([{
+      where: '2027-01-coco-leo › care #1 › date',
+      message: 'This care step (Dec 7, 2026) is before the litter was born (Jan 10, 2027).',
+    }]);
+  });
+
   test('a slug is unique across all litters, and contact is taken', () => {
     const data = validData();
     data.litters.push({ ...validData().litters[0], id: '2027-06-coco-leo' });
@@ -132,6 +141,29 @@ describe('checkLitters — values', () => {
     }]);
   });
 
+  test('lineage breeds must add up to 100', () => {
+    const data = validData();
+    data.litters[0].lineage = { source: 'Wisdom Panel', tested: 'Bear', breeds: { poodle: 47, havanese: 37, bichon: 13, other: 2 } };
+    expect(checkLitters(data, schema).errors).toEqual([{
+      where: '2027-01-coco-leo › lineage › breeds',
+      message: 'The breeds add up to 99%, not 100%.',
+    }]);
+  });
+
+  test('a lineage sourceUrl must start with https:// and say so', () => {
+    const data = validData();
+    data.litters[0].lineage = { source: 'Wisdom Panel', sourceUrl: 'http://www.wisdompanel.com', tested: 'Bear', breeds: { poodle: 47, havanese: 37, bichon: 13, other: 3 } };
+    expect(checkLitters(data, schema).errors[0].message).toBe('"http://www.wisdompanel.com" doesn\'t fit. Start it with https://, e.g. https://www.wisdompanel.com.');
+  });
+
+  test('a breed percentage over 100 is an error, and a missing breed names the group', () => {
+    const data = validData();
+    data.litters[0].lineage = { source: 'Wisdom Panel', tested: 'Bear', breeds: { poodle: 101, havanese: 0, bichon: 0 } };
+    const messages = checkLitters(data, schema).errors.map((e) => e.message);
+    expect(messages).toContain('Must be at most 100.');
+    expect(messages).toContain('"other" is missing — every breeds group needs it.');
+  });
+
   test('broken JSON gets a plain-language message', () => {
     const { errors } = checkLittersText('{ "litters": [ }', schema);
     expect(errors[0].message).toMatch(/^This isn't valid JSON: .*missing or extra comma/);
@@ -152,6 +184,15 @@ describe('checkLitters — photos', () => {
     const files = validFiles();
     files.parents = ['coco.jpg'];
     expect(checkLitters(validData(), schema, { files }).errors[0].where).toBe('2027-01-coco-leo › dad › photo');
+  });
+
+  test('a missing lineage photo is an error', () => {
+    const data = validData();
+    data.litters[0].lineage = { source: 'Wisdom Panel', tested: 'Bear', photo: 'bear.jpg', breeds: { poodle: 47, havanese: 37, bichon: 13, other: 3 } };
+    expect(checkLitters(data, schema, { files: validFiles() }).errors).toEqual([{
+      where: '2027-01-coco-leo › lineage › photo',
+      message: '"bear.jpg" isn\'t in src/images/parents/.',
+    }]);
   });
 
   test('a puppy without photos, a HEIC file and a stray folder are warnings', () => {

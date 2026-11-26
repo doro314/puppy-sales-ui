@@ -403,6 +403,8 @@ function nounFor(path) {
   const last = path[path.length - 1];
   if (typeof last === 'number') return CONTAINER_NOUNS[path[path.length - 2]] ?? 'entry';
   if (last === 'mom' || last === 'dad') return 'parent';
+  if (last === 'lineage') return 'lineage block';
+  if (last === 'breeds') return 'breeds group';
   return 'entry';
 }
 
@@ -426,6 +428,7 @@ function validate(node, value, path, ctx) {
   if (typeof value === 'number') {
     if (s.exclusiveMinimum !== undefined && !(value > s.exclusiveMinimum)) add(ctx, 'errors', path, `Must be more than ${s.exclusiveMinimum}.`);
     if (s.minimum !== undefined && value < s.minimum) add(ctx, 'errors', path, `Must be at least ${s.minimum}.`);
+    if (s.maximum !== undefined && value > s.maximum) add(ctx, 'errors', path, `Must be at most ${s.maximum}.`);
   }
   if (Array.isArray(value)) validateList(s, value, path, ctx);
   if (isPlainObject(value)) validateFields(s, value, path, ctx);
@@ -539,7 +542,13 @@ function checkRules(data, ctx) {
     }
 
     for (const field of ['due', 'born', 'readyDate']) checkRealDate(litter[field], [...lp, field], ctx);
-    (litter.care ?? []).forEach((step, ci) => checkRealDate(step.date, [...lp, 'care', ci, 'date'], ctx));
+    (litter.care ?? []).forEach((step, ci) => {
+      const cp = [...lp, 'care', ci, 'date'];
+      checkRealDate(step.date, cp, ctx);
+      if (litter.born && step.date && step.date < litter.born) {
+        add(ctx, 'errors', cp, `This care step (${formatDay(step.date)}) is before the litter was born (${formatDay(litter.born)}).`);
+      }
+    });
     if (litter.born && litter.readyDate && litter.readyDate < litter.born) {
       add(ctx, 'errors', [...lp, 'readyDate'], `readyDate (${formatDay(litter.readyDate)}) is before born (${formatDay(litter.born)}).`);
     }
@@ -549,6 +558,11 @@ function checkRules(data, ctx) {
     }
     if (litter.litterSize !== undefined && litter.litterSize < litter.puppies.length) {
       add(ctx, 'warnings', [...lp, 'litterSize'], `litterSize is ${litter.litterSize}, but ${litter.puppies.length} puppies are listed.`);
+    }
+    const breeds = litter.lineage?.breeds;
+    if (breeds) {
+      const total = Object.values(breeds).reduce((sum, n) => sum + n, 0);
+      if (total !== 100) add(ctx, 'errors', [...lp, 'lineage', 'breeds'], `The breeds add up to ${total}%, not 100%.`);
     }
 
     litter.puppies.forEach((puppy, pi) => {
@@ -605,6 +619,7 @@ function checkFiles(data, files, ctx) {
     for (const parent of ['mom', 'dad']) {
       if (litter[parent].photo) needFile(files.parents, litter[parent].photo, 'src/images/parents/', [...lp, parent, 'photo'], ctx);
     }
+    if (litter.lineage?.photo) needFile(files.parents, litter.lineage.photo, 'src/images/parents/', [...lp, 'lineage', 'photo'], ctx);
     litter.puppies.forEach((puppy, pi) => {
       const pp = [...lp, 'puppies', pi];
       const folder = `${litter.id}/${puppy.slug}`;
@@ -902,6 +917,31 @@ export function isLikelyBot() {
         }
       ]
     },
+    "lineage": {
+      "type": "object",
+      "description": "A DNA test that confirms the parents' lineage. Copy it into each new litter from the same mom and dad.",
+      "required": ["source", "tested", "breeds"],
+      "additionalProperties": false,
+      "properties": {
+        "source": { "$ref": "#/definitions/text", "description": "The test, e.g. Wisdom Panel." },
+        "sourceUrl": { "type": "string", "pattern": "^https://", "patternErrorMessage": "Start it with https://, e.g. https://www.wisdompanel.com.", "description": "The test's main website. The footnote links the test's name to it, e.g. https://www.wisdompanel.com." },
+        "tested": { "$ref": "#/definitions/text", "description": "The puppy who was tested, e.g. Bear." },
+        "testedFrom": { "$ref": "#/definitions/text", "description": "Which litter, e.g. Coco & Leo's first litter." },
+        "photo": { "type": "string", "description": "A file in src/images/parents/, shown as a small square beside the tested puppy's name." },
+        "breeds": {
+          "type": "object",
+          "required": ["poodle", "havanese", "bichon", "other"],
+          "additionalProperties": false,
+          "description": "Whole percentages that add up to 100.",
+          "properties": {
+            "poodle": { "type": "integer", "minimum": 0, "maximum": 100, "description": "All poodle sizes together." },
+            "havanese": { "type": "integer", "minimum": 0, "maximum": 100 },
+            "bichon": { "type": "integer", "minimum": 0, "maximum": 100, "description": "Bichon Frise, Bolonka, Maltese, Bolognese." },
+            "other": { "type": "integer", "minimum": 0, "maximum": 100 }
+          }
+        }
+      }
+    },
     "litter": {
       "type": "object",
       "required": ["id", "listed", "breed", "mom", "dad", "puppies"],
@@ -920,6 +960,7 @@ export function isLikelyBot() {
         "description": { "$ref": "#/definitions/text" },
         "facts": { "type": "array", "items": { "$ref": "#/definitions/text" }, "description": "Key breed facts, one short sentence each." },
         "cover": { "type": "string", "description": "A file in src/images/(litter id)/ to lead Home's gallery. Default: the first file alphabetically." },
+        "lineage": { "$ref": "#/definitions/lineage" },
         "puppies": { "type": "array", "items": { "$ref": "#/definitions/puppy" } }
       },
       "defaultSnippets": [

@@ -11,7 +11,8 @@
       "readyDate": "2026-07-28",
       "care": [
         { "type": "dewormed", "date": "2026-06-29" },
-        { "type": "vet-check" }
+        { "type": "vet-check", "date": "2026-07-15" },
+        { "type": "vaccinated", "note": "Rabies-1yr", "date": "2026-07-15" }
       ],
       "description": "Raised in a loving home with children and other pets, making them well-socialized and ready to settle into family life from day one.",
       "facts": [
@@ -19,6 +20,14 @@
         "Hypoallergenic, making them a good match for those with mild pet allergies",
         "Highly trainable and eager to please"
       ],
+      "lineage": {
+        "source": "Wisdom Panel",
+        "sourceUrl": "https://www.wisdompanel.com",
+        "tested": "Bear",
+        "testedFrom": "Coco & Leo's first litter",
+        "photo": "bear.jpg",
+        "breeds": { "poodle": 47, "havanese": 37, "bichon": 13, "other": 3 }
+      },
       "puppies": [
         {
           "slug": "bella", "name": "Bella", "sex": "female", "status": "adopted",

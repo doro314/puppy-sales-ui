@@ -1,5 +1,6 @@
 import { useState } from 'react';
 
+import LineageCard from './LineageCard';
 import ParentAvatars from './ParentAvatars';
 import { IconCalendar, IconCheck, IconHome } from './Icons';
 import { countAvailable, getCareDone, getCareLog } from '../data/puppies';
@@ -99,6 +100,7 @@ function LitterCard({ litter, today, defaultOpen = false }) {
           )}
         </div>
         {isOpen && <LitterDetails litter={litter} />}
+        {litter.lineage && <LineageCard lineage={litter.lineage} mom={litter.mom} dad={litter.dad} />}
       </div>
 
       {tiles.length > 0 && (

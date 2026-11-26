@@ -34,6 +34,10 @@ export function getParentPhoto(parent) {
   return parent.photo ? getPhoto("parents", parent.photo) : null;
 }
 
+export function getLineagePhoto(lineage) {
+  return lineage.photo ? getPhoto("parents", lineage.photo) : null;
+}
+
 // What a visitor can do: "soon" is an available puppy before her litter's ready date.
 export function getPuppyStatus(puppy, litter, today) {
   if (puppy.status === "available" && litter.readyDate && today < litter.readyDate) return "soon";

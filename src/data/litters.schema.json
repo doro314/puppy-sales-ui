@@ -143,6 +143,31 @@
         }
       ]
     },
+    "lineage": {
+      "type": "object",
+      "description": "A DNA test that confirms the parents' lineage. Copy it into each new litter from the same mom and dad.",
+      "required": ["source", "tested", "breeds"],
+      "additionalProperties": false,
+      "properties": {
+        "source": { "$ref": "#/definitions/text", "description": "The test, e.g. Wisdom Panel." },
+        "sourceUrl": { "type": "string", "pattern": "^https://", "patternErrorMessage": "Start it with https://, e.g. https://www.wisdompanel.com.", "description": "The test's main website. The footnote links the test's name to it, e.g. https://www.wisdompanel.com." },
+        "tested": { "$ref": "#/definitions/text", "description": "The puppy who was tested, e.g. Bear." },
+        "testedFrom": { "$ref": "#/definitions/text", "description": "Which litter, e.g. Coco & Leo's first litter." },
+        "photo": { "type": "string", "description": "A file in src/images/parents/, shown as a small square beside the tested puppy's name." },
+        "breeds": {
+          "type": "object",
+          "required": ["poodle", "havanese", "bichon", "other"],
+          "additionalProperties": false,
+          "description": "Whole percentages that add up to 100.",
+          "properties": {
+            "poodle": { "type": "integer", "minimum": 0, "maximum": 100, "description": "All poodle sizes together." },
+            "havanese": { "type": "integer", "minimum": 0, "maximum": 100 },
+            "bichon": { "type": "integer", "minimum": 0, "maximum": 100, "description": "Bichon Frise, Bolonka, Maltese, Bolognese." },
+            "other": { "type": "integer", "minimum": 0, "maximum": 100 }
+          }
+        }
+      }
+    },
     "litter": {
       "type": "object",
       "required": ["id", "listed", "breed", "mom", "dad", "puppies"],
@@ -161,6 +186,7 @@
         "description": { "$ref": "#/definitions/text" },
         "facts": { "type": "array", "items": { "$ref": "#/definitions/text" }, "description": "Key breed facts, one short sentence each." },
         "cover": { "type": "string", "description": "A file in src/images/(litter id)/ to lead Home's gallery. Default: the first file alphabetically." },
+        "lineage": { "$ref": "#/definitions/lineage" },
         "puppies": { "type": "array", "items": { "$ref": "#/definitions/puppy" } }
       },
       "defaultSnippets": [

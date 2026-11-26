@@ -76,6 +76,8 @@ function nounFor(path) {
   const last = path[path.length - 1];
   if (typeof last === 'number') return CONTAINER_NOUNS[path[path.length - 2]] ?? 'entry';
   if (last === 'mom' || last === 'dad') return 'parent';
+  if (last === 'lineage') return 'lineage block';
+  if (last === 'breeds') return 'breeds group';
   return 'entry';
 }
 
@@ -99,6 +101,7 @@ function validate(node, value, path, ctx) {
   if (typeof value === 'number') {
     if (s.exclusiveMinimum !== undefined && !(value > s.exclusiveMinimum)) add(ctx, 'errors', path, `Must be more than ${s.exclusiveMinimum}.`);
     if (s.minimum !== undefined && value < s.minimum) add(ctx, 'errors', path, `Must be at least ${s.minimum}.`);
+    if (s.maximum !== undefined && value > s.maximum) add(ctx, 'errors', path, `Must be at most ${s.maximum}.`);
   }
   if (Array.isArray(value)) validateList(s, value, path, ctx);
   if (isPlainObject(value)) validateFields(s, value, path, ctx);
@@ -212,7 +215,13 @@ function checkRules(data, ctx) {
     }
 
     for (const field of ['due', 'born', 'readyDate']) checkRealDate(litter[field], [...lp, field], ctx);
-    (litter.care ?? []).forEach((step, ci) => checkRealDate(step.date, [...lp, 'care', ci, 'date'], ctx));
+    (litter.care ?? []).forEach((step, ci) => {
+      const cp = [...lp, 'care', ci, 'date'];
+      checkRealDate(step.date, cp, ctx);
+      if (litter.born && step.date && step.date < litter.born) {
+        add(ctx, 'errors', cp, `This care step (${formatDay(step.date)}) is before the litter was born (${formatDay(litter.born)}).`);
+      }
+    });
     if (litter.born && litter.readyDate && litter.readyDate < litter.born) {
       add(ctx, 'errors', [...lp, 'readyDate'], `readyDate (${formatDay(litter.readyDate)}) is before born (${formatDay(litter.born)}).`);
     }
@@ -222,6 +231,11 @@ function checkRules(data, ctx) {
     }
     if (litter.litterSize !== undefined && litter.litterSize < litter.puppies.length) {
       add(ctx, 'warnings', [...lp, 'litterSize'], `litterSize is ${litter.litterSize}, but ${litter.puppies.length} puppies are listed.`);
+    }
+    const breeds = litter.lineage?.breeds;
+    if (breeds) {
+      const total = Object.values(breeds).reduce((sum, n) => sum + n, 0);
+      if (total !== 100) add(ctx, 'errors', [...lp, 'lineage', 'breeds'], `The breeds add up to ${total}%, not 100%.`);
     }
 
     litter.puppies.forEach((puppy, pi) => {
@@ -278,6 +292,7 @@ function checkFiles(data, files, ctx) {
     for (const parent of ['mom', 'dad']) {
       if (litter[parent].photo) needFile(files.parents, litter[parent].photo, 'src/images/parents/', [...lp, parent, 'photo'], ctx);
     }
+    if (litter.lineage?.photo) needFile(files.parents, litter.lineage.photo, 'src/images/parents/', [...lp, 'lineage', 'photo'], ctx);
     litter.puppies.forEach((puppy, pi) => {
       const pp = [...lp, 'puppies', pi];
       const folder = `${litter.id}/${puppy.slug}`;

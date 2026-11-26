@@ -36,6 +36,10 @@ Between adding `born` and the first puppy, Home says *"Puppies coming soon"* and
 - **Care:** add to the litter's `"care"` list: `{ "type": "dewormed", "date": "2027-02-07" }`. Each kind of step gets its own tile on Home the day it's added. The kinds are `vet-check`, `dewormed`, `vaccinated` (add a `"note"`, e.g. `"First DHPP"`) and `microchipped`.
 - **Photos:** drop them in the puppy's folder.
 
+## DNA lineage
+
+The litter's `"lineage"` block shows the "DNA-confirmed Havapoo pairing" card on Home. It belongs to the parents, so when Coco and Leo have a new litter, copy the whole block into it unchanged. A litter from different parents gets no `lineage` until one of its puppies, or its parents, is tested. The four `breeds` numbers must add up to 100. The tested puppy's `photo` goes in `src/images/parents/`, next to the parents' photos, and shows as a small square beside the tested puppy's name.
+
 ## Reserved, adopted
 
 Change the puppy's `"status"` to one of:
@@ -95,7 +99,7 @@ To see changes before pushing, run `npm run dev` and open http://localhost:5173.
 - **Addresses:** `/` is Home, `/bella` is a puppy, `/contact?about=bella` or `?about=waitlist` is the form.
 - **Hidden switches:** `?parents=true` shows the parents' photos large on Home. `?count` shows the visit counter in the footer.
 - **Settings:** the deposit amount is `DEPOSIT_AMOUNT` in `src/utils.js`. Inquiries go to the Formspree form whose ID is in `src/components/ContactForm.jsx`.
-- **Why it's built this way:** the decisions and their alternatives are in `docs/puppy-data-options.html` and `docs/site-design-options.html`.
+- **Why it's built this way:** the decisions and their alternatives are in `docs/puppy-data-options.html` and `docs/site-design-options.html`. The DNA lineage card's are in `docs/lineage-build.md`.
 - **When something fails:** a page that fails to draw shows "Sorry — this page didn't load properly" with Reload and Home (`src/components/ErrorBoundary.jsx`); the menu keeps working. If the script never runs at all, `index.html` shows a short note after 6 seconds. Neither ever shows an email or phone number: a faked failure mustn't reveal one.
 - **Old browsers:** no regex lookbehind (`(?<=`, `(?<!`): Safari before 16.4 can't read it, and the whole site fails to load. A test enforces this.
 - **Measuring:** `scripts/measure/measure.mjs` measures layouts in headless Chrome against a production build (it blocks the live visit counter).

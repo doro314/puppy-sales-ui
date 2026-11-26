@@ -1,0 +1,252 @@
+.lineage {
+  border-top: 1px solid #f0f4f8;
+  background: #faf6f1;
+}
+
+.lineage-summary {
+  display: block;
+  padding: 12px 14px;
+  list-style: none;
+  cursor: pointer;
+}
+
+.lineage-summary::-webkit-details-marker {
+  display: none;
+}
+
+/* The panel clips overflow, so the default outer focus ring would be cut off. */
+.lineage-summary:focus-visible {
+  outline: 2px solid #2a78c8;
+  outline-offset: -2px;
+}
+
+.lineage-summary-top {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  margin-bottom: 10px;
+}
+
+.lineage-seal {
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+}
+
+.lineage-summary-text {
+  flex: 1;
+  min-width: 0;
+}
+
+.lineage-summary-text b {
+  display: block;
+  color: #2c3e50;
+  font-size: 14.5px;
+}
+
+.lineage-summary-text small {
+  display: block;
+  margin-top: 1px;
+  color: #8a5a2b;
+  font-size: 11.5px;
+  font-weight: 700;
+}
+
+.lineage-chevron {
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+  color: #8a5a2b;
+  transition: transform 0.2s ease;
+}
+
+.lineage[open] .lineage-chevron {
+  transform: rotate(180deg);
+}
+
+.lineage-bar {
+  display: flex;
+  gap: 2px;
+  height: 8px;
+  overflow: hidden;
+  border-radius: 4px;
+  background: #f0f4f8;
+}
+
+.lineage-bar-segment {
+  display: block;
+  height: 100%;
+  background: var(--seg, #a9b6c4);
+}
+
+.lineage-more {
+  display: block;
+  margin-top: 9px;
+  color: #2a78c8;
+  font-size: 12.5px;
+  font-weight: 700;
+}
+
+.lineage-summary:hover .lineage-more {
+  text-decoration: underline;
+}
+
+.lineage[open] .lineage-more {
+  display: none;
+}
+
+.lineage-body {
+  padding: 0 14px 14px;
+}
+
+.lineage-breeds {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 13px;
+}
+
+.lineage-breed {
+  display: flex;
+  align-items: center;
+  padding: 4px 0;
+  color: #2c3e50;
+  font-weight: 600;
+}
+
+.lineage-swatch {
+  display: inline-block;
+  width: 9px;
+  height: 9px;
+  margin-right: 8px;
+  border-radius: 3px;
+  background: var(--seg, #a9b6c4);
+}
+
+.lineage-breed em {
+  margin-left: 6px;
+  color: #7c8fa7;
+  font-size: 11.5px;
+  font-style: normal;
+  font-weight: 500;
+}
+
+.lineage-breed b {
+  margin-left: auto;
+  font-variant-numeric: tabular-nums;
+}
+
+.lineage-heading {
+  margin: 14px 0 6px;
+  color: #5d718a;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.lineage-points {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.lineage-point {
+  display: flex;
+  gap: 8px;
+  padding: 4px 0;
+  color: #2c3e50;
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.lineage-point--soft {
+  color: #5d718a;
+}
+
+.lineage-point-icon {
+  flex-shrink: 0;
+  width: 15px;
+  height: 15px;
+  margin-top: 2px;
+  color: #1d8047;
+}
+
+.lineage-point-info {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 15px;
+  height: 15px;
+  margin-top: 2px;
+  border-radius: 50%;
+  background: #dfe6ee;
+  color: #5d718a;
+  font-size: 10px;
+  font-style: italic;
+  font-weight: 800;
+}
+
+.lineage-proof {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid #efe4d6;
+}
+
+.lineage-proof-photo {
+  width: 38px;
+  height: 38px;
+  border-radius: 9px;
+  object-fit: cover;
+}
+
+.lineage-proof b {
+  display: block;
+  color: #2c3e50;
+  font-size: 13px;
+}
+
+.lineage-proof small {
+  display: block;
+  color: #5d718a;
+  font-size: 11.5px;
+}
+
+.lineage-ref {
+  margin-left: 1px;
+  color: #a3b0be;
+  font-size: 0.55em;
+  font-weight: 600;
+  line-height: 0;
+  vertical-align: super;
+}
+
+.lineage-source {
+  margin: 10px 0 0;
+  color: #a3b0be;
+  font-size: 10.5px;
+  line-height: 1.4;
+}
+
+.lineage-source sup {
+  margin-right: 1px;
+  font-size: 0.75em;
+}
+
+.lineage-source-link {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+/* Between 768 and 1100 px the card runs the full content width; capping the list
+   keeps each percentage next to its name. */
+@media (min-width: 768px) {
+  .lineage-breeds {
+    max-width: 420px;
+  }
+}
